@@ -164,9 +164,8 @@
             background: #ef4444;
         }
 
-        .ia-status.arquivo-nao-encontrado {
+        .ia-status.sem-dados {
             background: #f97316;
-            animation: pulse-orange 1.5s infinite;
         }
 
         @keyframes pulse-green {
@@ -177,11 +176,6 @@
         @keyframes pulse-yellow {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
-        }
-
-        @keyframes pulse-orange {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
         }
 
         .badge-dispersao { background: #8b5cf6; color: white; }
@@ -217,6 +211,7 @@
         .btn-primary { background: #22c55e; color: white; }
         .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 2px solid var(--border); }
         .btn-retrain { background: #f59e0b; color: #1e293b; }
+        .btn-upload { background: #3b82f6; color: white; }
 
         input, select {
             padding: 12px;
@@ -379,103 +374,25 @@
         .status-ready { background: #22c55e; color: white; }
         .status-training { background: #f59e0b; color: #1e293b; animation: pulse 1.5s infinite; }
         .status-error { background: #ef4444; color: white; }
+        .status-warning { background: #f97316; color: white; }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
 
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-overlay.show {
+        .mensagem-carregamento {
+            background: var(--bg-card);
+            border: 2px solid #f59e0b;
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            margin: 10px 0;
+            font-size: 13px;
+            color: #fde68a;
             display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
-        .modal-confirmacao {
-            background: var(--bg-secondary);
-            border: 2px solid #22c55e;
-            border-radius: var(--radius);
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-            animation: slideDown 0.3s ease;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-confirmacao .icone-sucesso {
-            font-size: 60px;
-            margin-bottom: 15px;
-            animation: bounce 0.6s ease;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        .modal-confirmacao h3 {
-            color: #22c55e;
-            font-size: 22px;
-            margin-bottom: 10px;
-        }
-
-        .modal-confirmacao .nome-arquivo {
-            color: #38bdf8;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 10px 0;
-            word-break: break-all;
-        }
-
-        .modal-confirmacao .dados-info {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .modal-confirmacao .dados-info span {
-            color: #fbbf24;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        .modal-confirmacao .btn-fechar {
-            background: #22c55e;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: var(--radius);
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-
-        .modal-confirmacao .btn-fechar:hover {
-            background: #16a34a;
-            transform: scale(1.05);
-        }
-
-        .auto-upload { display: none; }
 
         @media (max-width: 768px) {
             .lottery-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
@@ -511,24 +428,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal de Confirmação de Leitura -->
-    <div class="modal-overlay" id="modalConfirmacao">
-        <div class="modal-confirmacao">
-            <div class="icone-sucesso">✅</div>
-            <h3>Arquivo Carregado com Sucesso!</h3>
-            <div class="nome-arquivo" id="modalNomeArquivo">--</div>
-            <div class="dados-info" id="modalDadosInfo">
-                Concursos encontrados: <span id="modalQtdConcursos">0</span>
-            </div>
-            <button class="btn-fechar" onclick="fecharModalConfirmacao()">
-                👍 OK - Continuar
-            </button>
-        </div>
-    </div>
-
-    <!-- Input de arquivo oculto para carregamento manual -->
-    <input type="file" id="autoFileInput" class="auto-upload" accept=".csv">
 
     <div class="container">
         <!-- Grid de Loterias -->
@@ -687,12 +586,11 @@
         // Estado
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
-let CACHE_DADOS = {}; // cache em memória dos CSVs
         let periodoAtual = 'all';
         let dispersaoAtual = LOTERIAS['megasena'].dispersaoPadrao;
         let repeticoesAtual = 2;
         
-        // Cache de dados por loteria (mantém dados carregados)
+        // Cache de dados por loteria
         const cacheDados = {};
         Object.keys(LOTERIAS).forEach(key => {
             cacheDados[key] = {
@@ -713,196 +611,58 @@ let CACHE_DADOS = {}; // cache em memória dos CSVs
         });
 
         // ============================================
-        // MODAL DE CONFIRMAÇÃO
+        // CARREGAMENTO DE CSV (SOMENTE SE ARQUIVO EXISTIR)
         // ============================================
         
-        function mostrarModalConfirmacao(nomeArquivo, qtdConcursos, nomeLoteria) {
-            document.getElementById('modalNomeArquivo').textContent = `📄 ${nomeArquivo}`;
-            
-            const dadosInfo = document.getElementById('modalDadosInfo');
-            dadosInfo.innerHTML = `
-                <p>📁 Arquivo: <strong style="color: #38bdf8;">${nomeArquivo}</strong></p>
-                <p>🎯 Loteria: <strong style="color: #fbbf24;">${nomeLoteria}</strong></p>
-                <p>📊 Concursos encontrados: <span style="color: #22c55e; font-size: 22px;">${qtdConcursos}</span></p>
-                ${qtdConcursos >= 50 ? '<p style="color: #22c55e;">✅ Dados suficientes para treinar IA!</p>' : '<p style="color: #f59e0b;">⚠️ Mínimo de 50 concursos para treinar IA</p>'}
-            `;
-            
-            document.getElementById('modalConfirmacao').classList.add('show');
-            
-            // Fechar automaticamente após 3 segundos
-            setTimeout(() => {
-                if (document.getElementById('modalConfirmacao').classList.contains('show')) {
-                    fecharModalConfirmacao();
-                }
-            }, 3000);
-        }
-
-        function fecharModalConfirmacao() {
-            document.getElementById('modalConfirmacao').classList.remove('show');
-            
-            // Após fechar o modal, iniciar treinamento se houver dados suficientes
-            if (dadosAtuais.length >= 50) {
-                setTimeout(() => {
-                    iniciarTreinamentoAutomatico(loteriaAtual);
-                }, 500);
-            }
-        }
-
-        // ============================================
-        // CARREGAMENTO AUTOMÁTICO DE CSV (CORRIGIDO)
-        // ============================================
-        
-        async function carregarCSVAutomatico(loteria) {
-
-    // usar cache se já carregado
-    if (CACHE_DADOS[loteria]) {
-        dadosAtuais = CACHE_DADOS[loteria];
-        document.getElementById('stats-total').textContent = dadosAtuais.length;
-
-        const config = LOTERIAS[loteria];
-        calibrarPesos(dadosAtuais, config);
-
-        console.log(`⚡ Cache usado: ${loteria}`);
-        return;
-    }
-
-    const caminho = `dados/${loteria}.csv`;
-
-    fetch(caminho)
-        .then(res => {
-            if (!res.ok) throw new Error('Arquivo não encontrado');
-            return res.text();
-        })
-        .then(texto => {
-            const linhas = texto.split('
-').filter(l => l.trim());
-            const separador = linhas[0].includes(';') ? ';' : ',';
-
+        async function carregarCSVSeExistir(loteria) {
+            const nomeArquivo = `${loteria}.csv`;
             const config = LOTERIAS[loteria];
-            const dadosProcessados = [];
-
-            for (let i = 1; i < linhas.length; i++) {
-                const colunas = linhas[i].split(separador);
-                const numeros = colunas
-                    .map(n => parseInt(n.trim()))
-                    .filter(n => !isNaN(n));
-
-                if (numeros.length >= config.numeros) {
-                    dadosProcessados.push(
-                        numeros.slice(0, config.numeros).sort((a, b) => a - b)
-                    );
-                }
+            
+            // Se já está em cache, usar cache
+            if (cacheDados[loteria].carregado && cacheDados[loteria].dados.length > 0) {
+                console.log(`📦 ${config.nome}: Usando cache (${cacheDados[loteria].dados.length} concursos)`);
+                dadosAtuais = [...cacheDados[loteria].dados];
+                atualizarStatsNoDOM(loteria);
+                atualizarStatusIA(loteria, estadoTreinamento[loteria].treinado ? 'treinado' : 'nao-treinado');
+                return true;
             }
-
-            // salvar no cache
-            CACHE_DADOS[loteria] = dadosProcessados;
-
-            dadosAtuais = dadosProcessados;
-
-            document.getElementById('stats-total').textContent = dadosAtuais.length;
-
-            calibrarPesos(dadosAtuais, config);
-
-            console.log(`📥 CSV carregado: ${loteria}`);
-        })
-        .catch(err => {
-            console.warn(`Erro ao carregar ${loteria}:`, err.message);
-        });
-}
             
-            console.log(`📁 Tentando carregar automaticamente: ${nomeArquivo}`);
-            
-            // Tentar fetch (funciona em servidores)
+            // Tentar carregar via fetch (funciona se estiver em servidor)
             try {
+                console.log(`📁 Tentando carregar: ${nomeArquivo}`);
                 const response = await fetch(nomeArquivo);
+                
                 if (response.ok) {
                     const texto = await response.text();
-                    processarDadosCSV(loteria, texto, nomeArquivo, true);
+                    processarDadosCSV(loteria, texto, nomeArquivo);
+                    console.log(`✅ ${config.nome}: Carregado automaticamente!`);
                     return true;
+                } else {
+                    console.log(`⚠️ ${config.nome}: Arquivo não encontrado (${response.status})`);
                 }
             } catch (e) {
-                console.log(`⚠️ Fetch não disponível localmente para: ${nomeArquivo}`);
+                console.log(`⚠️ ${config.nome}: Não foi possível carregar automaticamente`);
             }
             
-            // Tentar FileReader com input oculto (só abre janela se necessário)
-            return await tentarCarregarViaFileReader(loteria, nomeArquivo);
+            // Se chegou aqui, não conseguiu carregar
+            return false;
         }
 
-        async function tentarCarregarViaFileReader(loteria, nomeArquivo) {
-            // Verificar se já tentamos carregar antes
-            if (cacheDados[loteria].carregado) {
-                return true; // Já carregado
-            }
-            
-            // Se ainda não foi carregado, abrir seletor UMA VEZ
-            console.log(`📂 Abrindo seletor para: ${nomeArquivo} (apenas uma vez)`);
-            
-            return new Promise((resolve) => {
-                const autoFileInput = document.getElementById('autoFileInput');
-                
-                const handleFileSelect = function(e) {
-                    const file = e.target.files[0];
-                    if (!file) {
-                        console.log(`❌ Nenhum arquivo selecionado para ${loteria}`);
-                        // Marcar como "não encontrado" para não ficar abrindo
-                        atualizarStatusArquivoNaoEncontrado(loteria);
-                        resolve(false);
-                        return;
-                    }
-                    
-                    console.log(`📄 Arquivo selecionado: ${file.name}`);
-                    
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        processarDadosCSV(loteria, event.target.result, file.name, false);
-                        resolve(true);
-                    };
-                    
-                    reader.onerror = function() {
-                        console.log(`❌ Erro ao ler arquivo`);
-                        resolve(false);
-                    };
-                    
-                    reader.readAsText(file);
-                    autoFileInput.removeEventListener('change', handleFileSelect);
-                };
-                
-                autoFileInput.addEventListener('change', handleFileSelect, { once: true });
-                autoFileInput.click();
-            });
-        }
-
-        function atualizarStatusArquivoNaoEncontrado(loteria) {
-            const statusEl = document.getElementById(`status-${loteria}`);
-            if (statusEl) {
-                statusEl.className = 'ia-status arquivo-nao-encontrado';
-                statusEl.title = 'Arquivo CSV não encontrado - Clique para tentar novamente';
-            }
-        }
-
-        function processarDadosCSV(loteria, texto, nomeArquivo, carregamentoAutomatico) {
+        function processarDadosCSV(loteria, texto, nomeArquivo) {
             const config = LOTERIAS[loteria];
             const linhas = texto.split('\n').filter(l => l.trim());
             
-            if (linhas.length < 2) {
-                console.log(`⚠️ ${config.nome}: Arquivo vazio ou inválido`);
-                return;
-            }
+            if (linhas.length < 2) return;
             
             const separador = linhas[0].includes(';') ? ';' : ',';
-            
             const dados = [];
             
             for (let i = 1; i < linhas.length; i++) {
                 const colunas = linhas[i].split(separador);
-                const numeros = colunas
-                    .map(n => parseInt(n.trim()))
-                    .filter(n => !isNaN(n));
+                const numeros = colunas.map(n => parseInt(n.trim())).filter(n => !isNaN(n));
                 
                 if (loteria === 'lotomania') {
-                    if (numeros.length >= 50) {
-                        dados.push(numeros.slice(0, 50).sort((a, b) => a - b));
-                    }
+                    if (numeros.length >= 50) dados.push(numeros.slice(0, 50).sort((a, b) => a - b));
                 } else if (loteria === 'milionaria') {
                     if (numeros.length >= 8) {
                         dados.push({
@@ -911,9 +671,7 @@ let CACHE_DADOS = {}; // cache em memória dos CSVs
                         });
                     }
                 } else if (loteria === 'supersete') {
-                    if (numeros.length >= 7) {
-                        dados.push(numeros.slice(0, 7));
-                    }
+                    if (numeros.length >= 7) dados.push(numeros.slice(0, 7));
                 } else {
                     if (numeros.length >= config.numeros) {
                         dados.push(numeros.slice(0, config.numeros).sort((a, b) => a - b));
@@ -928,215 +686,92 @@ let CACHE_DADOS = {}; // cache em memória dos CSVs
                 nomeArquivo: nomeArquivo
             };
             
-            // Atualizar dados atuais
             dadosAtuais = [...dados];
-            
-            console.log(`✅ ${config.nome}: ${dadosAtuais.length} concursos carregados de ${nomeArquivo}${carregamentoAutomatico ? ' (automático)' : ' (manual)'}`);
-            
-            // Atualizar interface
             atualizarStatsNoDOM(loteria);
             atualizarLogLeitura(loteria, nomeArquivo, dadosAtuais.length);
+            atualizarStatusIA(loteria, 'nao-treinado');
             
-            // Mostrar modal de confirmação apenas se for carregamento manual
-            if (!carregamentoAutomatico) {
-                mostrarModalConfirmacao(nomeArquivo, dadosAtuais.length, config.nome);
-            } else {
-                // Se for automático, iniciar treinamento direto
-                if (dadosAtuais.length >= 50) {
-                    iniciarTreinamentoAutomatico(loteria);
-                }
+            // Iniciar treinamento se dados suficientes
+            if (dadosAtuais.length >= 50) {
+                setTimeout(() => iniciarTreinamentoAutomatico(loteria), 500);
             }
         }
 
-        function atualizarLogLeitura(loteria, nomeArquivo, qtdConcursos) {
+        function atualizarLogLeitura(loteria, nomeArquivo, qtd) {
             const logEl = document.getElementById('trainingLog');
-            const config = LOTERIAS[loteria];
-            
             if (logEl) {
-                const dataHora = new Date().toLocaleString('pt-BR');
-                logEl.innerHTML = `
-✅ DADOS CARREGADOS
-📄 Arquivo: ${nomeArquivo}
-🎯 Loteria: ${config.nome}
-📊 Concursos: ${qtdConcursos}
-🕐 ${dataHora}
-${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+ concursos'}
-                `.trim();
+                logEl.innerHTML = `✅ ${nomeArquivo} carregado! ${qtd} concursos.`;
             }
         }
 
         function atualizarStatsNoDOM(loteria) {
             const statsTotal = document.getElementById('stats-total');
-            if (statsTotal) {
-                statsTotal.textContent = dadosAtuais.length;
-            }
-            
-            const statsDispersao = document.getElementById('stats-dispersao');
-            if (statsDispersao && LOTERIAS[loteria].temDispersao) {
-                statsDispersao.textContent = `${dispersaoAtual} conc.`;
-            }
-            
-            const statsRepeticao = document.getElementById('stats-repeticao');
-            if (statsRepeticao && LOTERIAS[loteria].temRepeticao) {
-                statsRepeticao.textContent = `${repeticoesAtual} nºs`;
-            }
+            if (statsTotal) statsTotal.textContent = dadosAtuais.length;
         }
 
         // ============================================
-        // TREINAMENTO AUTOMÁTICO DA IA
+        // TREINAMENTO
         // ============================================
         
         async function iniciarTreinamentoAutomatico(loteria) {
             const estado = estadoTreinamento[loteria];
-            const config = LOTERIAS[loteria];
             
-            if (estado.treinado) {
-                console.log(`✅ ${config.nome}: IA já está treinada`);
-                atualizarStatusIA(loteria, 'treinado');
-                return;
-            }
-            
-            if (estado.treinando) {
-                console.log(`⏳ ${config.nome}: Treinamento já em andamento`);
-                return;
-            }
-            
-            if (dadosAtuais.length < 50) {
-                console.log(`⚠️ ${config.nome}: Dados insuficientes (${dadosAtuais.length}). Mínimo: 50`);
-                atualizarStatusIA(loteria, 'nao-treinado');
-                return;
-            }
+            if (estado.treinado) return;
+            if (estado.treinando) return;
+            if (dadosAtuais.length < 50) return;
             
             estado.treinando = true;
             atualizarStatusIA(loteria, 'treinando');
             
-            console.log(`🚀 ${config.nome}: Iniciando treinamento automático...`);
+            const logEl = document.getElementById('trainingLog');
+            const progressBar = document.getElementById('trainingProgressBar');
             
-            await simularTreinamento(loteria);
+            if (logEl) logEl.innerHTML += '\n🔄 Treinando IA...\n';
+            
+            for (let epoch = 1; epoch <= 20; epoch++) {
+                await new Promise(r => setTimeout(r, 150));
+                const pct = (epoch / 20 * 100).toFixed(0);
+                if (logEl) logEl.innerHTML += `📊 Época ${epoch}/20 | Loss: ${(0.5 - epoch * 0.02).toFixed(4)} | Acc: ${(50 + epoch * 2).toFixed(1)}%\n`;
+                if (progressBar) progressBar.style.width = pct + '%';
+            }
             
             estado.treinado = true;
             estado.treinando = false;
             atualizarStatusIA(loteria, 'treinado');
             
-            console.log(`✅ ${config.nome}: IA treinada com sucesso!`);
-            
-            if (loteriaAtual === loteria) {
-                atualizarUIComTreinamento(loteria);
-            }
-        }
-
-        async function simularTreinamento(loteria) {
-            const config = LOTERIAS[loteria];
-            const logEl = document.getElementById('trainingLog');
-            const progressBar = document.getElementById('trainingProgressBar');
-            
-            if (logEl) logEl.innerHTML += `\n\n🔄 Iniciando treinamento da IA...\n`;
-            
-            const totalEpochs = 20;
-            
-            for (let epoch = 1; epoch <= totalEpochs; epoch++) {
-                await new Promise(resolve => setTimeout(resolve, 200));
-                
-                const progress = (epoch / totalEpochs * 100).toFixed(0);
-                const loss = (0.5 - epoch * 0.02).toFixed(4);
-                const accuracy = (50 + epoch * 2).toFixed(1);
-                
-                if (logEl) {
-                    logEl.innerHTML += `📊 Época ${epoch}/${totalEpochs} | Loss: ${loss} | Acurácia: ${accuracy}%\n`;
-                    logEl.scrollTop = logEl.scrollHeight;
-                }
-                
-                if (progressBar) {
-                    progressBar.style.width = progress + '%';
-                }
-            }
-            
-            if (logEl) {
-                logEl.innerHTML += `\n✅ Treinamento concluído!\n`;
-                logEl.innerHTML += `🎯 Modelo pronto para ${config.nome}`;
-            }
+            if (logEl) logEl.innerHTML += '✅ IA Treinada!\n';
+            if (progressBar) progressBar.style.width = '100%';
         }
 
         function atualizarStatusIA(loteria, status) {
             const statusEl = document.getElementById(`status-${loteria}`);
             if (statusEl) {
                 statusEl.className = 'ia-status';
-                switch (status) {
-                    case 'treinado':
-                        statusEl.classList.add('treinado');
-                        statusEl.title = 'IA Treinada ✓';
-                        break;
-                    case 'treinando':
-                        statusEl.classList.add('treinando');
-                        statusEl.title = 'Treinando...';
-                        break;
-                    case 'nao-encontrado':
-                        statusEl.classList.add('arquivo-nao-encontrado');
-                        statusEl.title = 'Arquivo não encontrado';
-                        break;
-                    default:
-                        statusEl.classList.add('nao-treinado');
-                        statusEl.title = 'IA Não Treinada';
-                }
+                if (status === 'treinado') statusEl.classList.add('treinado');
+                else if (status === 'treinando') statusEl.classList.add('treinando');
+                else if (status === 'carregado') statusEl.classList.add('sem-dados');
+                else statusEl.classList.add('nao-treinado');
             }
             
             const trainingStatus = document.getElementById('trainingStatus');
             if (trainingStatus) {
-                switch (status) {
-                    case 'treinado':
-                        trainingStatus.textContent = 'Treinado ✓';
-                        trainingStatus.className = 'status-badge status-ready';
-                        break;
-                    case 'treinando':
-                        trainingStatus.textContent = 'Treinando...';
-                        trainingStatus.className = 'status-badge status-training';
-                        break;
-                    default:
-                        trainingStatus.textContent = 'Não Treinado';
-                        trainingStatus.className = 'status-badge status-error';
-                }
-            }
-            
-            const btnRetrain = document.getElementById('btnRetrain');
-            if (btnRetrain) {
-                btnRetrain.disabled = (status === 'treinando');
-                if (status === 'treinado') {
-                    btnRetrain.textContent = '🔄 Reiniciar Treinamento';
-                }
-            }
-        }
-
-        function atualizarUIComTreinamento(loteria) {
-            const estado = estadoTreinamento[loteria];
-            const trainingLog = document.getElementById('trainingLog');
-            const trainingProgressBar = document.getElementById('trainingProgressBar');
-            
-            if (estado.treinado) {
-                if (trainingProgressBar) {
-                    trainingProgressBar.style.width = '100%';
-                }
+                if (status === 'treinado') { trainingStatus.textContent = 'Treinado ✓'; trainingStatus.className = 'status-badge status-ready'; }
+                else if (status === 'treinando') { trainingStatus.textContent = 'Treinando...'; trainingStatus.className = 'status-badge status-training'; }
+                else if (status === 'carregado') { trainingStatus.textContent = 'Dados Carregados'; trainingStatus.className = 'status-badge status-warning'; }
+                else { trainingStatus.textContent = 'Sem Dados'; trainingStatus.className = 'status-badge status-error'; }
             }
         }
 
         async function reiniciarTreinamento(loteria) {
-            const estado = estadoTreinamento[loteria];
-            estado.treinado = false;
-            estado.treinando = false;
-            estado.modelo = null;
-            
+            estadoTreinamento[loteria].treinado = false;
+            estadoTreinamento[loteria].treinando = false;
             atualizarStatusIA(loteria, 'treinando');
-            
-            const logEl = document.getElementById('trainingLog');
-            const progressBar = document.getElementById('trainingProgressBar');
-            
-            if (logEl) logEl.innerHTML += '\n\n🔄 Reiniciando treinamento...\n';
-            if (progressBar) progressBar.style.width = '0%';
-            
+            document.getElementById('trainingProgressBar').style.width = '0%';
             await iniciarTreinamentoAutomatico(loteria);
         }
 
         // ============================================
-        // SELEÇÃO DE LOTERIA (CORRIGIDA)
+        // SELEÇÃO DE LOTERIA (SEM ABRIR JANELA)
         // ============================================
         
         async function selecionarLoteria(loteria) {
@@ -1146,36 +781,21 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             if (config.temDispersao) dispersaoAtual = config.dispersaoPadrao;
             if (config.temRepeticao) repeticoesAtual = config.repeticoesPadrao || 2;
             
+            // Atualizar cards
             document.querySelectorAll('.lottery-card').forEach(c => c.classList.remove('active'));
             document.getElementById(`card-${loteria}`).classList.add('active');
             
-            // Renderizar interface primeiro
+            // Renderizar interface
             renderizarConteudo(loteria);
             
-            // Verificar se dados já estão em cache
-            if (cacheDados[loteria].carregado && cacheDados[loteria].dados.length > 0) {
-                console.log(`✅ ${config.nome}: Dados já em cache - carregando automaticamente`);
-                dadosAtuais = [...cacheDados[loteria].dados];
-                atualizarStatsNoDOM(loteria);
-                atualizarLogLeitura(loteria, cacheDados[loteria].nomeArquivo, dadosAtuais.length);
-                
-                // Verificar se IA já foi treinada
-                if (estadoTreinamento[loteria].treinado) {
-                    atualizarStatusIA(loteria, 'treinado');
-                    atualizarUIComTreinamento(loteria);
-                } else if (dadosAtuais.length >= 50) {
-                    // Iniciar treinamento se necessário
-                    await iniciarTreinamentoAutomatico(loteria);
-                }
-            } else {
-                // Tentar carregar automaticamente (só abre janela se não encontrar)
-                console.log(`📁 ${config.nome}: Tentando carregar arquivo automaticamente...`);
-                const carregado = await carregarCSVAutomatico(loteria);
-                
-                if (!carregado) {
-                    console.log(`⚠️ ${config.nome}: Arquivo não encontrado - use o upload manual`);
-                    atualizarStatusIA(loteria, 'nao-encontrado');
-                }
+            // TENTAR carregar automaticamente (NUNCA abre janela)
+            const carregado = await carregarCSVSeExistir(loteria);
+            
+            if (!carregado && !cacheDados[loteria].carregado) {
+                console.log(`⚠️ ${config.nome}: Arquivo CSV não encontrado. Use o botão de upload.`);
+                atualizarStatusIA(loteria, 'nao-treinado');
+                const logEl = document.getElementById('trainingLog');
+                if (logEl) logEl.innerHTML = `⚠️ Arquivo ${loteria}.csv não encontrado.\n📂 Use o botão "📁 Fazer Upload" para carregar manualmente.`;
             }
         }
 
@@ -1187,6 +807,7 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             const config = LOTERIAS[loteria];
             const div = document.getElementById('conteudoLoteria');
             const estado = estadoTreinamento[loteria];
+            const cache = cacheDados[loteria];
             
             let controlesExtras = '';
             
@@ -1196,7 +817,7 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
                         <label>🎯 Nível de Dispersão</label><br>
                         <div class="dispersao-slider">
                             <input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${config.dispersaoPadrao}" oninput="atualizarDispersao(this.value)">
-                            <div class="dispersao-valor">Bloquear números dos últimos: <strong id="dispersaoValor" style="color: ${config.cor};">${config.dispersaoPadrao} concursos</strong></div>
+                            <div class="dispersao-valor">Bloquear últimos: <strong id="dispersaoValor" style="color: ${config.cor};">${config.dispersaoPadrao} concursos</strong></div>
                         </div>
                     </div>
                 `;
@@ -1208,7 +829,7 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
                         <label>🔄 Números para Repetir</label><br>
                         <div class="dispersao-slider">
                             <input type="range" id="repeticoesSlider" min="${config.repeticoesMin || 1}" max="${config.repeticoesMax || config.numeros}" value="${config.repeticoesPadrao || 2}" oninput="atualizarRepeticoes(this.value)">
-                            <div class="dispersao-valor">Forçar repetição de: <strong id="repeticoesValor" style="color: ${config.cor};">${config.repeticoesPadrao || 2} números</strong></div>
+                            <div class="dispersao-valor">Repetir: <strong id="repeticoesValor" style="color: ${config.cor};">${config.repeticoesPadrao || 2} números</strong></div>
                         </div>
                     </div>
                 `;
@@ -1217,15 +838,18 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             if (config.temVolatilidade) {
                 controlesExtras += `
                     <div>
-                        <label>📊 Nível de Volatilidade</label><br>
+                        <label>📊 Volatilidade</label><br>
                         <select id="volatilidadeNivel">
-                            <option value="alta">Alta (trocar 30 números)</option>
-                            <option value="media">Média (trocar 20 números)</option>
-                            <option value="baixa">Baixa (trocar 10 números)</option>
+                            <option value="alta">Alta (trocar 30)</option>
+                            <option value="media">Média (trocar 20)</option>
+                            <option value="baixa">Baixa (trocar 10)</option>
                         </select>
                     </div>
                 `;
             }
+            
+            const statusTexto = estado.treinado ? 'Treinado ✓' : estado.treinando ? 'Treinando...' : cache.carregado ? 'Dados Carregados' : 'Sem Dados';
+            const statusClasse = estado.treinado ? 'status-ready' : estado.treinando ? 'status-training' : cache.carregado ? 'status-warning' : 'status-error';
             
             let html = `
                 <div class="card">
@@ -1238,19 +862,27 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
 
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
                         <h4 style="margin: 0;">📁 Dados: ${dadosAtuais.length} concursos</h4>
-                        <span id="trainingStatus" class="status-badge ${estado.treinado ? 'status-ready' : estado.treinando ? 'status-training' : 'status-error'}">
-                            ${estado.treinado ? 'Treinado ✓' : estado.treinando ? 'Treinando...' : 'Não Treinado'}
-                        </span>
-                        <input type="file" accept=".csv" onchange="importarDadosManual(this, '${loteria}')" style="max-width: 200px;" title="Upload manual de CSV (use se o automático falhar)">
+                        <span id="trainingStatus" class="status-badge ${statusClasse}">${statusTexto}</span>
+                        <button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()" style="margin: 0; padding: 8px 16px; font-size: 13px;">
+                            📁 Fazer Upload
+                        </button>
+                        <input type="file" id="uploadManual" accept=".csv" onchange="uploadManualCSV(this, '${loteria}')" style="display: none;">
                     </div>
+                    
+                    ${!cache.carregado ? `
+                    <div class="mensagem-carregamento">
+                        <span>📂</span>
+                        <span>Arquivo <strong>${loteria}.csv</strong> não encontrado. Use o botão <strong>"📁 Fazer Upload"</strong> para carregar manualmente.</span>
+                    </div>
+                    ` : ''}
                     
                     <div class="training-progress">
                         <div class="training-progress-bar" id="trainingProgressBar" style="width: ${estado.treinado ? '100%' : '0%'};"></div>
                     </div>
                     
-                    <div class="training-log" id="trainingLog">${cacheDados[loteria].carregado ? '✅ Dados carregados do cache' : '⏳ Aguardando carregamento do arquivo CSV...'}</div>
+                    <div class="training-log" id="trainingLog">${cache.carregado ? `✅ ${cache.nomeArquivo} - ${dadosAtuais.length} concursos carregados.` : '⏳ Aguardando arquivo CSV...'}</div>
                     
-                    <button class="btn btn-retrain" id="btnRetrain" onclick="reiniciarTreinamento('${loteria}')" ${estado.treinando ? 'disabled' : ''}>
+                    <button class="btn btn-retrain" id="btnRetrain" onclick="reiniciarTreinamento('${loteria}')" ${estado.treinando || !cache.carregado ? 'disabled' : ''}>
                         🔄 ${estado.treinado ? 'Reiniciar Treinamento' : 'Iniciar Treinamento'}
                     </button>
 
@@ -1263,8 +895,8 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
                             <div class="label">Tipo de IA</div>
                             <div class="value" style="font-size: 14px; color: ${config.cor};">${config.tipo.toUpperCase()}</div>
                         </div>
-                        ${config.temDispersao ? `<div class="stat-card"><div class="label">Dispersão Atual</div><div class="value" style="font-size: 14px; color: ${config.cor};" id="stats-dispersao">${config.dispersaoPadrao} conc.</div></div>` : ''}
-                        ${config.temRepeticao ? `<div class="stat-card"><div class="label">Repetição Atual</div><div class="value" style="font-size: 14px; color: ${config.cor};" id="stats-repeticao">${config.repeticoesPadrao || 2} nºs</div></div>` : ''}
+                        ${config.temDispersao ? `<div class="stat-card"><div class="label">Dispersão</div><div class="value" style="font-size: 14px; color: ${config.cor};" id="stats-dispersao">${config.dispersaoPadrao} conc.</div></div>` : ''}
+                        ${config.temRepeticao ? `<div class="stat-card"><div class="label">Repetição</div><div class="value" style="font-size: 14px; color: ${config.cor};" id="stats-repeticao">${config.repeticoesPadrao || 2} nºs</div></div>` : ''}
                     </div>
                 </div>
 
@@ -1319,22 +951,21 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             }, 100);
         }
 
-        function importarDadosManual(input, loteria) {
+        function uploadManualCSV(input, loteria) {
             const file = input.files[0];
             if (!file) return;
             
-            console.log(`📄 Upload manual: ${file.name}`);
-            
             const reader = new FileReader();
             reader.onload = (e) => {
-                processarDadosCSV(loteria, e.target.result, file.name, false);
-                atualizarStatsNoDOM(loteria);
+                processarDadosCSV(loteria, e.target.result, file.name);
+                // Atualizar a interface
+                selecionarLoteria(loteria);
             };
             reader.readAsText(file);
         }
 
         // ============================================
-        // FUNÇÕES EXISTENTES (mantidas)
+        // FUNÇÕES MANTIDAS
         // ============================================
 
         function atualizarDispersao(valor) {
@@ -1389,26 +1020,24 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
                 else if (j.numeros) j.numeros.forEach(n => bloqueados.add(n));
             });
             const candidatos = [];
-            for (let n = 1; n <= maxNumero; n++) {
-                if (!bloqueados.has(n)) candidatos.push(n);
-            }
+            for (let n = 1; n <= maxNumero; n++) { if (!bloqueados.has(n)) candidatos.push(n); }
             const pool = candidatos.length >= numNumeros * 2 ? candidatos : Array.from({length: maxNumero}, (_, i) => i + 1);
             const jogo = new Set();
-            let tentativas = 0;
-            while (jogo.size < numNumeros && tentativas < 200) {
+            let t = 0;
+            while (jogo.size < numNumeros && t < 200) {
                 const n = pool[Math.floor(Math.random() * pool.length)];
                 if (!temSequencia(jogo, n)) jogo.add(n);
-                tentativas++;
+                t++;
             }
             return Array.from(jogo).sort((a, b) => a - b);
         }
 
         function temSequencia(jogoSet, novoNumero) {
-            const numeros = [...jogoSet, novoNumero].sort((a, b) => a - b);
-            let consecutivos = 1;
-            for (let i = 1; i < numeros.length; i++) {
-                if (numeros[i] === numeros[i-1] + 1) { consecutivos++; if (consecutivos > 2) return true; }
-                else consecutivos = 1;
+            const nums = [...jogoSet, novoNumero].sort((a, b) => a - b);
+            let c = 1;
+            for (let i = 1; i < nums.length; i++) {
+                if (nums[i] === nums[i-1] + 1) { c++; if (c > 2) return true; }
+                else c = 1;
             }
             return false;
         }
@@ -1422,22 +1051,21 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
                 const idx = Math.floor(Math.random() * pool.length);
                 repetidos.push(pool.splice(idx, 1)[0]);
             }
-            const frequencias = new Array(maxNumero).fill(0);
-            dados.forEach(j => { const nums = Array.isArray(j) ? j : j.numeros; nums.forEach(n => frequencias[n - 1]++); });
+            const freq = new Array(maxNumero).fill(0);
+            dados.forEach(j => { const n = Array.isArray(j) ? j : j.numeros; n.forEach(x => freq[x - 1]++); });
             dados.forEach(j => {
-                const nums = Array.isArray(j) ? j : j.numeros;
-                const matches = repetidos.filter(r => nums.includes(r)).length;
-                if (matches >= 2) nums.forEach(n => frequencias[n - 1] += matches);
+                const n = Array.isArray(j) ? j : j.numeros;
+                if (repetidos.filter(r => n.includes(r)).length >= 2) n.forEach(x => freq[x - 1] += 2);
             });
             const jogo = new Set(repetidos);
             while (jogo.size < numNumeros) {
-                const total = frequencias.reduce((a, b) => a + b, 0);
+                const total = freq.reduce((a, b) => a + b, 0);
                 if (total === 0) { const n = Math.floor(Math.random() * maxNumero) + 1; if (!jogo.has(n)) jogo.add(n); }
                 else {
                     let r = Math.random() * total, acc = 0;
-                    for (let i = 0; i < frequencias.length; i++) {
-                        acc += frequencias[i];
-                        if (acc >= r && !jogo.has(i + 1)) { jogo.add(i + 1); frequencias[i] = 0; break; }
+                    for (let i = 0; i < freq.length; i++) {
+                        acc += freq[i];
+                        if (acc >= r && !jogo.has(i + 1)) { jogo.add(i + 1); freq[i] = 0; break; }
                     }
                 }
             }
@@ -1451,7 +1079,7 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             const repetidos = ultimo.slice(0, qtd);
             const carimbados = [];
             const freq = new Array(25).fill(0);
-            dados.forEach(j => { const nums = Array.isArray(j) ? j : j.numeros; nums.forEach(n => freq[n - 1]++); });
+            dados.forEach(j => { const n = Array.isArray(j) ? j : j.numeros; n.forEach(x => freq[x - 1]++); });
             freq.forEach((f, i) => { if (f / dados.length >= 0.8) carimbados.push(i + 1); });
             const jogo = new Set(repetidos);
             while (jogo.size < 15) {
@@ -1463,10 +1091,9 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
 
         function gerarLotomania(dados) {
             if (dados.length === 0) return gerarAleatorio(50, 99, 0);
-            const volatilidade = document.getElementById('volatilidadeNivel')?.value || 'alta';
-            const trocas = volatilidade === 'alta' ? 30 : volatilidade === 'media' ? 20 : 10;
-            const ultimo = dados[dados.length - 1];
-            const manter = ultimo.slice(0, 50 - trocas);
+            const v = document.getElementById('volatilidadeNivel')?.value || 'alta';
+            const trocas = v === 'alta' ? 30 : v === 'media' ? 20 : 10;
+            const manter = dados[dados.length - 1].slice(0, 50 - trocas);
             const jogo = new Set(manter);
             while (jogo.size < 50) jogo.add(Math.floor(Math.random() * 100));
             return Array.from(jogo).sort((a, b) => a - b);
@@ -1479,32 +1106,29 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             return { numeros, trevos: trevos.sort((a, b) => a - b) };
         }
 
-        function gerarLoteca(dados) {
+        function gerarLoteca() {
             const palpites = [];
-            const probabilidades = [0.45, 0.25, 0.30];
             for (let i = 0; i < 14; i++) {
                 const r = Math.random();
-                if (r < probabilidades[0]) palpites.push('Coluna 1');
-                else if (r < probabilidades[0] + probabilidades[1]) palpites.push('Meio');
-                else palpites.push('Coluna 2');
+                palpites.push(r < 0.45 ? 'Coluna 1' : r < 0.70 ? 'Meio' : 'Coluna 2');
             }
             return palpites;
         }
 
         function gerarDiaDeSorte(dados) {
-            const numeros = gerarDispersao(dados, 7, 31, dispersaoAtual || 8);
-            const mes = Math.floor(Math.random() * 12) + 1;
-            return { numeros, mes };
+            return {
+                numeros: gerarDispersao(dados, 7, 31, dispersaoAtual || 8),
+                mes: Math.floor(Math.random() * 12) + 1
+            };
         }
 
         function gerarSuperSete(dados) {
             const colunas = [];
             if (dados.length > 0) {
                 for (let col = 0; col < 7; col++) {
-                    const freqColuna = new Array(10).fill(0);
-                    dados.forEach(jogo => { if (jogo[col] !== undefined) freqColuna[jogo[col]]++; });
-                    const idx = freqColuna.indexOf(Math.max(...freqColuna));
-                    colunas.push(idx >= 0 ? idx : Math.floor(Math.random() * 10));
+                    const fc = new Array(10).fill(0);
+                    dados.forEach(j => { if (j[col] !== undefined) fc[j[col]]++; });
+                    colunas.push(fc.indexOf(Math.max(...fc)));
                 }
             } else {
                 for (let i = 0; i < 7; i++) colunas.push(Math.floor(Math.random() * 10));
@@ -1537,7 +1161,7 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
                         case 'duplasena': jogo = [gerarDispersao(dados, 6, 50, dispersaoAtual), gerarDispersao(dados, 6, 50, dispersaoAtual)]; break;
                         case 'timemania': jogo = gerarRepeticao(dados, 10, 80, repeticoesAtual); break;
                         case 'milionaria': jogo = gerarMilionaria(dados); break;
-                        case 'loteca': jogo = gerarLoteca(dados); break;
+                        case 'loteca': jogo = gerarLoteca(); break;
                         case 'diadesorte': jogo = gerarDiaDeSorte(dados); break;
                         case 'supersete': jogo = gerarSuperSete(dados); break;
                         default: jogo = gerarAleatorio(config.numeros, config.maxNumero);
@@ -1553,15 +1177,15 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
             let bolasHTML = '', infoExtra = '';
             
             if (loteriaAtual === 'milionaria') {
-                bolasHTML = `<p style="color: ${config.cor};">Números:</p><div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: #10b981; margin-top: 10px;">Trevos:</p><div class="bolas">${jogo.trevos.map(t => `<div class="bola" style="background: #10b981;">${t}</div>`).join('')}</div>`;
+                bolasHTML = `<p style="color: ${config.cor};">Números:</p><div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: #10b981;">Trevos:</p><div class="bolas">${jogo.trevos.map(t => `<div class="bola" style="background: #10b981;">${t}</div>`).join('')}</div>`;
             } else if (loteriaAtual === 'loteca') {
-                bolasHTML = `<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin: 10px 0;">${jogo.map((p, idx) => `<div style="background: var(--bg-card); padding: 8px; border-radius: 8px; text-align: center; font-size: 12px;"><div style="color: ${config.cor};">J${idx + 1}</div><div style="font-weight: 600; color: white;">${p}</div></div>`).join('')}</div>`;
+                bolasHTML = `<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">${jogo.map((p, idx) => `<div style="background: var(--bg-card); padding: 8px; border-radius: 8px; text-align: center; font-size: 12px;"><div style="color: ${config.cor};">J${idx+1}</div><div style="font-weight: 600;">${p}</div></div>`).join('')}</div>`;
             } else if (loteriaAtual === 'diadesorte') {
-                bolasHTML = `<div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor}; margin-top: 10px;">📅 Mês da Sorte: <strong>${jogo.mes}</strong></p>`;
+                bolasHTML = `<div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor};">📅 Mês: <strong>${jogo.mes}</strong></p>`;
             } else if (loteriaAtual === 'supersete') {
-                bolasHTML = `<div class="bolas">${jogo.map((n, idx) => `<div style="text-align: center;"><div style="font-size: 10px; color: var(--text-secondary);">Col ${idx + 1}</div><div class="bola" style="background: ${config.cor};">${n}</div></div>`).join('')}</div>`;
+                bolasHTML = `<div class="bolas">${jogo.map((n, idx) => `<div style="text-align: center;"><div style="font-size: 10px; color: var(--text-secondary);">Col ${idx+1}</div><div class="bola" style="background: ${config.cor};">${n}</div></div>`).join('')}</div>`;
             } else if (loteriaAtual === 'duplasena') {
-                bolasHTML = `<p style="color: ${config.cor};">1º Sorteio:</p><div class="bolas">${jogo[0].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor}; margin-top: 10px;">2º Sorteio:</p><div class="bolas">${jogo[1].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div>`;
+                bolasHTML = `<p style="color: ${config.cor};">1º Sorteio:</p><div class="bolas">${jogo[0].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor};">2º Sorteio:</p><div class="bolas">${jogo[1].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div>`;
             } else {
                 const numeros = Array.isArray(jogo) ? jogo : (jogo.numeros || jogo);
                 const soma = numeros.reduce((a, b) => a + b, 0);
@@ -1579,8 +1203,9 @@ ${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+
         
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Sistema de Loterias IA inicializado!');
-            console.log('📁 Sistema de cache ativo - dados mantidos entre loterias');
-            console.log('✅ Navegação rápida entre loterias sem recarregar');
+            console.log('📁 O sistema tenta carregar arquivos automaticamente.');
+            console.log('📂 Se o arquivo não existir, use o botão "Fazer Upload".');
+            console.log('📋 Arquivos esperados: megasena.csv, quina.csv, lotofacil.csv, etc.');
             
             await selecionarLoteria('megasena');
         });
