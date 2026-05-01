@@ -687,6 +687,7 @@
         // Estado
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
+let CACHE_DADOS = {}; // cache em memória dos CSVs
         let periodoAtual = 'all';
         let dispersaoAtual = LOTERIAS['megasena'].dispersaoPadrao;
         let repeticoesAtual = 2;
@@ -752,17 +753,62 @@
         // ============================================
         
         async function carregarCSVAutomatico(loteria) {
-            const nomeArquivo = `${loteria}.csv`;
+
+    // usar cache se já carregado
+    if (CACHE_DADOS[loteria]) {
+        dadosAtuais = CACHE_DADOS[loteria];
+        document.getElementById('stats-total').textContent = dadosAtuais.length;
+
+        const config = LOTERIAS[loteria];
+        calibrarPesos(dadosAtuais, config);
+
+        console.log(`⚡ Cache usado: ${loteria}`);
+        return;
+    }
+
+    const caminho = `dados/${loteria}.csv`;
+
+    fetch(caminho)
+        .then(res => {
+            if (!res.ok) throw new Error('Arquivo não encontrado');
+            return res.text();
+        })
+        .then(texto => {
+            const linhas = texto.split('
+').filter(l => l.trim());
+            const separador = linhas[0].includes(';') ? ';' : ',';
+
             const config = LOTERIAS[loteria];
-            
-            // Verificar se já está em cache
-            if (cacheDados[loteria].carregado && cacheDados[loteria].dados.length > 0) {
-                console.log(`✅ ${config.nome}: Usando dados em cache (${cacheDados[loteria].dados.length} concursos)`);
-                dadosAtuais = [...cacheDados[loteria].dados];
-                atualizarStatsNoDOM(loteria);
-                atualizarLogLeitura(loteria, cacheDados[loteria].nomeArquivo, dadosAtuais.length);
-                return true;
+            const dadosProcessados = [];
+
+            for (let i = 1; i < linhas.length; i++) {
+                const colunas = linhas[i].split(separador);
+                const numeros = colunas
+                    .map(n => parseInt(n.trim()))
+                    .filter(n => !isNaN(n));
+
+                if (numeros.length >= config.numeros) {
+                    dadosProcessados.push(
+                        numeros.slice(0, config.numeros).sort((a, b) => a - b)
+                    );
+                }
             }
+
+            // salvar no cache
+            CACHE_DADOS[loteria] = dadosProcessados;
+
+            dadosAtuais = dadosProcessados;
+
+            document.getElementById('stats-total').textContent = dadosAtuais.length;
+
+            calibrarPesos(dadosAtuais, config);
+
+            console.log(`📥 CSV carregado: ${loteria}`);
+        })
+        .catch(err => {
+            console.warn(`Erro ao carregar ${loteria}:`, err.message);
+        });
+}
             
             console.log(`📁 Tentando carregar automaticamente: ${nomeArquivo}`);
             
