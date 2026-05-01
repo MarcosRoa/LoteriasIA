@@ -55,16 +55,14 @@
         }
 
         .header-logo img {
-            width: 200px;
+            width: 80px;
             height: auto;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
             transition: transform 0.3s ease;
         }
 
-        .header-logo img:hover {
-            transform: scale(1.1);
-        }
+        .header-logo img:hover { transform: scale(1.1); }
 
         .header-text {
             flex: 1 1 auto;
@@ -141,7 +139,6 @@
             margin-top: 10px;
         }
 
-        /* Status de IA no card */
         .ia-status {
             position: absolute;
             top: 10px;
@@ -191,10 +188,7 @@
             margin-bottom: 20px;
         }
 
-        .card h3 {
-            margin-bottom: 20px;
-            font-size: 20px;
-        }
+        .card h3 { margin-bottom: 20px; font-size: 20px; }
 
         .btn {
             padding: 12px 24px;
@@ -334,7 +328,6 @@
             margin-top: 5px;
         }
 
-        /* Barra de progresso do treinamento */
         .training-progress {
             width: 100%;
             height: 6px;
@@ -382,6 +375,99 @@
             50% { opacity: 0.7; }
         }
 
+        /* Modal de confirmação */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-confirmacao {
+            background: var(--bg-secondary);
+            border: 2px solid #22c55e;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-confirmacao .icone-sucesso {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .modal-confirmacao h3 {
+            color: #22c55e;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .modal-confirmacao .nome-arquivo {
+            color: #38bdf8;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+
+        .modal-confirmacao .dados-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .modal-confirmacao .dados-info span {
+            color: #fbbf24;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .modal-confirmacao .btn-fechar {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .modal-confirmacao .btn-fechar:hover {
+            background: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .auto-upload { display: none; }
+
         @media (max-width: 768px) {
             .lottery-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
             .header-content { gap: 15px; }
@@ -416,6 +502,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Confirmação de Leitura -->
+    <div class="modal-overlay" id="modalConfirmacao">
+        <div class="modal-confirmacao">
+            <div class="icone-sucesso">✅</div>
+            <h3>Arquivo Carregado com Sucesso!</h3>
+            <div class="nome-arquivo" id="modalNomeArquivo">--</div>
+            <div class="dados-info" id="modalDadosInfo">
+                Concursos encontrados: <span id="modalQtdConcursos">0</span>
+            </div>
+            <button class="btn-fechar" onclick="fecharModalConfirmacao()">
+                👍 OK - Continuar
+            </button>
+        </div>
+    </div>
+
+    <!-- Input de arquivo oculto para carregamento automático -->
+    <input type="file" id="autoFileInput" class="auto-upload" accept=".csv">
 
     <div class="container">
         <!-- Grid de Loterias -->
@@ -589,34 +693,106 @@
         });
 
         // ============================================
+        // MODAL DE CONFIRMAÇÃO
+        // ============================================
+        
+        function mostrarModalConfirmacao(nomeArquivo, qtdConcursos, nomeLoteria) {
+            document.getElementById('modalNomeArquivo').textContent = `📄 ${nomeArquivo}`;
+            document.getElementById('modalQtdConcursos').textContent = qtdConcursos;
+            
+            // Adicionar informação extra
+            const dadosInfo = document.getElementById('modalDadosInfo');
+            dadosInfo.innerHTML = `
+                <p>📁 Arquivo: <strong style="color: #38bdf8;">${nomeArquivo}</strong></p>
+                <p>🎯 Loteria: <strong style="color: #fbbf24;">${nomeLoteria}</strong></p>
+                <p>📊 Concursos encontrados: <span style="color: #22c55e; font-size: 22px;">${qtdConcursos}</span></p>
+                ${qtdConcursos >= 50 ? '<p style="color: #22c55e;">✅ Dados suficientes para treinar IA!</p>' : '<p style="color: #f59e0b;">⚠️ Mínimo de 50 concursos para treinar IA</p>'}
+            `;
+            
+            document.getElementById('modalConfirmacao').classList.add('show');
+        }
+
+        function fecharModalConfirmacao() {
+            document.getElementById('modalConfirmacao').classList.remove('show');
+            
+            // Após fechar o modal, iniciar treinamento se houver dados suficientes
+            if (dadosAtuais.length >= 50) {
+                setTimeout(() => {
+                    iniciarTreinamentoAutomatico(loteriaAtual);
+                }, 500);
+            }
+        }
+
+        // ============================================
         // CARREGAMENTO AUTOMÁTICO DE CSV
         // ============================================
         
         async function carregarCSVAutomatico(loteria) {
             const nomeArquivo = `${loteria}.csv`;
+            const autoFileInput = document.getElementById('autoFileInput');
+            const config = LOTERIAS[loteria];
             
+            console.log(`📁 Tentando carregar: ${nomeArquivo}`);
+            
+            // Método 1: Tentar fetch
             try {
                 const response = await fetch(nomeArquivo);
-                if (!response.ok) {
-                    console.log(`📁 Arquivo ${nomeArquivo} não encontrado. Faça upload manual.`);
-                    return false;
+                if (response.ok) {
+                    const texto = await response.text();
+                    processarDadosCSV(loteria, texto, nomeArquivo);
+                    return true;
                 }
-                
-                const texto = await response.text();
-                processarDadosCSV(loteria, texto);
-                console.log(`✅ ${LOTERIAS[loteria].nome}: Dados carregados automaticamente de ${nomeArquivo}`);
-                return true;
-            } catch (error) {
-                console.log(`⚠️ ${LOTERIAS[loteria].nome}: Erro ao carregar ${nomeArquivo} - ${error.message}`);
-                return false;
+            } catch (e) {
+                console.log(`⚠️ Fetch falhou (esperado localmente)`);
             }
+            
+            // Método 2: FileReader API
+            console.log(`📂 Abrindo seletor para: ${nomeArquivo}`);
+            
+            return new Promise((resolve) => {
+                autoFileInput.setAttribute('data-loteria', loteria);
+                autoFileInput.setAttribute('data-filename', nomeArquivo);
+                
+                const handleFileSelect = function(e) {
+                    const file = e.target.files[0];
+                    if (!file) {
+                        console.log(`❌ Nenhum arquivo selecionado`);
+                        resolve(false);
+                        return;
+                    }
+                    
+                    // Mostrar nome do arquivo selecionado
+                    console.log(`📄 Arquivo selecionado: ${file.name}`);
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        processarDadosCSV(loteria, event.target.result, file.name);
+                        resolve(true);
+                    };
+                    
+                    reader.onerror = function() {
+                        console.log(`❌ Erro ao ler arquivo`);
+                        resolve(false);
+                    };
+                    
+                    reader.readAsText(file);
+                    autoFileInput.removeEventListener('change', handleFileSelect);
+                };
+                
+                autoFileInput.addEventListener('change', handleFileSelect, { once: true });
+                autoFileInput.click();
+            });
         }
 
-        function processarDadosCSV(loteria, texto) {
+        function processarDadosCSV(loteria, texto, nomeArquivo) {
             const config = LOTERIAS[loteria];
             const linhas = texto.split('\n').filter(l => l.trim());
             
-            if (linhas.length < 2) return;
+            if (linhas.length < 2) {
+                console.log(`⚠️ ${config.nome}: Arquivo vazio ou inválido`);
+                alert(`⚠️ O arquivo ${nomeArquivo} está vazio ou tem formato inválido!`);
+                return;
+            }
             
             const separador = linhas[0].includes(';') ? ';' : ',';
             
@@ -650,7 +826,31 @@
                 }
             }
             
+            console.log(`✅ ${config.nome}: ${dadosAtuais.length} concursos carregados de ${nomeArquivo}`);
+            
+            // Atualizar interface
             atualizarStatsNoDOM(loteria);
+            atualizarLogLeitura(loteria, nomeArquivo, dadosAtuais.length);
+            
+            // Mostrar modal de confirmação
+            mostrarModalConfirmacao(nomeArquivo, dadosAtuais.length, config.nome);
+        }
+
+        function atualizarLogLeitura(loteria, nomeArquivo, qtdConcursos) {
+            const logEl = document.getElementById('trainingLog');
+            const config = LOTERIAS[loteria];
+            
+            if (logEl) {
+                const dataHora = new Date().toLocaleString('pt-BR');
+                logEl.innerHTML = `
+✅ ARQUIVO CARREGADO COM SUCESSO
+📄 Nome: ${nomeArquivo}
+🎯 Loteria: ${config.nome}
+📊 Concursos: ${qtdConcursos}
+🕐 Data/Hora: ${dataHora}
+${qtdConcursos >= 50 ? '✅ Dados suficientes para IA' : '⚠️ Necessário 50+ concursos'}
+                `.trim();
+            }
         }
 
         function atualizarStatsNoDOM(loteria) {
@@ -659,7 +859,6 @@
                 statsTotal.textContent = dadosAtuais.length;
             }
             
-            // Atualizar stats de dispersão/repetição se visíveis
             const statsDispersao = document.getElementById('stats-dispersao');
             if (statsDispersao && LOTERIAS[loteria].temDispersao) {
                 statsDispersao.textContent = `${dispersaoAtual} conc.`;
@@ -677,39 +876,43 @@
         
         async function iniciarTreinamentoAutomatico(loteria) {
             const estado = estadoTreinamento[loteria];
+            const config = LOTERIAS[loteria];
             
             if (estado.treinado) {
-                console.log(`✅ ${LOTERIAS[loteria].nome}: IA já está treinada`);
+                console.log(`✅ ${config.nome}: IA já está treinada`);
                 atualizarStatusIA(loteria, 'treinado');
                 return;
             }
             
             if (estado.treinando) {
-                console.log(`⏳ ${LOTERIAS[loteria].nome}: Treinamento já em andamento`);
+                console.log(`⏳ ${config.nome}: Treinamento já em andamento`);
                 return;
             }
             
             if (dadosAtuais.length < 50) {
-                console.log(`⚠️ ${LOTERIAS[loteria].nome}: Dados insuficientes (${dadosAtuais.length} concursos). Mínimo: 50`);
+                console.log(`⚠️ ${config.nome}: Dados insuficientes (${dadosAtuais.length}). Mínimo: 50`);
                 atualizarStatusIA(loteria, 'nao-treinado');
+                
+                const logEl = document.getElementById('trainingLog');
+                if (logEl) {
+                    logEl.innerHTML += `\n⚠️ Treinamento não iniciado: ${dadosAtuais.length} concursos (mínimo 50)`;
+                }
                 return;
             }
             
             estado.treinando = true;
             atualizarStatusIA(loteria, 'treinando');
             
-            console.log(`🚀 ${LOTERIAS[loteria].nome}: Iniciando treinamento automático...`);
+            console.log(`🚀 ${config.nome}: Iniciando treinamento automático...`);
             
-            // Simular treinamento (em produção, usaria TensorFlow)
             await simularTreinamento(loteria);
             
             estado.treinado = true;
             estado.treinando = false;
             atualizarStatusIA(loteria, 'treinado');
             
-            console.log(`✅ ${LOTERIAS[loteria].nome}: IA treinada com sucesso!`);
+            console.log(`✅ ${config.nome}: IA treinada com sucesso!`);
             
-            // Atualizar UI se esta loteria estiver selecionada
             if (loteriaAtual === loteria) {
                 atualizarUIComTreinamento(loteria);
             }
@@ -720,12 +923,12 @@
             const logEl = document.getElementById('trainingLog');
             const progressBar = document.getElementById('trainingProgressBar');
             
-            if (logEl) logEl.innerHTML = `🔄 Iniciando treinamento da IA para ${config.nome}...\n`;
+            if (logEl) logEl.innerHTML += `\n\n🔄 Iniciando treinamento da IA...\n`;
             
             const totalEpochs = 20;
             
             for (let epoch = 1; epoch <= totalEpochs; epoch++) {
-                await new Promise(resolve => setTimeout(resolve, 200)); // Simular tempo
+                await new Promise(resolve => setTimeout(resolve, 200));
                 
                 const progress = (epoch / totalEpochs * 100).toFixed(0);
                 const loss = (0.5 - epoch * 0.02).toFixed(4);
@@ -766,7 +969,6 @@
                 }
             }
             
-            // Atualizar badge de status na área de conteúdo
             const trainingStatus = document.getElementById('trainingStatus');
             if (trainingStatus) {
                 switch (status) {
@@ -784,7 +986,6 @@
                 }
             }
             
-            // Habilitar/desabilitar botões
             const btnRetrain = document.getElementById('btnRetrain');
             if (btnRetrain) {
                 btnRetrain.disabled = (status === 'treinando');
@@ -801,7 +1002,7 @@
             
             if (estado.treinado) {
                 if (trainingLog) {
-                    trainingLog.innerHTML = `✅ IA treinada com ${dadosAtuais.length} concursos\n🎯 Pronta para gerar jogos de ${LOTERIAS[loteria].nome}`;
+                    trainingLog.innerHTML += `\n✅ IA treinada e pronta para uso!`;
                 }
                 if (trainingProgressBar) {
                     trainingProgressBar.style.width = '100%';
@@ -820,7 +1021,9 @@
             const logEl = document.getElementById('trainingLog');
             const progressBar = document.getElementById('trainingProgressBar');
             
-            if (logEl) logEl.innerHTML = '🔄 Reiniciando treinamento...\n';
+            if (logEl) {
+                logEl.innerHTML += '\n\n🔄 Reiniciando treinamento...\n';
+            }
             if (progressBar) progressBar.style.width = '0%';
             
             await iniciarTreinamentoAutomatico(loteria);
@@ -840,15 +1043,16 @@
             document.querySelectorAll('.lottery-card').forEach(c => c.classList.remove('active'));
             document.getElementById(`card-${loteria}`).classList.add('active');
             
-            // Tentar carregar CSV automaticamente
-            const carregado = await carregarCSVAutomatico(loteria);
-            
-            // Renderizar interface
+            // Renderizar interface primeiro
             renderizarConteudo(loteria);
             
-            // Iniciar treinamento automático se dados foram carregados
-            if (carregado && dadosAtuais.length >= 50) {
-                await iniciarTreinamentoAutomatico(loteria);
+            // Depois tentar carregar CSV automaticamente
+            const carregado = await carregarCSVAutomatico(loteria);
+            
+            // Se carregou com sucesso, atualizar interface
+            if (carregado) {
+                atualizarStatsNoDOM(loteria);
+                // O treinamento será iniciado após fechar o modal (em fecharModalConfirmacao)
             }
         }
 
@@ -906,7 +1110,7 @@
                     
                     <div class="info-box" style="border-left: 4px solid ${config.cor};">
                         <h4 style="color: ${config.cor};">📊 Estratégia: ${config.estrategia}</h4>
-                        ${config.reglas ? config.reglas.map(r => `<p>✅ ${r}</p>`).join('') : config.regras.map(r => `<p>✅ ${r}</p>`).join('')}
+                        ${config.regras.map(r => `<p>✅ ${r}</p>`).join('')}
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
@@ -914,14 +1118,14 @@
                         <span id="trainingStatus" class="status-badge ${estado.treinado ? 'status-ready' : estado.treinando ? 'status-training' : 'status-error'}">
                             ${estado.treinado ? 'Treinado ✓' : estado.treinando ? 'Treinando...' : 'Não Treinado'}
                         </span>
-                        <input type="file" accept=".csv" onchange="importarDadosManual(this, '${loteria}')" style="max-width: 200px;">
+                        <input type="file" accept=".csv" onchange="importarDadosManual(this, '${loteria}')" style="max-width: 200px;" title="Upload manual de CSV">
                     </div>
                     
                     <div class="training-progress">
                         <div class="training-progress-bar" id="trainingProgressBar" style="width: ${estado.treinado ? '100%' : '0%'};"></div>
                     </div>
                     
-                    <div class="training-log" id="trainingLog">${estado.treinado ? '✅ IA treinada e pronta para uso!' : '⏳ Aguardando dados para treinamento...'}</div>
+                    <div class="training-log" id="trainingLog">⏳ Aguardando carregamento do arquivo CSV...</div>
                     
                     <button class="btn btn-retrain" id="btnRetrain" onclick="reiniciarTreinamento('${loteria}')" ${estado.treinando ? 'disabled' : ''}>
                         🔄 ${estado.treinado ? 'Reiniciar Treinamento' : 'Iniciar Treinamento'}
@@ -996,15 +1200,14 @@
             const file = input.files[0];
             if (!file) return;
             
+            console.log(`📄 Upload manual: ${file.name}`);
+            
             const reader = new FileReader();
             reader.onload = (e) => {
-                processarDadosCSV(loteria, e.target.result);
+                processarDadosCSV(loteria, e.target.result, file.name);
                 atualizarStatsNoDOM(loteria);
                 
-                // Reiniciar treinamento com novos dados
-                if (dadosAtuais.length >= 50) {
-                    reiniciarTreinamento(loteria);
-                }
+                // O treinamento será iniciado após fechar o modal
             };
             reader.readAsText(file);
         }
@@ -1255,9 +1458,9 @@
         
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 Sistema de Loterias IA inicializado!');
-            console.log('📁 Tentando carregar arquivos CSV automaticamente...');
+            console.log('📁 O sistema abrirá o seletor de arquivos automaticamente.');
+            console.log('📂 Selecione o arquivo CSV correspondente à loteria.');
             
-            // Iniciar com Mega-Sena
             await selecionarLoteria('megasena');
         });
     </script>
