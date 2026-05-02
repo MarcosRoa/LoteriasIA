@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todas as Loterias com IA Especializada</title>
+    <title>Sistema Completo de Loterias com IA Especializada</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
@@ -48,9 +48,8 @@
         }
 
         .header-logo { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
-        .header-logo img { width: 200px; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); transition: transform 0.3s ease; }
+        .header-logo img { width: 80px; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(56,189,248,0.3); transition: transform 0.3s ease; }
         .header-logo img:hover { transform: scale(1.1); }
-
         .header-text { flex: 1 1 auto; text-align: center; min-width: 300px; padding: 10px 0; }
 
         .header h1 {
@@ -61,8 +60,7 @@
             margin-bottom: 8px;
         }
 
-        .header-subtitle { color: var(--text-secondary); font-size: 15px; margin-top: 5px; line-height: 1.5; }
-
+        .header-subtitle { color: var(--text-secondary); font-size: 15px; margin-top: 5px; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
         .lottery-grid {
@@ -97,6 +95,12 @@
             margin-top: 10px;
         }
 
+        .badge-dispersao { background: #8b5cf6; color: white; }
+        .badge-repeticao { background: #f59e0b; color: #1e293b; }
+        .badge-volatil { background: #ef4444; color: white; }
+        .badge-padrao { background: #10b981; color: white; }
+        .badge-especial { background: #06b6d4; color: #1e293b; }
+
         .ia-status {
             position: absolute;
             top: 10px;
@@ -107,21 +111,18 @@
             border: 2px solid var(--border);
         }
 
-        .ia-status.treinado { background: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); animation: pulse-green 2s infinite; }
-        .ia-status.treinando { background: #f59e0b; animation: pulse-yellow 1s infinite; }
+        .ia-status.treinado { background: #22c55e; }
         .ia-status.nao-treinado { background: #ef4444; }
         .ia-status.sem-dados { background: #f97316; }
 
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); } 50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.8); } }
-        @keyframes pulse-yellow { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .card {
+            background: var(--bg-secondary);
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
 
-        .badge-dispersao { background: #8b5cf6; color: white; }
-        .badge-repeticao { background: #f59e0b; color: #1e293b; }
-        .badge-volatil { background: #ef4444; color: white; }
-        .badge-padrao { background: #10b981; color: white; }
-        .badge-especial { background: #06b6d4; color: #1e293b; }
-
-        .card { background: var(--bg-secondary); padding: 25px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 20px; }
         .card h3 { margin-bottom: 20px; font-size: 20px; }
 
         .btn {
@@ -136,10 +137,7 @@
         }
 
         .btn:hover { transform: translateY(-2px); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
         .btn-primary { background: #22c55e; color: white; }
-        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 2px solid var(--border); }
-        .btn-retrain { background: #f59e0b; color: #1e293b; }
         .btn-upload { background: #3b82f6; color: white; }
 
         input, select {
@@ -171,7 +169,60 @@
 
         @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .resultado-jogo { background: var(--bg-card); padding: 20px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 15px; }
+        .resultado-jogo {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            margin-bottom: 15px;
+        }
+
+        .info-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin: 15px 0;
+        }
+
+        .info-box h4 { margin-bottom: 10px; }
+        .info-box p { font-size: 13px; color: var(--text-secondary); margin: 3px 0; }
+
+        /* Regras oficiais */
+        .regras-oficiais {
+            background: var(--bg-card);
+            border-left: 4px solid #38bdf8;
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .regras-oficiais h4 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .regras-oficiais strong {
+            color: #fbbf24;
+        }
+
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-card .label { font-size: 11px; color: var(--text-secondary); }
+        .stat-card .value { font-size: 20px; font-weight: 700; margin-top: 5px; }
 
         .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
 
@@ -187,44 +238,14 @@
 
         .filtro-btn.ativo { background: #38bdf8; color: var(--bg-secondary); border-color: #38bdf8; }
 
-        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
-
-        .info-box { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: var(--radius); margin: 15px 0; }
-        .info-box h4 { margin-bottom: 10px; }
-        .info-box p { font-size: 13px; color: var(--text-secondary); margin: 3px 0; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
-
-        .stat-card { background: var(--bg-card); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); text-align: center; }
-        .stat-card .label { font-size: 11px; color: var(--text-secondary); }
-        .stat-card .value { font-size: 20px; font-weight: 700; margin-top: 5px; }
-
         .dispersao-slider { width: 100%; max-width: 300px; }
         .dispersao-slider input[type="range"] { width: 100%; margin: 10px 0; }
         .dispersao-valor { font-size: 14px; color: var(--text-secondary); margin-top: 5px; }
 
-        .training-progress { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin: 10px 0; overflow: hidden; }
-        .training-progress-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #22c55e); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
-
-        .training-log {
-            background: var(--bg-card);
-            padding: 15px;
-            border-radius: var(--radius);
-            border: 2px solid var(--border);
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .status-ready { background: #22c55e; color: white; }
-        .status-training { background: #f59e0b; color: #1e293b; animation: pulse 1.5s infinite; }
         .status-error { background: #ef4444; color: white; }
         .status-warning { background: #f97316; color: white; }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
         .mensagem-carregamento {
             background: var(--bg-card);
@@ -234,15 +255,12 @@
             margin: 10px 0;
             font-size: 13px;
             color: #fde68a;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         @media (max-width: 768px) {
             .lottery-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
             .header-content { gap: 15px; }
-            .header-logo img { width: 120px; }
+            .header-logo img { width: 60px; }
             .header h1 { font-size: 22px; }
         }
     </style>
@@ -279,7 +297,7 @@
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('lotomania')" id="card-lotomania">
                 <div class="ia-status nao-treinado" id="status-lotomania"></div>
-                <h3>🎪 Lotomania</h3><span class="badge badge-volatil">Muito Volátil</span><p class="rules">50 números • 0 a 99</p>
+                <h3>🎪 Lotomania</h3><span class="badge badge-volatil">50 marca • 20 sorteia</span><p class="rules">50 números • 0 a 99</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('duplasena')" id="card-duplasena">
                 <div class="ia-status nao-treinado" id="status-duplasena"></div>
@@ -312,72 +330,154 @@
 
     <script>
         // ============================================
-        // CONFIGURAÇÕES
+        // REGRAS OFICIAIS DE CADA LOTERIA
         // ============================================
         
-        const LOTERIAS = {
-            megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', tipo: 'dispersao', temDispersao: true, temRepeticao: false, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25, estrategia: 'Alta dispersão: evita números dos últimos concursos', regras: ['6 números de 1 a 60', 'Alta dispersão natural', 'Intervalo médio de repetição: 15-20 concursos', 'Distribuição uniforme entre terços'] },
-            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', tipo: 'repeticao', temDispersao: false, temRepeticao: true, repeticoesPadrao: 2, repeticoesMin: 1, repeticoesMax: 4, estrategia: 'Força repetição de números do concurso anterior', regras: ['5 números de 1 a 80', 'Alta taxa de repetição', '2-3 números repetem em média', 'Grupos frequentes identificáveis'] },
-            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', tipo: 'repeticao_maxima', temDispersao: false, temRepeticao: true, repeticoesPadrao: 9, repeticoesMin: 5, repeticoesMax: 12, estrategia: 'Força repetição de 8-12 números + carimbados', regras: ['15 números de 1 a 25', 'Altíssima repetição', '8-12 números repetem em média', 'Números carimbados (80%+)'] },
-            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', tipo: 'volatil', temDispersao: false, temRepeticao: false, temVolatilidade: true, volatilidadePadrao: 'alta', estrategia: 'Alta volatilidade: troca 25-30 números por concurso', regras: ['50 números de 0 a 99', 'Muito volátil', '25-30 números mudam por concurso', 'Difícil estabelecer padrões'] },
-            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', tipo: 'intermediario', temDispersao: true, temRepeticao: false, dispersaoPadrao: 10, dispersaoMin: 4, dispersaoMax: 18, estrategia: 'Dispersão moderada com 2 sorteios independentes', regras: ['6 números de 1 a 50', 'Dois sorteios por concurso', 'Dispersão moderada (8-12 concursos)', 'Comportamento entre Mega e Quina'] },
-            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', tipo: 'repeticao_moderada', temDispersao: false, temRepeticao: true, repeticoesPadrao: 3, repeticoesMin: 1, repeticoesMax: 6, estrategia: 'Similar à Quina com 10 números + Time do Coração', regras: ['10 números de 1 a 80', 'Mais Time do Coração', 'Repetição moderada', 'Time é escolha pessoal'] },
-            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, trevos: 2, maxTrevos: 6, cor: '#a855f7', tipo: 'dupla_matriz', temDispersao: true, temRepeticao: false, dispersaoPadrao: 12, dispersaoMin: 5, dispersaoMax: 20, estrategia: 'Matriz dupla: 6 números (1-50) + 2 trevos (1-6)', regras: ['6 números de 1 a 50', '2 trevos de 1 a 6', 'Duas matrizes independentes', 'Dispersão para números'] },
-            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16', tipo: 'futebol', temDispersao: false, temRepeticao: false, estrategia: '14 jogos de futebol com palpites', regras: ['14 jogos de futebol', 'Palpites: Coluna 1, Meio, Coluna 2', 'Análise de favoritismo'] },
-            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, mesSorte: 12, cor: '#f97316', tipo: 'mes_sorte', temDispersao: true, temRepeticao: false, dispersaoPadrao: 8, dispersaoMin: 3, dispersaoMax: 15, estrategia: '7 números (1-31) + Mês da Sorte (1-12)', regras: ['7 números de 1 a 31', '1 Mês da Sorte (1 a 12)', 'Números representam dias do mês'] },
-            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', tipo: 'colunas', temDispersao: false, temRepeticao: false, estrategia: '7 colunas independentes (0-9 cada)', regras: ['7 colunas independentes', '1 número por coluna (0 a 9)', 'Análise por posição/coluna'] }
+        const REGRAS_OFICIAIS = {
+            megasena: `
+                <strong>Mega-Sena</strong> é uma loteria onde o apostador escolhe de <strong>6 a 20 números</strong>, de <strong>1 a 60</strong>, ganhando o prêmio principal ao acertar as <strong>6 dezenas</strong> sorteadas. A aposta mínima é de <strong>6 números</strong>.
+            `,
+            quina: `
+                Na <strong>Quina</strong>, selecione de <strong>5 a 15 números</strong> dentre os <strong>80 disponíveis</strong> no volante. A aposta mínima é de <strong>5 números</strong>. Ganha prêmios acertando 2, 3, 4 ou 5 dezenas.
+            `,
+            lotofacil: `
+                <strong>Lotofácil</strong> consiste em marcar de <strong>15 a 20 números</strong>, dentre os <strong>25 disponíveis</strong> no volante, ganhando prêmios ao acertar <strong>11, 12, 13, 14 ou 15 dezenas</strong>. A aposta mínima é de <strong>15 números</strong>.
+            `,
+            lotomania: `
+                Na <strong>Lotomania</strong> você escolhe <strong>50 números</strong> entre 100 disponíveis (<strong>00 a 99</strong>) e ganha prêmios acertando <strong>20, 19, 18, 17, 16, 15 ou nenhum número (0 acertos)</strong>. A aposta é sempre de <strong>50 números</strong>.
+            `,
+            duplasena: `
+                A <strong>Dupla Sena</strong> permite apostar de <strong>6 a 15 números</strong> dentre <strong>50 disponíveis</strong>. Ganha-se acertando <strong>3, 4, 5 ou 6</strong> números no 1º e/ou 2º sorteio. A aposta mínima é de <strong>6 números</strong>.
+            `,
+            timemania: `
+                <strong>Timemania</strong> consiste em escolher <strong>10 números</strong> entre <strong>80 disponíveis</strong> e <strong>1 time do coração</strong>. São sorteados <strong>7 números</strong> e <strong>1 time</strong> por concurso. Ganha acertando de 3 a 7 números ou o time.
+            `,
+            milionaria: `
+                Na <strong>+Milionária</strong>, escolha de <strong>6 a 12 números</strong> (de 01 a 50) e de <strong>2 a 6 trevos</strong> (de 01 a 06). A aposta mínima é de <strong>6 números e 2 trevos</strong>.
+            `,
+            loteca: `
+                <strong>Loteca</strong> é baseada em <strong>14 jogos de futebol</strong>. O objetivo é acertar os resultados:<br>
+                <strong>Coluna 1:</strong> Time mandante vence<br>
+                <strong>Coluna X (Meio):</strong> Empate<br>
+                <strong>Coluna 2:</strong> Time visitante vence<br>
+                <strong>Duplo (D):</strong> Marcar dois resultados possíveis<br>
+                <strong>Triplo (T):</strong> Marcar os três resultados possíveis
+            `,
+            diadesorte: `
+                <strong>Dia de Sorte</strong> é uma loteria onde você escolhe de <strong>7 a 15 números</strong> (dentre <strong>31 disponíveis</strong>) e mais <strong>1 "Mês de Sorte"</strong> (entre 12 opções). São sorteados <strong>7 números</strong> e <strong>1 mês</strong> por concurso. A aposta mínima é de <strong>7 números</strong>.
+            `,
+            supersete: `
+                <strong>Super Sete</strong> é uma loteria onde você escolhe números em <strong>7 colunas</strong>, cada uma com números de <strong>0 a 9</strong>.<br>
+                <strong>Aposta Simples:</strong> 1 número por coluna (7 números)<br>
+                <strong>Apostas Múltiplas:</strong> Até 21 números no total<br>
+                São sorteados <strong>7 números</strong>, um para cada coluna.
+            `
         };
 
-        // Estado ATUAL (não é cache)
+        const LOTERIAS = {
+            megasena: {
+                nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6',
+                tipo: 'dispersao', temDispersao: true, temRepeticao: false,
+                dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25,
+                estrategia: 'Alta dispersão: evita números dos últimos concursos',
+                regras: ['6 números de 1 a 60', 'Alta dispersão natural', 'Intervalo médio de repetição: 15-20 concursos', 'Distribuição uniforme entre terços']
+            },
+            quina: {
+                nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b',
+                tipo: 'repeticao', temDispersao: false, temRepeticao: true,
+                repeticoesPadrao: 2, repeticoesMin: 1, repeticoesMax: 4,
+                estrategia: 'Força repetição de números do concurso anterior',
+                regras: ['5 números de 1 a 80', 'Alta taxa de repetição', '2-3 números repetem em média', 'Grupos frequentes identificáveis']
+            },
+            lotofacil: {
+                nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981',
+                tipo: 'repeticao_maxima', temDispersao: false, temRepeticao: true,
+                repeticoesPadrao: 9, repeticoesMin: 5, repeticoesMax: 12,
+                estrategia: 'Força repetição de 8-12 números + carimbados',
+                regras: ['15 números de 1 a 25', 'Altíssima repetição', '8-12 números repetem em média', 'Números carimbados (80%+)']
+            },
+            lotomania: {
+                nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444',
+                tipo: 'volatil', temDispersao: false, temRepeticao: false, temVolatilidade: true,
+                volatilidadePadrao: 'alta',
+                estrategia: '50 números marcados, 20 sorteados. Ganha com 20,19,18,17,16,15 ou 0 acertos',
+                regras: ['Você marca 50 números de 0 a 99', 'São sorteados 20 números', 'Ganha com 20, 19, 18, 17, 16 ou 15 acertos', 'Também ganha se NÃO acertar nenhum número!']
+            },
+            duplasena: {
+                nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4',
+                tipo: 'intermediario', temDispersao: true, temRepeticao: false,
+                dispersaoPadrao: 10, dispersaoMin: 4, dispersaoMax: 18,
+                estrategia: 'Dispersão moderada com 2 sorteios independentes',
+                regras: ['6 números de 1 a 50', 'Dois sorteios por concurso', 'Dispersão moderada (8-12 concursos)', 'Comportamento entre Mega e Quina']
+            },
+            timemania: {
+                nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899',
+                tipo: 'repeticao_moderada', temDispersao: false, temRepeticao: true,
+                repeticoesPadrao: 3, repeticoesMin: 1, repeticoesMax: 6,
+                estrategia: 'Similar à Quina com 10 números + Time do Coração',
+                regras: ['10 números de 1 a 80', 'Mais Time do Coração', 'Repetição moderada', 'Time é escolha pessoal']
+            },
+            milionaria: {
+                nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, trevos: 2, maxTrevos: 6, cor: '#a855f7',
+                tipo: 'dupla_matriz', temDispersao: true, temRepeticao: false,
+                dispersaoPadrao: 12, dispersaoMin: 5, dispersaoMax: 20,
+                estrategia: 'Matriz dupla: 6 números (1-50) + 2 trevos (1-6)',
+                regras: ['6 números de 1 a 50', '2 trevos de 1 a 6', 'Duas matrizes independentes', 'Dispersão para números']
+            },
+            loteca: {
+                nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16',
+                tipo: 'futebol', temDispersao: false, temRepeticao: false,
+                estrategia: '14 jogos de futebol com palpites',
+                regras: ['14 jogos de futebol', 'Palpites: Coluna 1, Meio, Coluna 2', 'Análise de favoritismo']
+            },
+            diadesorte: {
+                nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, mesSorte: 12, cor: '#f97316',
+                tipo: 'mes_sorte', temDispersao: true, temRepeticao: false,
+                dispersaoPadrao: 8, dispersaoMin: 3, dispersaoMax: 15,
+                estrategia: '7 números (1-31) + Mês da Sorte (1-12)',
+                regras: ['7 números de 1 a 31', '1 Mês da Sorte (1 a 12)', 'Números representam dias do mês']
+            },
+            supersete: {
+                nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24',
+                tipo: 'colunas', temDispersao: false, temRepeticao: false,
+                estrategia: '7 colunas independentes (0-9 cada)',
+                regras: ['7 colunas independentes', '1 número por coluna (0 a 9)', 'Análise por posição/coluna']
+            }
+        };
+
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
         let periodoAtual = 'all';
         let dispersaoAtual = 15;
         let repeticoesAtual = 2;
         
-        // Cache separado por loteria
         const cacheDados = {};
-        const estadoTreinamento = {};
-        
-        // Inicializar cache vazio para cada loteria
         Object.keys(LOTERIAS).forEach(key => {
             cacheDados[key] = { dados: [], carregado: false, nomeArquivo: null };
-            estadoTreinamento[key] = { treinado: false, treinando: false, modelo: null };
         });
 
-        // ============================================
-        // CARREGAMENTO DE CSV
-        // ============================================
-        
-        async function carregarCSVSeExistir(loteria) {
-            const nomeArquivo = `${loteria}.csv`;
+        function selecionarLoteria(loteria) {
+            loteriaAtual = loteria;
+            const config = LOTERIAS[loteria];
+            if (config.temDispersao) dispersaoAtual = config.dispersaoPadrao;
+            if (config.temRepeticao) repeticoesAtual = config.repeticoesPadrao || 2;
             
-            console.log(`📁 [${loteria}] Tentando carregar: ${nomeArquivo}`);
+            document.querySelectorAll('.lottery-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(`card-${loteria}`).classList.add('active');
             
-            // Tentar fetch
-            try {
-                const response = await fetch(nomeArquivo);
-                if (response.ok) {
-                    const texto = await response.text();
-                    processarDadosCSV(loteria, texto, nomeArquivo);
-                    console.log(`✅ [${loteria}] Carregado automaticamente!`);
-                    return true;
-                }
-            } catch (e) {
-                console.log(`⚠️ [${loteria}] Fetch falhou`);
+            if (cacheDados[loteria].carregado) {
+                dadosAtuais = [...cacheDados[loteria].dados];
+            } else {
+                dadosAtuais = [];
             }
             
-            return false;
+            renderizarConteudo(loteria);
         }
 
-        function processarDadosCSV(loteria, texto, nomeArquivo) {
+        function processarCSV(loteria, texto, nomeArquivo) {
             const config = LOTERIAS[loteria];
             const linhas = texto.split('\n').filter(l => l.trim());
-            
-            if (linhas.length < 2) {
-                console.log(`⚠️ [${loteria}] Arquivo vazio`);
-                return;
-            }
+            if (linhas.length < 2) return;
             
             const separador = linhas[0].includes(';') ? ';' : ',';
             const dados = [];
@@ -387,7 +487,7 @@
                 const numeros = colunas.map(n => parseInt(n.trim())).filter(n => !isNaN(n));
                 
                 if (loteria === 'lotomania') {
-                    if (numeros.length >= 50) dados.push(numeros.slice(0, 50).sort((a, b) => a - b));
+                    if (numeros.length >= 20) dados.push(numeros.slice(0, 20).sort((a, b) => a - b));
                 } else if (loteria === 'milionaria') {
                     if (numeros.length >= 8) {
                         dados.push({ numeros: numeros.slice(0, 6).sort((a, b) => a - b), trevos: numeros.slice(6, 8).sort((a, b) => a - b) });
@@ -401,218 +501,40 @@
                 }
             }
             
-            console.log(`📊 [${loteria}] ${dados.length} concursos processados`);
-            
-            // SALVAR NO CACHE DA LOTERIA CORRETA
-            cacheDados[loteria] = {
-                dados: dados,
-                carregado: true,
-                nomeArquivo: nomeArquivo
-            };
-            
-            // Se for a loteria atual, atualizar dadosAtuais
+            cacheDados[loteria] = { dados, carregado: true, nomeArquivo };
             if (loteriaAtual === loteria) {
                 dadosAtuais = [...dados];
-                atualizarInterfaceAposCarregamento(loteria);
+                atualizarInterface(loteria);
             }
         }
 
-        function atualizarInterfaceAposCarregamento(loteria) {
-            // Atualizar elementos da interface
+        function atualizarInterface(loteria) {
             const statsTotal = document.getElementById('stats-total');
             if (statsTotal) statsTotal.textContent = dadosAtuais.length;
-            
-            const logEl = document.getElementById('trainingLog');
-            if (logEl) {
-                logEl.innerHTML = `✅ ${cacheDados[loteria].nomeArquivo} carregado!\n📊 ${dadosAtuais.length} concursos de ${LOTERIAS[loteria].nome}`;
-            }
-            
-            atualizarStatusIALoteria(loteria, 'carregado');
-            
-            // Se dados suficientes, iniciar treinamento
-            if (dadosAtuais.length >= 50 && !estadoTreinamento[loteria].treinado && !estadoTreinamento[loteria].treinando) {
-                setTimeout(() => iniciarTreinamento(loteria), 300);
-            }
         }
 
-        function atualizarStatusIALoteria(loteria, status) {
-            // Atualizar bolinha no card
-            const statusEl = document.getElementById(`status-${loteria}`);
-            if (statusEl) {
-                statusEl.className = 'ia-status';
-                if (status === 'treinado') statusEl.classList.add('treinado');
-                else if (status === 'treinando') statusEl.classList.add('treinando');
-                else if (status === 'carregado') statusEl.classList.add('sem-dados');
-                else statusEl.classList.add('nao-treinado');
-            }
-            
-            // Atualizar badge na área de conteúdo (se for a loteria atual)
-            if (loteriaAtual === loteria) {
-                const trainingStatus = document.getElementById('trainingStatus');
-                if (trainingStatus) {
-                    if (status === 'treinado') { trainingStatus.textContent = 'Treinado ✓'; trainingStatus.className = 'status-badge status-ready'; }
-                    else if (status === 'treinando') { trainingStatus.textContent = 'Treinando...'; trainingStatus.className = 'status-badge status-training'; }
-                    else if (status === 'carregado') { trainingStatus.textContent = 'Dados Carregados'; trainingStatus.className = 'status-badge status-warning'; }
-                    else { trainingStatus.textContent = 'Sem Dados'; trainingStatus.className = 'status-badge status-error'; }
-                }
-            }
-        }
-
-        // ============================================
-        // TREINAMENTO
-        // ============================================
-        
-        async function iniciarTreinamento(loteria) {
-            if (estadoTreinamento[loteria].treinado || estadoTreinamento[loteria].treinando) return;
-            if (cacheDados[loteria].dados.length < 50) return;
-            
-            estadoTreinamento[loteria].treinando = true;
-            atualizarStatusIALoteria(loteria, 'treinando');
-            
-            console.log(`🚀 [${loteria}] Iniciando treinamento...`);
-            
-            const logEl = document.getElementById('trainingLog');
-            const progressBar = document.getElementById('trainingProgressBar');
-            
-            if (logEl && loteriaAtual === loteria) {
-                logEl.innerHTML += '\n🔄 Treinando IA...\n';
-            }
-            
-            for (let epoch = 1; epoch <= 20; epoch++) {
-                await new Promise(r => setTimeout(r, 100));
-                
-                if (logEl && loteriaAtual === loteria) {
-                    const pct = (epoch / 20 * 100).toFixed(0);
-                    logEl.innerHTML += `📊 Época ${epoch}/20 | Acc: ${(50 + epoch * 2).toFixed(1)}%\n`;
-                    logEl.scrollTop = logEl.scrollHeight;
-                    if (progressBar) progressBar.style.width = pct + '%';
-                }
-            }
-            
-            estadoTreinamento[loteria].treinado = true;
-            estadoTreinamento[loteria].treinando = false;
-            atualizarStatusIALoteria(loteria, 'treinado');
-            
-            console.log(`✅ [${loteria}] IA Treinada!`);
-            
-            if (logEl && loteriaAtual === loteria) {
-                logEl.innerHTML += '✅ IA Treinada com sucesso!\n';
-                if (progressBar) progressBar.style.width = '100%';
-            }
-        }
-
-        async function reiniciarTreinamento() {
-            const loteria = loteriaAtual;
-            estadoTreinamento[loteria].treinado = false;
-            estadoTreinamento[loteria].treinando = false;
-            atualizarStatusIALoteria(loteria, 'treinando');
-            
-            const progressBar = document.getElementById('trainingProgressBar');
-            if (progressBar) progressBar.style.width = '0%';
-            
-            await iniciarTreinamento(loteria);
-        }
-
-        // ============================================
-        // SELEÇÃO DE LOTERIA (CORRIGIDA)
-        // ============================================
-        
-        async function selecionarLoteria(loteria) {
-            console.log(`🔄 Alternando para: ${LOTERIAS[loteria].nome} [${loteria}]`);
-            
-            // ATUALIZAR loteriaAtual PRIMEIRO
-            loteriaAtual = loteria;
-            
-            // Atualizar configurações
-            const config = LOTERIAS[loteria];
-            if (config.temDispersao) dispersaoAtual = config.dispersaoPadrao;
-            if (config.temRepeticao) repeticoesAtual = config.repeticoesPadrao || 2;
-            
-            // Atualizar cards visuais
-            document.querySelectorAll('.lottery-card').forEach(c => c.classList.remove('active'));
-            const cardEl = document.getElementById(`card-${loteria}`);
-            if (cardEl) cardEl.classList.add('active');
-            
-            // CARREGAR DADOS DO CACHE DA LOTERIA CORRETA
-            if (cacheDados[loteria] && cacheDados[loteria].carregado) {
-                dadosAtuais = [...cacheDados[loteria].dados];
-                console.log(`📦 [${loteria}] Cache: ${dadosAtuais.length} concursos`);
-            } else {
-                dadosAtuais = [];
-                console.log(`📭 [${loteria}] Sem cache`);
-            }
-            
-            // Renderizar interface
-            renderizarConteudo(loteria);
-            
-            // Tentar carregar automaticamente se não tiver cache
-            if (!cacheDados[loteria].carregado) {
-                const carregado = await carregarCSVSeExistir(loteria);
-                if (carregado) {
-                    // Recarregar dados do cache após carregamento
-                    dadosAtuais = [...cacheDados[loteria].dados];
-                    // Re-renderizar para atualizar números
-                    renderizarConteudo(loteria);
-                }
-            }
-        }
-
-        // ============================================
-        // RENDERIZAÇÃO DO CONTEÚDO
-        // ============================================
-        
         function renderizarConteudo(loteria) {
             const config = LOTERIAS[loteria];
             const div = document.getElementById('conteudoLoteria');
-            const estado = estadoTreinamento[loteria];
             const cache = cacheDados[loteria];
             
             let controlesExtras = '';
-            
             if (config.temDispersao) {
-                controlesExtras += `
-                    <div>
-                        <label>🎯 Nível de Dispersão</label><br>
-                        <div class="dispersao-slider">
-                            <input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${config.dispersaoPadrao}" oninput="atualizarDispersao(this.value)">
-                            <div class="dispersao-valor">Bloquear últimos: <strong id="dispersaoValor" style="color: ${config.cor};">${config.dispersaoPadrao} concursos</strong></div>
-                        </div>
-                    </div>
-                `;
+                controlesExtras += `<div><label>🎯 Nível de Dispersão</label><br><div class="dispersao-slider"><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${config.dispersaoPadrao}" oninput="atualizarDispersao(this.value)"><div class="dispersao-valor">Bloquear últimos: <strong id="dispersaoValor" style="color: ${config.cor};">${config.dispersaoPadrao} concursos</strong></div></div></div>`;
             }
-            
             if (config.temRepeticao) {
-                controlesExtras += `
-                    <div>
-                        <label>🔄 Números para Repetir</label><br>
-                        <div class="dispersao-slider">
-                            <input type="range" id="repeticoesSlider" min="${config.repeticoesMin || 1}" max="${config.repeticoesMax || config.numeros}" value="${config.repeticoesPadrao || 2}" oninput="atualizarRepeticoes(this.value)">
-                            <div class="dispersao-valor">Repetir: <strong id="repeticoesValor" style="color: ${config.cor};">${config.repeticoesPadrao || 2} números</strong></div>
-                        </div>
-                    </div>
-                `;
+                controlesExtras += `<div><label>🔄 Números para Repetir</label><br><div class="dispersao-slider"><input type="range" id="repeticoesSlider" min="${config.repeticoesMin || 1}" max="${config.repeticoesMax || config.numeros}" value="${config.repeticoesPadrao || 2}" oninput="atualizarRepeticoes(this.value)"><div class="dispersao-valor">Repetir: <strong id="repeticoesValor" style="color: ${config.cor};">${config.repeticoesPadrao || 2} números</strong></div></div></div>`;
             }
-            
             if (config.temVolatilidade) {
-                controlesExtras += `
-                    <div>
-                        <label>📊 Volatilidade</label><br>
-                        <select id="volatilidadeNivel">
-                            <option value="alta">Alta (trocar 30)</option>
-                            <option value="media">Média (trocar 20)</option>
-                            <option value="baixa">Baixa (trocar 10)</option>
-                        </select>
-                    </div>
-                `;
+                controlesExtras += `<div><label>📊 Volatilidade</label><br><select id="volatilidadeNivel"><option value="alta">Alta (trocar 30)</option><option value="media">Média (trocar 20)</option><option value="baixa">Baixa (trocar 10)</option></select></div>`;
             }
             
-            const statusTexto = estado.treinado ? 'Treinado ✓' : estado.treinando ? 'Treinando...' : cache.carregado ? 'Dados Carregados' : 'Sem Dados';
-            const statusClasse = estado.treinado ? 'status-ready' : estado.treinando ? 'status-training' : cache.carregado ? 'status-warning' : 'status-error';
+            const statusTexto = cache.carregado ? 'Dados Carregados' : 'Sem Dados';
+            const statusClasse = cache.carregado ? 'status-warning' : 'status-error';
             
             let html = `
                 <div class="card">
                     <h3 style="color: ${config.cor};">${config.icone} ${config.nome} - IA Especializada</h3>
-                    
                     <div class="info-box" style="border-left: 4px solid ${config.cor};">
                         <h4 style="color: ${config.cor};">📊 Estratégia: ${config.estrategia}</h4>
                         ${config.regras.map(r => `<p>✅ ${r}</p>`).join('')}
@@ -621,40 +543,16 @@
                     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
                         <h4 style="margin: 0;">📁 Dados: ${dadosAtuais.length} concursos</h4>
                         <span id="trainingStatus" class="status-badge ${statusClasse}">${statusTexto}</span>
-                        <button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()" style="margin: 0; padding: 8px 16px; font-size: 13px;">
-                            📁 Fazer Upload
-                        </button>
-                        <input type="file" id="uploadManual" accept=".csv" onchange="uploadManualCSV(this, '${loteria}')" style="display: none;">
+                        <button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()" style="margin: 0; padding: 8px 16px; font-size: 13px;">📁 Fazer Upload</button>
+                        <input type="file" id="uploadManual" accept=".csv" onchange="importarArquivo(this, '${loteria}')" style="display: none;">
                     </div>
-                    
-                    ${!cache.carregado ? `
-                    <div class="mensagem-carregamento">
-                        <span>📂</span>
-                        <span>Arquivo <strong>${loteria}.csv</strong> não encontrado. Use o botão <strong>"📁 Fazer Upload"</strong> para carregar manualmente.</span>
-                    </div>
-                    ` : ''}
-                    
-                    <div class="training-progress">
-                        <div class="training-progress-bar" id="trainingProgressBar" style="width: ${estado.treinado ? '100%' : '0%'};"></div>
-                    </div>
-                    
-                    <div class="training-log" id="trainingLog">${cache.carregado ? `✅ ${cache.nomeArquivo} - ${dadosAtuais.length} concursos de ${config.nome}` : '⏳ Aguardando arquivo CSV...'}</div>
-                    
-                    <button class="btn btn-retrain" id="btnRetrain" onclick="reiniciarTreinamento()" ${estado.treinando || !cache.carregado ? 'disabled' : ''}>
-                        🔄 ${estado.treinado ? 'Reiniciar Treinamento' : 'Iniciar Treinamento'}
-                    </button>
+                    ${!cache.carregado ? `<div class="mensagem-carregamento">📂 Arquivo <strong>${loteria}.csv</strong> não encontrado. Use o botão <strong>"📁 Fazer Upload"</strong>.</div>` : ''}
 
                     <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="label">Concursos</div>
-                            <div class="value" id="stats-total" style="color: ${config.cor};">${dadosAtuais.length}</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="label">Tipo de IA</div>
-                            <div class="value" style="font-size: 14px; color: ${config.cor};">${config.tipo.toUpperCase()}</div>
-                        </div>
-                        ${config.temDispersao ? `<div class="stat-card"><div class="label">Dispersão</div><div class="value" style="font-size: 14px; color: ${config.cor};" id="stats-dispersao">${config.dispersaoPadrao} conc.</div></div>` : ''}
-                        ${config.temRepeticao ? `<div class="stat-card"><div class="label">Repetição</div><div class="value" style="font-size: 14px; color: ${config.cor};" id="stats-repeticao">${config.repeticoesPadrao || 2} nºs</div></div>` : ''}
+                        <div class="stat-card"><div class="label">Concursos</div><div class="value" id="stats-total" style="color: ${config.cor};">${dadosAtuais.length}</div></div>
+                        <div class="stat-card"><div class="label">Tipo de IA</div><div class="value" style="font-size: 14px; color: ${config.cor};">${config.tipo.toUpperCase()}</div></div>
+                        ${config.temDispersao ? `<div class="stat-card"><div class="label">Dispersão</div><div class="value" style="font-size: 14px; color: ${config.cor};">${config.dispersaoPadrao} conc.</div></div>` : ''}
+                        ${config.temRepeticao ? `<div class="stat-card"><div class="label">Repetição</div><div class="value" style="font-size: 14px; color: ${config.cor};">${config.repeticoesPadrao || 2} nºs</div></div>` : ''}
                     </div>
                 </div>
 
@@ -672,61 +570,43 @@
 
                 <div class="card">
                     <h4>🎲 Gerar Jogos - ${config.nome}</h4>
-                    
                     <div class="config-grid">
                         <div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="3" min="1" max="20"></div>
                         <div><label>Modo de Geração</label><br><select id="modoGeracao"><option value="ia">🤖 IA Especializada</option><option value="profissional">📈 Modo Profissional</option><option value="hibrido">🚀 Híbrido</option><option value="random">🎯 Aleatório</option></select></div>
                         ${controlesExtras}
                     </div>
-                    
                     <button class="btn btn-primary" onclick="gerarJogos()" style="background: ${config.cor};">${config.icone} Gerar Jogos</button>
                     <div id="resultados" style="margin-top: 20px;"></div>
+                </div>
+
+                <!-- REGRAS OFICIAIS DA LOTERIA -->
+                <div class="regras-oficiais">
+                    <h4>📜 Regras Oficiais da ${config.nome}</h4>
+                    <p>${REGRAS_OFICIAIS[loteria]}</p>
                 </div>
             `;
             
             div.innerHTML = html;
-            
             setTimeout(() => {
                 document.querySelectorAll('.filtro-btn.ativo').forEach(btn => {
-                    btn.style.background = config.cor;
-                    btn.style.borderColor = config.cor;
-                    btn.style.color = 'white';
+                    btn.style.background = config.cor; btn.style.borderColor = config.cor; btn.style.color = 'white';
                 });
             }, 100);
         }
 
-        function uploadManualCSV(input, loteria) {
+        function importarArquivo(input, loteria) {
             const file = input.files[0];
             if (!file) return;
-            
-            console.log(`📄 [${loteria}] Upload manual: ${file.name}`);
-            
             const reader = new FileReader();
             reader.onload = (e) => {
-                processarDadosCSV(loteria, e.target.result, file.name);
-                // Recarregar dados do cache e re-renderizar
-                dadosAtuais = [...cacheDados[loteria].dados];
+                processarCSV(loteria, e.target.result, file.name);
                 renderizarConteudo(loteria);
-                atualizarStatusIALoteria(loteria, 'carregado');
             };
             reader.readAsText(file);
         }
 
-        // ============================================
-        // FUNÇÕES AUXILIARES
-        // ============================================
-
-        function atualizarDispersao(valor) {
-            dispersaoAtual = parseInt(valor);
-            const el = document.getElementById('dispersaoValor');
-            if (el) el.textContent = `${valor} concursos`;
-        }
-
-        function atualizarRepeticoes(valor) {
-            repeticoesAtual = parseInt(valor);
-            const el = document.getElementById('repeticoesValor');
-            if (el) el.textContent = `${valor} números`;
-        }
+        function atualizarDispersao(valor) { dispersaoAtual = parseInt(valor); const el = document.getElementById('dispersaoValor'); if (el) el.textContent = `${valor} concursos`; }
+        function atualizarRepeticoes(valor) { repeticoesAtual = parseInt(valor); const el = document.getElementById('repeticoesValor'); if (el) el.textContent = `${valor} números`; }
 
         function setPeriodo(periodo) {
             periodoAtual = periodo;
@@ -747,24 +627,10 @@
             return dadosAtuais.slice(-periodoAtual * 100);
         }
 
-        // ============================================
-        // ALGORITMOS DE GERAÇÃO
-        // ============================================
-
         function gerarAleatorio(numNumeros, maxNumero, minNumero = 1) {
             const jogo = new Set();
             while (jogo.size < numNumeros) jogo.add(Math.floor(Math.random() * (maxNumero - minNumero + 1)) + minNumero);
             return Array.from(jogo).sort((a, b) => a - b);
-        }
-
-        function temSequencia(jogoSet, novoNumero) {
-            const nums = [...jogoSet, novoNumero].sort((a, b) => a - b);
-            let c = 1;
-            for (let i = 1; i < nums.length; i++) {
-                if (nums[i] === nums[i-1] + 1) { c++; if (c > 2) return true; }
-                else c = 1;
-            }
-            return false;
         }
 
         function gerarDispersao(dados, numNumeros, maxNumero, dispersao) {
@@ -779,12 +645,7 @@
             for (let n = 1; n <= maxNumero; n++) { if (!bloqueados.has(n)) candidatos.push(n); }
             const pool = candidatos.length >= numNumeros * 2 ? candidatos : Array.from({length: maxNumero}, (_, i) => i + 1);
             const jogo = new Set();
-            let t = 0;
-            while (jogo.size < numNumeros && t < 200) {
-                const n = pool[Math.floor(Math.random() * pool.length)];
-                if (!temSequencia(jogo, n)) jogo.add(n);
-                t++;
-            }
+            while (jogo.size < numNumeros) jogo.add(pool[Math.floor(Math.random() * pool.length)]);
             return Array.from(jogo).sort((a, b) => a - b);
         }
 
@@ -793,26 +654,14 @@
             const ultimo = Array.isArray(dados[dados.length - 1]) ? dados[dados.length - 1] : dados[dados.length - 1].numeros;
             const repetidos = [];
             const pool = [...ultimo];
-            for (let i = 0; i < repeticoes && pool.length > 0; i++) {
-                repetidos.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-            }
+            for (let i = 0; i < repeticoes && pool.length > 0; i++) repetidos.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
             const freq = new Array(maxNumero).fill(0);
             dados.forEach(j => { const n = Array.isArray(j) ? j : j.numeros; n.forEach(x => freq[x - 1]++); });
-            dados.forEach(j => {
-                const n = Array.isArray(j) ? j : j.numeros;
-                if (repetidos.filter(r => n.includes(r)).length >= 2) n.forEach(x => freq[x - 1] += 2);
-            });
             const jogo = new Set(repetidos);
             while (jogo.size < numNumeros) {
-                const total = freq.reduce((a, b) => a + b, 0);
-                if (total === 0) { const n = Math.floor(Math.random() * maxNumero) + 1; if (!jogo.has(n)) jogo.add(n); }
-                else {
-                    let r = Math.random() * total, acc = 0;
-                    for (let i = 0; i < freq.length; i++) {
-                        acc += freq[i];
-                        if (acc >= r && !jogo.has(i + 1)) { jogo.add(i + 1); freq[i] = 0; break; }
-                    }
-                }
+                const idx = freq.indexOf(Math.max(...freq));
+                if (idx >= 0 && !jogo.has(idx + 1)) jogo.add(idx + 1);
+                freq[idx] = 0;
             }
             return Array.from(jogo).sort((a, b) => a - b);
         }
@@ -836,11 +685,15 @@
 
         function gerarLotomania(dados) {
             if (dados.length === 0) return gerarAleatorio(50, 99, 0);
-            const v = document.getElementById('volatilidadeNivel')?.value || 'alta';
-            const trocas = v === 'alta' ? 30 : v === 'media' ? 20 : 10;
-            const manter = dados[dados.length - 1].slice(0, 50 - trocas);
-            const jogo = new Set(manter);
-            while (jogo.size < 50) jogo.add(Math.floor(Math.random() * 100));
+            const frequencias = new Array(100).fill(0);
+            dados.forEach(jogo => jogo.forEach(n => frequencias[n]++));
+            const todosNumeros = Array.from({length: 100}, (_, i) => i);
+            const ordenadosPorFrequencia = todosNumeros.sort((a, b) => frequencias[a] - frequencias[b]);
+            const poolMenosFrequentes = ordenadosPorFrequencia.slice(0, 70);
+            const jogo = new Set();
+            while (jogo.size < 50) {
+                jogo.add(poolMenosFrequentes[Math.floor(Math.random() * poolMenosFrequentes.length)]);
+            }
             return Array.from(jogo).sort((a, b) => a - b);
         }
 
@@ -879,8 +732,9 @@
             
             for (let i = 0; i < qtd; i++) {
                 let jogo;
-                if (modo === 'random') { jogo = gerarAleatorio(config.numeros, config.maxNumero); }
-                else {
+                if (modo === 'random') {
+                    jogo = loteriaAtual === 'lotomania' ? gerarAleatorio(50, 99, 0) : gerarAleatorio(config.numeros, config.maxNumero);
+                } else {
                     switch (loteriaAtual) {
                         case 'megasena': jogo = gerarDispersao(dados, 6, 60, dispersaoAtual); break;
                         case 'quina': jogo = gerarRepeticao(dados, 5, 80, repeticoesAtual); break;
@@ -895,16 +749,18 @@
                         default: jogo = gerarAleatorio(config.numeros, config.maxNumero);
                     }
                 }
-                if (modo === 'hibrido' && Math.random() > 0.5) jogo = gerarAleatorio(config.numeros, config.maxNumero);
                 html += renderizarJogo(jogo, i, config, modo);
             }
             document.getElementById('resultados').innerHTML = html;
         }
 
         function renderizarJogo(jogo, index, config, modo) {
-            let bolasHTML = '', infoExtra = '';
+            let bolasHTML = '';
             
-            if (loteriaAtual === 'milionaria') {
+            if (loteriaAtual === 'lotomania') {
+                const numeros = Array.isArray(jogo) ? jogo : jogo;
+                bolasHTML = `<p style="color: ${config.cor}; font-size: 13px;">📝 ${numeros.length} números marcados | 🎯 20 serão sorteados</p><div class="bolas">${numeros.slice(0, 20).map(n => `<div class="bola" style="background: ${config.cor}; width: 32px; height: 32px; font-size: 12px;">${n}</div>`).join('')}<span style="color: ${config.cor}; font-weight: 600;">...+${numeros.length - 20} números</span></div><p style="color: var(--text-secondary); font-size: 12px;">💡 Estratégia: Números MENOS frequentes (0 acertos também ganha!)</p>`;
+            } else if (loteriaAtual === 'milionaria') {
                 bolasHTML = `<p style="color: ${config.cor};">Números:</p><div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: #10b981;">Trevos:</p><div class="bolas">${jogo.trevos.map(t => `<div class="bola" style="background: #10b981;">${t}</div>`).join('')}</div>`;
             } else if (loteriaAtual === 'loteca') {
                 bolasHTML = `<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">${jogo.map((p, idx) => `<div style="background: var(--bg-card); padding: 8px; border-radius: 8px; text-align: center; font-size: 12px;"><div style="color: ${config.cor};">J${idx+1}</div><div style="font-weight: 600;">${p}</div></div>`).join('')}</div>`;
@@ -916,25 +772,15 @@
                 bolasHTML = `<p style="color: ${config.cor};">1º Sorteio:</p><div class="bolas">${jogo[0].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor};">2º Sorteio:</p><div class="bolas">${jogo[1].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div>`;
             } else {
                 const numeros = Array.isArray(jogo) ? jogo : (jogo.numeros || jogo);
-                const soma = numeros.reduce((a, b) => a + b, 0);
-                const pares = numeros.filter(n => n % 2 === 0).length;
-                bolasHTML = `<div class="bolas">${numeros.slice(0, 20).map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}${numeros.length > 20 ? `<span style="color: ${config.cor};">...+${numeros.length - 20}</span>` : ''}</div>`;
-                infoExtra = `<div style="margin-top: 10px; font-size: 13px; color: var(--text-secondary);">${config.temDispersao ? `Dispersão: <span style="color: ${config.cor};">${dispersaoAtual} conc.</span> | ` : ''}${config.temRepeticao ? `Repetidos: <span style="color: ${config.cor};">${repeticoesAtual} nºs</span> | ` : ''}Soma: <span style="color: ${config.cor};">${soma}</span> | Pares: <span style="color: ${config.cor};">${pares}</span></div>`;
+                bolasHTML = `<div class="bolas">${numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div>`;
             }
             
-            return `<div class="resultado-jogo"><h4 style="color: ${config.cor};">${config.icone} Jogo ${index + 1} - Modo: ${modo.toUpperCase()}</h4>${bolasHTML}${infoExtra}</div>`;
+            return `<div class="resultado-jogo"><h4 style="color: ${config.cor};">${config.icone} Jogo ${index + 1} - Modo: ${modo.toUpperCase()}</h4>${bolasHTML}</div>`;
         }
 
-        // ============================================
-        // INICIALIZAÇÃO
-        // ============================================
-        
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Sistema de Loterias IA inicializado!');
-            console.log('📁 Cache separado para cada loteria');
-            console.log('✅ Dados NÃO se misturam entre loterias');
-            
-            await selecionarLoteria('megasena');
+            renderizarConteudo('megasena');
         });
     </script>
 </body>
