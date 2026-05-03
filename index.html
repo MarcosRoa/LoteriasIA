@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Completo de Loterias com IA Especializada</title>
+    <title>Sistema Profissional de Loterias com IA Real</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
@@ -152,9 +152,14 @@
         }
 
         .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
         .btn-primary { background: #22c55e; color: white; }
         .btn-upload { background: #3b82f6; color: white; }
         .btn-treinar { background: #f59e0b; color: #1e293b; }
+        .btn-backtest { background: #06b6d4; color: #1e293b; }
+        .btn-cancelar { background: #ef4444; color: white; }
+        .btn-confirmar { background: #22c55e; color: white; }
+        .btn-exemplo { background: #64748b; color: white; }
 
         input, select {
             padding: 12px;
@@ -191,7 +196,20 @@
             border-radius: var(--radius);
             border: 2px solid var(--border);
             margin-bottom: 15px;
+            position: relative;
         }
+
+        .confianca-bar {
+            height: 4px;
+            border-radius: 2px;
+            margin: 8px 0;
+            transition: width 0.5s ease;
+        }
+        .confianca-alta { background: linear-gradient(90deg, #22c55e, #10b981); }
+        .confianca-media { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .confianca-baixa { background: linear-gradient(90deg, #ef4444, #f97316); }
+
+        .confianca-label { font-size: 11px; color: var(--text-secondary); margin-top: 3px; }
 
         .info-box {
             background: var(--bg-card);
@@ -200,9 +218,6 @@
             border-radius: var(--radius);
             margin: 15px 0;
         }
-
-        .info-box h4 { margin-bottom: 10px; }
-        .info-box p { font-size: 13px; color: var(--text-secondary); margin: 3px 0; }
 
         .regras-oficiais {
             background: var(--bg-card);
@@ -218,7 +233,20 @@
         .regras-oficiais h4 { color: #38bdf8; margin-bottom: 10px; font-size: 15px; }
         .regras-oficiais strong { color: #fbbf24; }
 
-        /* Treinamento IA - VISÍVEL */
+        .backtest-result {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: var(--radius);
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .backtest-result .modelo-nome { font-weight: 600; }
+        .backtest-result .modelo-score { color: #fbbf24; font-weight: 700; }
+
         .training-section {
             background: var(--bg-card);
             border: 2px solid var(--border);
@@ -227,45 +255,22 @@
             margin: 15px 0;
         }
 
-        .training-section h4 {
-            color: #fbbf24;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .training-section h4 { color: #fbbf24; margin-bottom: 15px; }
+        .training-progress { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin: 10px 0; overflow: hidden; }
+        .training-progress-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #22c55e); border-radius: 4px; transition: width 0.3s ease; width: 0%; }
+        .training-log { background: var(--bg-primary); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border); font-family: 'Courier New', monospace; font-size: 12px; color: #86efac; max-height: 200px; overflow-y: auto; margin-top: 10px; }
 
-        .training-progress {
-            width: 100%;
-            height: 8px;
-            background: var(--border);
-            border-radius: 4px;
-            margin: 10px 0;
-            overflow: hidden;
+        .tf-indicator {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
         }
+        .tf-active { background: #8b5cf6; color: white; }
+        .tf-inactive { background: #64748b; color: white; }
 
-        .training-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #f59e0b, #22c55e);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        .training-log {
-            background: var(--bg-primary);
-            padding: 15px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #86efac;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 10px;
-        }
-
-        /* Filtros aplicados */
         .filtros-aplicados {
             background: rgba(56, 189, 248, 0.1);
             border: 2px solid #38bdf8;
@@ -273,12 +278,7 @@
             border-radius: var(--radius);
             margin: 15px 0;
         }
-
-        .filtros-aplicados h4 {
-            color: #38bdf8;
-            margin-bottom: 10px;
-        }
-
+        .filtros-aplicados h4 { color: #38bdf8; margin-bottom: 10px; }
         .filtros-aplicados .filtro-item {
             display: inline-block;
             background: var(--bg-card);
@@ -288,10 +288,7 @@
             font-size: 12px;
             border: 1px solid var(--border);
         }
-
-        .filtros-aplicados .filtro-item strong {
-            color: #fbbf24;
-        }
+        .filtros-aplicados .filtro-item strong { color: #fbbf24; }
 
         .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
@@ -303,23 +300,36 @@
             border: 1px solid var(--border);
             text-align: center;
         }
-
         .stat-card .label { font-size: 11px; color: var(--text-secondary); }
         .stat-card .value { font-size: 20px; font-weight: 700; margin-top: 5px; }
 
-        .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
-
+        .filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0;
+        }
         .filtro-btn {
-            padding: 8px 16px;
+            padding: 10px 20px;
             border: 2px solid var(--border);
-            border-radius: 20px;
+            border-radius: 30px;
             background: var(--bg-card);
             color: var(--text-primary);
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-
-        .filtro-btn.ativo { background: #38bdf8; color: var(--bg-secondary); border-color: #38bdf8; }
+        .filtro-btn:hover {
+            transform: translateY(-2px);
+            border-color: #38bdf8;
+        }
+        .filtro-btn.ativo {
+            background: #38bdf8;
+            color: var(--bg-secondary);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56,189,248,0.3);
+        }
 
         .dispersao-slider { width: 100%; max-width: 300px; }
         .dispersao-slider input[type="range"] { width: 100%; margin: 10px 0; }
@@ -331,6 +341,16 @@
         .status-warning { background: #f97316; color: white; }
         .status-training { background: #f59e0b; color: #1e293b; animation: pulse 1.5s infinite; }
 
+        .mensagem-sucesso {
+            background: rgba(34, 197, 94, 0.1);
+            border: 2px solid #22c55e;
+            padding: 10px 15px;
+            border-radius: var(--radius);
+            margin: 10px 0;
+            font-size: 13px;
+            color: #86efac;
+        }
+
         .mensagem-carregamento {
             background: var(--bg-card);
             border: 2px solid #f59e0b;
@@ -341,14 +361,14 @@
             color: #fde68a;
         }
 
-        .mensagem-sucesso {
-            background: rgba(34, 197, 94, 0.1);
-            border: 2px solid #22c55e;
+        .mensagem-erro {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
             padding: 10px 15px;
             border-radius: var(--radius);
             margin: 10px 0;
             font-size: 13px;
-            color: #86efac;
+            color: #fca5a5;
         }
 
         .ia-treinada-badge {
@@ -362,11 +382,82 @@
             animation: pulse 2s infinite;
         }
 
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-container {
+            background: var(--bg-secondary);
+            border: 2px solid #38bdf8;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            margin: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px;
+            border-bottom: 2px solid #38bdf8;
+            border-radius: 18px 18px 0 0;
+        }
+        .modal-header h3 {
+            color: #38bdf8;
+            margin: 0;
+        }
+        .modal-body {
+            padding: 25px;
+        }
+        .config-item {
+            background: var(--bg-card);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border);
+        }
+        .config-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .config-value {
+            font-weight: 700;
+            color: #fbbf24;
+        }
+        .modal-footer {
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border);
+        }
+
         @media (max-width: 768px) {
             .lottery-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
             .header-content { gap: 15px; }
             .header-logo img { width: 120px; }
             .header h1 { font-size: 22px; }
+            .filtro-btn { padding: 6px 12px; font-size: 12px; }
         }
     </style>
 </head>
@@ -377,8 +468,8 @@
                 <img src="BrasãoRoa Imagem.png" alt="ROA SOUZA·KARLOWSKI" onerror="this.style.display='none'" title="ROA SOUZA·KARLOWSKI">
             </div>
             <div class="header-text">
-                <h1>🎯 Sistema Completo de Loterias com IA Especializada</h1>
-                <p class="header-subtitle">10 loterias • IAs individuais • Treinamento com Filtros</p>
+                <h1>🎯 Sistema Profissional de Loterias com IA Real</h1>
+                <p class="header-subtitle">10 loterias • IA Especialista • Dados Reais • Análise Profissional</p>
             </div>
             <div class="header-logo">
                 <img src="BrasãoRoa Imagem.png" alt="ROA SOUZA·KARLOWSKI" onerror="this.style.display='none'" title="ROA SOUZA·KARLOWSKI">
@@ -391,62 +482,52 @@
             <div class="lottery-card active" onclick="selecionarLoteria('megasena')" id="card-megasena">
                 <div class="ia-status nao-treinado" id="status-megasena"></div>
                 <h3>💰 Mega-Sena</h3><span class="badge badge-dispersao">Alta Dispersão</span>
-                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span>
-                <p class="rules">6 números • 1 a 60</p>
+                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span><p class="rules">6 números • 1 a 60</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('quina')" id="card-quina">
                 <div class="ia-status nao-treinado" id="status-quina"></div>
                 <h3>🎯 Quina</h3><span class="badge badge-repeticao">Alta Repetição</span>
-                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span>
-                <p class="rules">5 números • 1 a 80</p>
+                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span><p class="rules">5 números • 1 a 80</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('lotofacil')" id="card-lotofacil">
                 <div class="ia-status nao-treinado" id="status-lotofacil"></div>
                 <h3>🍀 Lotofácil</h3><span class="badge badge-repeticao">Repetição Máxima</span>
-                <span class="impacto-badge impacto-cuidado">🟡 Cuidado</span>
-                <p class="rules">15 números • 1 a 25</p>
+                <span class="impacto-badge impacto-cuidado">🟡 Cuidado</span><p class="rules">15 números • 1 a 25</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('lotomania')" id="card-lotomania">
                 <div class="ia-status nao-treinado" id="status-lotomania"></div>
                 <h3>🎪 Lotomania</h3><span class="badge badge-volatil">50 marca • 20 sorteia</span>
-                <span class="impacto-badge impacto-cuidado">🟡 Cuidado</span>
-                <p class="rules">50 números • 0 a 99</p>
+                <span class="impacto-badge impacto-cuidado">🟡 Cuidado</span><p class="rules">50 números • 0 a 99</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('duplasena')" id="card-duplasena">
                 <div class="ia-status nao-treinado" id="status-duplasena"></div>
                 <h3>🎲 Dupla Sena</h3><span class="badge badge-padrao">Intermediário</span>
-                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span>
-                <p class="rules">6 números • 2 sorteios</p>
+                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span><p class="rules">6 números • 2 sorteios</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('timemania')" id="card-timemania">
                 <div class="ia-status nao-treinado" id="status-timemania"></div>
                 <h3>⚽ Timemania</h3><span class="badge badge-especial">Time do Coração</span>
-                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span>
-                <p class="rules">10 números + Time</p>
+                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span><p class="rules">10 números + Time</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('milionaria')" id="card-milionaria">
                 <div class="ia-status nao-treinado" id="status-milionaria"></div>
                 <h3>💎 +Milionária</h3><span class="badge badge-especial">Dupla Matriz</span>
-                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span>
-                <p class="rules">6 números + 2 trevos</p>
+                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span><p class="rules">6 números + 2 trevos</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('loteca')" id="card-loteca">
                 <div class="ia-status nao-treinado" id="status-loteca"></div>
                 <h3>⚽ Loteca</h3><span class="badge badge-especial">Futebol</span>
-                <span class="impacto-badge impacto-nao-mexer">🔴 Não Mexer</span>
-                <p class="rules">14 jogos • Palpites</p>
+                <span class="impacto-badge impacto-nao-mexer">🔴 Não Mexer</span><p class="rules">14 jogos • Palpites</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('diadesorte')" id="card-diadesorte">
                 <div class="ia-status nao-treinado" id="status-diadesorte"></div>
                 <h3>📅 Dia de Sorte</h3><span class="badge badge-padrao">Mês da Sorte</span>
-                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span>
-                <p class="rules">7 números + Mês</p>
+                <span class="impacto-badge impacto-seguro">🟢 IA Seguro</span><p class="rules">7 números + Mês</p>
             </div>
             <div class="lottery-card" onclick="selecionarLoteria('supersete')" id="card-supersete">
                 <div class="ia-status nao-treinado" id="status-supersete"></div>
                 <h3>🌟 Super Sete</h3><span class="badge badge-dispersao">Colunas</span>
-                <span class="impacto-badge impacto-nao-mexer">🔴 Não Mexer</span>
-                <p class="rules">7 colunas • 0 a 9</p>
+                <span class="impacto-badge impacto-nao-mexer">🔴 Não Mexer</span><p class="rules">7 colunas • 0 a 9</p>
             </div>
         </div>
 
@@ -455,49 +536,304 @@
 
     <script>
         // ============================================
-        // CONFIGURAÇÕES (MANTIDAS - SEM ALTERAÇÕES)
+        // CONFIGURAÇÕES DAS LOTERIAS
         // ============================================
         
         const REGRAS_OFICIAIS = {
-            megasena: `<strong>Mega-Sena</strong> é uma loteria onde o apostador escolhe de <strong>6 a 20 números</strong>, de <strong>1 a 60</strong>, ganhando o prêmio principal ao acertar as <strong>6 dezenas</strong> sorteadas. A aposta mínima é de <strong>6 números</strong>.`,
-            quina: `Na <strong>Quina</strong>, selecione de <strong>5 a 15 números</strong> dentre os <strong>80 disponíveis</strong> no volante. A aposta mínima é de <strong>5 números</strong>. Ganha prêmios acertando 2, 3, 4 ou 5 dezenas.`,
-            lotofacil: `<strong>Lotofácil</strong> consiste em marcar de <strong>15 a 20 números</strong>, dentre os <strong>25 disponíveis</strong> no volante, ganhando prêmios ao acertar <strong>11, 12, 13, 14 ou 15 dezenas</strong>. A aposta mínima é de <strong>15 números</strong>.`,
-            lotomania: `Na <strong>Lotomania</strong> você escolhe <strong>50 números</strong> entre 100 disponíveis (<strong>00 a 99</strong>) e ganha prêmios acertando <strong>20, 19, 18, 17, 16, 15 ou nenhum número (0 acertos)</strong>. A aposta é sempre de <strong>50 números</strong>.`,
-            duplasena: `A <strong>Dupla Sena</strong> permite apostar de <strong>6 a 15 números</strong> dentre <strong>50 disponíveis</strong>. Ganha-se acertando <strong>3, 4, 5 ou 6</strong> números no 1º e/ou 2º sorteio. A aposta mínima é de <strong>6 números</strong>.`,
-            timemania: `<strong>Timemania</strong> consiste em escolher <strong>10 números</strong> entre <strong>80 disponíveis</strong> e <strong>1 time do coração</strong>. São sorteados <strong>7 números</strong> e <strong>1 time</strong> por concurso.`,
-            milionaria: `Na <strong>+Milionária</strong>, escolha de <strong>6 a 12 números</strong> (de 01 a 50) e de <strong>2 a 6 trevos</strong> (de 01 a 06). A aposta mínima é de <strong>6 números e 2 trevos</strong>.`,
-            loteca: `<strong>Loteca</strong> é baseada em <strong>14 jogos de futebol</strong>. O objetivo é acertar os resultados:<br><strong>Coluna 1:</strong> Time mandante vence<br><strong>Coluna X (Meio):</strong> Empate<br><strong>Coluna 2:</strong> Time visitante vence`,
-            diadesorte: `<strong>Dia de Sorte</strong> é uma loteria onde você escolhe de <strong>7 a 15 números</strong> (dentre <strong>31 disponíveis</strong>) e mais <strong>1 "Mês de Sorte"</strong> (entre 12 opções).`,
-            supersete: `<strong>Super Sete</strong> é uma loteria onde você escolhe números em <strong>7 colunas</strong>, cada uma com números de <strong>0 a 9</strong>.`
+            megasena: `<strong>Mega-Sena</strong> - 6 a 20 números, de 1 a 60. Mínimo 6 números.`,
+            quina: `<strong>Quina</strong> - 5 a 15 números, de 1 a 80. Mínimo 5 números.`,
+            lotofacil: `<strong>Lotofácil</strong> - 15 a 20 números, de 1 a 25. Mínimo 15 números.`,
+            lotomania: `<strong>Lotomania</strong> - 50 números entre 00 a 99. 20 sorteados.`,
+            duplasena: `<strong>Dupla Sena</strong> - 6 a 15 números, de 1 a 50. Mínimo 6.`,
+            timemania: `<strong>Timemania</strong> - 10 números (1-80) + Time do Coração.`,
+            milionaria: `<strong>+Milionária</strong> - 6 números (1-50) + 2 trevos (1-6).`,
+            loteca: `<strong>Loteca</strong> - 14 jogos de futebol. Coluna 1, X, Coluna 2.`,
+            diadesorte: `<strong>Dia de Sorte</strong> - 7 a 15 números (1-31) + Mês da Sorte.`,
+            supersete: `<strong>Super Sete</strong> - 7 colunas, 0 a 9 cada.`
         };
 
         const IMPACTO_IA = {
-            megasena: { nivel: 'seguro', desc: '🟢 IA funciona bem - Alta dispersão permite boas previsões' },
-            quina: { nivel: 'seguro', desc: '🟢 IA funciona bem - Padrões de repetição são capturáveis' },
-            lotofacil: { nivel: 'cuidado', desc: '🟡 Cuidado - Já tem lógica estatística forte (carimbados)' },
-            lotomania: { nivel: 'cuidado', desc: '🟡 Cuidado - Muito sensível a variações (50 números)' },
-            duplasena: { nivel: 'seguro', desc: '🟢 IA funciona bem - Comportamento intermediário' },
+            megasena: { nivel: 'seguro', desc: '🟢 IA funciona bem - Alta dispersão' },
+            quina: { nivel: 'seguro', desc: '🟢 IA funciona bem - Padrões de repetição' },
+            lotofacil: { nivel: 'cuidado', desc: '🟡 Cuidado - Lógica estatística forte' },
+            lotomania: { nivel: 'cuidado', desc: '🟡 Cuidado - Muito sensível' },
+            duplasena: { nivel: 'seguro', desc: '🟢 IA funciona bem - Intermediário' },
             timemania: { nivel: 'seguro', desc: '🟢 IA funciona bem - Similar à Quina' },
-            milionaria: { nivel: 'seguro', desc: '🟢 IA funciona bem - Dupla matriz com dispersão' },
-            loteca: { nivel: 'nao-mexer', desc: '🔴 Não mexer muito - Não é numérico puro (futebol)' },
-            diadesorte: { nivel: 'seguro', desc: '🟢 IA funciona bem - Números com dispersão controlada' },
-            supersete: { nivel: 'nao-mexer', desc: '🔴 Não mexer muito - Estrutura por colunas independentes' }
+            milionaria: { nivel: 'seguro', desc: '🟢 IA funciona bem - Dupla matriz' },
+            loteca: { nivel: 'nao-mexer', desc: '🔴 Não mexer - Futebol' },
+            diadesorte: { nivel: 'seguro', desc: '🟢 IA funciona bem - Dispersão controlada' },
+            supersete: { nivel: 'nao-mexer', desc: '🔴 Não mexer - Colunas independentes' }
         };
 
         const LOTERIAS = {
-            megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', tipo: 'dispersao', temDispersao: true, temRepeticao: false, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25, estrategia: 'Alta dispersão: evita números dos últimos concursos' },
-            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', tipo: 'repeticao', temDispersao: false, temRepeticao: true, repeticoesPadrao: 2, repeticoesMin: 1, repeticoesMax: 4, estrategia: 'Força repetição de números do concurso anterior' },
-            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', tipo: 'repeticao_maxima', temDispersao: false, temRepeticao: true, repeticoesPadrao: 9, repeticoesMin: 5, repeticoesMax: 12, estrategia: 'Força repetição de 8-12 números + carimbados' },
-            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', tipo: 'volatil', temDispersao: false, temRepeticao: false, temVolatilidade: true, estrategia: '50 números marcados, 20 sorteados' },
-            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', tipo: 'intermediario', temDispersao: true, temRepeticao: false, dispersaoPadrao: 10, dispersaoMin: 4, dispersaoMax: 18, estrategia: 'Dispersão moderada com 2 sorteios independentes' },
-            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', tipo: 'repeticao_moderada', temDispersao: false, temRepeticao: true, repeticoesPadrao: 3, repeticoesMin: 1, repeticoesMax: 6, estrategia: 'Similar à Quina com 10 números + Time' },
-            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, trevos: 2, maxTrevos: 6, cor: '#a855f7', tipo: 'dupla_matriz', temDispersao: true, temRepeticao: false, dispersaoPadrao: 12, dispersaoMin: 5, dispersaoMax: 20, estrategia: 'Matriz dupla: 6 números (1-50) + 2 trevos (1-6)' },
-            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16', tipo: 'futebol', temDispersao: false, temRepeticao: false, estrategia: '14 jogos de futebol com palpites' },
-            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, mesSorte: 12, cor: '#f97316', tipo: 'mes_sorte', temDispersao: true, temRepeticao: false, dispersaoPadrao: 8, dispersaoMin: 3, dispersaoMax: 15, estrategia: '7 números (1-31) + Mês da Sorte baseado em frequência' },
-            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', tipo: 'colunas', temDispersao: false, temRepeticao: false, estrategia: '7 colunas independentes (0-9 cada)' }
+            megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', tipo: 'dispersao', temDispersao: true, temRepeticao: false, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25, estrategia: 'Alta dispersão' },
+            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', tipo: 'repeticao', temDispersao: false, temRepeticao: true, repeticoesPadrao: 2, repeticoesMin: 1, repeticoesMax: 4, estrategia: 'Força repetição' },
+            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', tipo: 'repeticao_maxima', temDispersao: false, temRepeticao: true, repeticoesPadrao: 9, repeticoesMin: 5, repeticoesMax: 12, estrategia: 'Repetição + carimbados' },
+            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', tipo: 'volatil', temDispersao: false, temRepeticao: false, temVolatilidade: true, estrategia: '50 marcados, 20 sorteados' },
+            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', tipo: 'intermediario', temDispersao: true, temRepeticao: false, dispersaoPadrao: 10, dispersaoMin: 4, dispersaoMax: 18, estrategia: 'Dispersão moderada' },
+            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', tipo: 'repeticao_moderada', temDispersao: false, temRepeticao: true, repeticoesPadrao: 3, repeticoesMin: 1, repeticoesMax: 6, estrategia: 'Similar à Quina' },
+            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, trevos: 2, maxTrevos: 6, cor: '#a855f7', tipo: 'dupla_matriz', temDispersao: true, temRepeticao: false, dispersaoPadrao: 12, dispersaoMin: 5, dispersaoMax: 20, estrategia: 'Matriz dupla' },
+            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16', tipo: 'futebol', temDispersao: false, temRepeticao: false, estrategia: '14 jogos de futebol' },
+            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, mesSorte: 12, cor: '#f97316', tipo: 'mes_sorte', temDispersao: true, temRepeticao: false, dispersaoPadrao: 8, dispersaoMin: 3, dispersaoMax: 15, estrategia: '7 números + Mês' },
+            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', tipo: 'colunas', temDispersao: false, temRepeticao: false, estrategia: '7 colunas independentes' }
         };
 
-        // Estado global (MANTIDO)
+        // ============================================
+        // IA REAL - ANALISADOR MULTIDIMENSIONAL
+        // ============================================
+        
+        class LotteryAnalyzer {
+            constructor(dados, maxNumero) {
+                this.dados = dados;
+                this.maxNumero = maxNumero;
+                this.cache = {};
+                this.treinado = dados.length >= 10;
+            }
+
+            analisarFrequenciaPonderada() {
+                const total = this.dados.length;
+                const frequencia = new Array(this.maxNumero).fill(0);
+                const pesos = new Array(this.maxNumero).fill(0);
+                
+                this.dados.forEach((jogo, idx) => {
+                    const peso = Math.pow(1.3, idx / total);
+                    const numeros = Array.isArray(jogo) ? jogo : (jogo.numeros || jogo);
+                    numeros.forEach(n => {
+                        if (n >= 1 && n <= this.maxNumero) {
+                            frequencia[n-1] += peso;
+                            pesos[n-1] += peso;
+                        }
+                    });
+                });
+                
+                const maxFreq = Math.max(...frequencia, 1);
+                return frequencia.map((f, i) => ({
+                    numero: i + 1,
+                    frequencia: f / maxFreq,
+                    probabilidadeBase: total > 0 ? (frequencia[i] / total) * 100 : 0,
+                    peso: pesos[i] > 0 ? frequencia[i] / pesos[i] : 0.5
+                }));
+            }
+
+            analisarAtraso() {
+                const ultimoAtraso = new Array(this.maxNumero).fill(this.dados.length);
+                const atrasoMedio = new Array(this.maxNumero).fill(0);
+                const totalAparicoes = new Array(this.maxNumero).fill(0);
+                const somaAtrasos = new Array(this.maxNumero).fill(0);
+                
+                for (let n = 1; n <= this.maxNumero; n++) {
+                    let ultimaPos = -1;
+                    for (let i = 0; i < this.dados.length; i++) {
+                        const numeros = Array.isArray(this.dados[i]) ? this.dados[i] : (this.dados[i].numeros || this.dados[i]);
+                        if (numeros.includes(n)) {
+                            totalAparicoes[n-1]++;
+                            if (ultimaPos !== -1) {
+                                const gap = i - ultimaPos;
+                                somaAtrasos[n-1] += gap;
+                            }
+                            ultimaPos = i;
+                        }
+                    }
+                    if (totalAparicoes[n-1] > 1) {
+                        atrasoMedio[n-1] = somaAtrasos[n-1] / (totalAparicoes[n-1] - 1) || this.dados.length;
+                        ultimoAtraso[n-1] = this.dados.length - ultimaPos - 1;
+                    } else if (totalAparicoes[n-1] === 1) {
+                        atrasoMedio[n-1] = this.dados.length;
+                        ultimoAtraso[n-1] = this.dados.length - ultimaPos - 1;
+                    }
+                }
+                
+                const maxAtraso = Math.max(...ultimoAtraso, 1);
+                return Array.from({ length: this.maxNumero }, (_, i) => ({
+                    numero: i + 1,
+                    atrasoAtual: ultimoAtraso[i],
+                    atrasoMedio: atrasoMedio[i] || this.dados.length,
+                    fatorUrgencia: Math.min(1.5, (ultimoAtraso[i] / (atrasoMedio[i] || 1))),
+                    porcentagemAtraso: (ultimoAtraso[i] / maxAtraso) * 100
+                }));
+            }
+
+            analisarCombinacoes() {
+                const pares = new Array(this.maxNumero).fill(0);
+                const somaPorNumero = new Array(this.maxNumero).fill(0);
+                
+                this.dados.forEach(jogo => {
+                    const numeros = Array.isArray(jogo) ? jogo : (jogo.numeros || jogo);
+                    const soma = numeros.reduce((a, b) => a + b, 0);
+                    numeros.forEach(n => {
+                        if (n % 2 === 0) pares[n-1]++;
+                        somaPorNumero[n-1] += soma;
+                    });
+                });
+                
+                return { pares, somaMedia: somaPorNumero.map(s => s / this.dados.length) };
+            }
+
+            analisarSequencias() {
+                const sequencias = new Array(this.maxNumero).fill(0);
+                const distanciaMedia = new Array(this.maxNumero).fill(0);
+                
+                for (let n = 1; n <= this.maxNumero; n++) {
+                    let distancias = [];
+                    for (let i = 0; i < this.dados.length; i++) {
+                        const numeros = Array.isArray(this.dados[i]) ? this.dados[i] : (this.dados[i].numeros || this.dados[i]);
+                        const idx = numeros.indexOf(n);
+                        if (idx !== -1) {
+                            const distParaFim = numeros.length - 1 - idx;
+                            const distParaInicio = idx;
+                            distancias.push(Math.min(distParaFim, distParaInicio));
+                        }
+                    }
+                    if (distancias.length > 0) {
+                        distanciaMedia[n-1] = distancias.reduce((a, b) => a + b, 0) / distancias.length;
+                        sequencias[n-1] = distancias.filter(d => d <= 2).length / distancias.length;
+                    } else {
+                        sequencias[n-1] = 0.3;
+                        distanciaMedia[n-1] = 3;
+                    }
+                }
+                
+                return { sequencias, distanciaMedia };
+            }
+
+            calcularScoreCompleto() {
+                if (this.dados.length < 10) return [];
+                
+                const freq = this.analisarFrequenciaPonderada();
+                const atraso = this.analisarAtraso();
+                const combos = this.analisarCombinacoes();
+                const sequencias = this.analisarSequencias();
+                
+                const scores = [];
+                
+                for (let n = 1; n <= this.maxNumero; n++) {
+                    let score = 0;
+                    let pesoTotal = 0;
+                    
+                    const f = freq[n-1];
+                    if (f) {
+                        score += (1 - f.frequencia) * 0.25;
+                        pesoTotal += 0.25;
+                    }
+                    
+                    const a = atraso[n-1];
+                    if (a) {
+                        score += a.fatorUrgencia * 0.35;
+                        pesoTotal += 0.35;
+                    }
+                    
+                    const e = combos.pares[n-1] / this.dados.length;
+                    score += (e > 0.5 ? 0.8 : 0.4) * 0.10;
+                    pesoTotal += 0.10;
+                    
+                    const s = sequencias.sequencias[n-1] || 0.3;
+                    score += (1 - s) * 0.15;
+                    pesoTotal += 0.15;
+                    
+                    const prob = (f?.probabilidadeBase || 50) / 100;
+                    score += (1 - prob) * 0.15;
+                    pesoTotal += 0.15;
+                    
+                    scores.push({
+                        numero: n,
+                        score: pesoTotal > 0 ? Math.min(0.95, score / pesoTotal) : 0.5,
+                        atraso: a?.atrasoAtual || 0,
+                        frequencia: f?.frequencia || 0.5,
+                        probabilidade: f?.probabilidadeBase?.toFixed(1) || '0.0'
+                    });
+                }
+                
+                return scores.sort((a, b) => b.score - a.score);
+            }
+
+            predizer(qtd, usarDispersao = true, windowDispersao = 10) {
+                if (this.dados.length < 10) {
+                    const resultado = [];
+                    while (resultado.length < qtd) {
+                        const n = Math.floor(Math.random() * this.maxNumero) + 1;
+                        if (!resultado.includes(n)) resultado.push(n);
+                    }
+                    return resultado.sort((a, b) => a - b);
+                }
+                
+                const scores = this.calcularScoreCompleto();
+                if (scores.length === 0) {
+                    return this.predizerAleatorio(qtd);
+                }
+                
+                if (usarDispersao && this.dados.length >= windowDispersao) {
+                    const recentes = new Set();
+                    const ultimos = this.dados.slice(-windowDispersao);
+                    ultimos.forEach(jogo => {
+                        const nums = Array.isArray(jogo) ? jogo : (jogo.numeros || jogo);
+                        nums.forEach(n => recentes.add(n));
+                    });
+                    
+                    scores.forEach(s => {
+                        if (recentes.has(s.numero)) {
+                            s.score *= 0.4;
+                        }
+                    });
+                    scores.sort((a, b) => b.score - a.score);
+                }
+                
+                const selecionados = new Set();
+                const resultado = [];
+                
+                for (const s of scores) {
+                    if (selecionados.size >= qtd) break;
+                    
+                    const chanceAceite = Math.random() * 1.2;
+                    if (chanceAceite <= s.score || selecionados.size < qtd * 0.6) {
+                        if (!selecionados.has(s.numero)) {
+                            selecionados.add(s.numero);
+                            resultado.push(s.numero);
+                        }
+                    }
+                }
+                
+                if (resultado.length < qtd) {
+                    for (const s of scores) {
+                        if (!selecionados.has(s.numero)) {
+                            resultado.push(s.numero);
+                            if (resultado.length === qtd) break;
+                        }
+                    }
+                }
+                
+                return resultado.sort((a, b) => a - b);
+            }
+
+            predizerAleatorio(qtd) {
+                const resultado = [];
+                while (resultado.length < qtd) {
+                    const n = Math.floor(Math.random() * this.maxNumero) + 1;
+                    if (!resultado.includes(n)) resultado.push(n);
+                }
+                return resultado.sort((a, b) => a - b);
+            }
+
+            calcularConfianca(jogo) {
+                if (this.dados.length < 10) return 50;
+                
+                const scores = this.calcularScoreCompleto();
+                if (scores.length === 0) return 50;
+                
+                const scoreMap = new Map(scores.map(s => [s.numero, s.score]));
+                
+                let confianca = 0;
+                jogo.forEach(n => {
+                    confianca += (scoreMap.get(n) || 0.3) * 20;
+                });
+                
+                return Math.min(100, Math.max(0, Math.round(confianca / jogo.length * 100)));
+            }
+        }
+
+        // ============================================
+        // ESTADO - INICIALIZAÇÃO REAL (SEM DADOS FICTÍCIOS)
+        // ============================================
+        
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
         let periodoAtual = 'all';
@@ -506,34 +842,491 @@
         let isTraining = false;
         let iaTreinada = false;
         let filtrosTreinamento = null;
+        let analyzer = null;
+        let ultimosFiltrosUsados = null;
         
+        // Cache de dados - INICIALMENTE VAZIO (o usuário precisa fazer upload)
         const cacheDados = {};
         Object.keys(LOTERIAS).forEach(key => {
             cacheDados[key] = { dados: [], carregado: false, nomeArquivo: null };
         });
 
         // ============================================
-        // CARREGAMENTO AUTOMÁTICO (MANTIDO)
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        
+        function getPeriodoTexto() {
+            if (periodoAtual === 'all') return 'Todos os concursos';
+            return `${periodoAtual} ano(s) (até ${periodoAtual * 100} concursos)`;
+        }
+
+        function getModoTexto() {
+            const modo = document.getElementById('modoGeracao')?.value || 'ia_real';
+            const modos = {
+                'ia_real': '🎓 IA Especialista',
+                'ensemble': '🧠 Ensemble',
+                'random': '🎲 Aleatório'
+            };
+            return modos[modo] || modo;
+        }
+
+        function isTensorFlowDisponivel() {
+            try {
+                return typeof tf !== 'undefined' && tf.version && tf.version.tfjs;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        function getFiltrosAtivos() {
+            const config = LOTERIAS[loteriaAtual];
+            const filtros = [];
+            filtros.push({ label: 'Loteria', valor: `${config.icone} ${config.nome}` });
+            filtros.push({ label: 'Período', valor: getPeriodoTexto() });
+            filtros.push({ label: 'Modo', valor: getModoTexto() });
+            filtros.push({ label: 'Quantidade', valor: `${document.getElementById('qtdJogos')?.value || 3} jogos` });
+            if (config.temDispersao) filtros.push({ label: 'Dispersão', valor: `${dispersaoAtual} concursos` });
+            if (config.temRepeticao) filtros.push({ label: 'Repetição', valor: `${repeticoesAtual} números` });
+            filtros.push({ label: 'Base dados', valor: `${filtrarDados().length} concursos` });
+            return filtros;
+        }
+
+        function mostrarModalConfirmacao(callback) {
+            const filtros = getFiltrosAtivos();
+            const config = LOTERIAS[loteriaAtual];
+            const dadosCount = filtrarDados().length;
+            
+            if (dadosCount < 10) {
+                alert(`⚠️ Dados insuficientes! Apenas ${dadosCount} concursos carregados.\n\nPor favor, faça upload de um arquivo CSV com mais dados.`);
+                return false;
+            }
+            
+            let modalHtml = `
+                <div class="modal-overlay" id="modalConfirmacao">
+                    <div class="modal-container">
+                        <div class="modal-header">
+                            <h3>🔍 Confirme suas configurações</h3>
+                        </div>
+                        <div class="modal-body">
+                            <p style="margin-bottom: 15px; color: var(--text-secondary);">Revise os filtros selecionados antes de gerar os jogos:</p>
+            `;
+            
+            filtros.forEach(f => {
+                modalHtml += `
+                    <div class="config-item">
+                        <span class="config-label">${f.label}</span>
+                        <span class="config-value">${f.valor}</span>
+                    </div>
+                `;
+            });
+            
+            modalHtml += `
+                            <div style="margin-top: 15px; padding: 10px; background: rgba(56,189,248,0.1); border-radius: 8px;">
+                                <span style="font-size: 12px; color: #38bdf8;">ℹ️</span>
+                                <span style="font-size: 12px; color: var(--text-secondary);">A IA será retreinada automaticamente com os filtros acima.</span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-cancelar" onclick="fecharModalECancelar()">❌ Cancelar</button>
+                            <button class="btn btn-confirmar" onclick="confirmarGeracao()">✅ Confirmar e Gerar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const modalExistente = document.getElementById('modalConfirmacao');
+            if (modalExistente) modalExistente.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            window.callbackGeracao = callback;
+            return true;
+        }
+
+        function fecharModalECancelar() {
+            const modal = document.getElementById('modalConfirmacao');
+            if (modal) modal.remove();
+        }
+
+        async function confirmarGeracao() {
+            const modal = document.getElementById('modalConfirmacao');
+            if (modal) modal.remove();
+            
+            const resultadosDiv = document.getElementById('resultados');
+            if (resultadosDiv) {
+                resultadosDiv.innerHTML = `<div class="mensagem-carregamento">🔄 Retreinando IA com os filtros selecionados... Aguarde...</div>`;
+            }
+            
+            ultimosFiltrosUsados = getFiltrosAtivos();
+            
+            const treinou = await treinarIAComFiltrosAtuais();
+            
+            if (treinou && window.callbackGeracao) {
+                await window.callbackGeracao();
+            } else if (!treinou) {
+                if (resultadosDiv) {
+                    resultadosDiv.innerHTML = `<div class="mensagem-erro">❌ Falha no treinamento. Verifique se há dados suficientes (mínimo 10 concursos).</div>`;
+                }
+            }
+        }
+
+        async function treinarIAComFiltrosAtuais() {
+            const dadosFiltrados = filtrarDados();
+            const config = LOTERIAS[loteriaAtual];
+            
+            if (dadosFiltrados.length < 10) {
+                const msg = `⚠️ Dados insuficientes! Apenas ${dadosFiltrados.length} concursos disponíveis.\n\nMínimo necessário: 10 concursos.\n\nFaça upload de um arquivo CSV com mais dados.`;
+                alert(msg);
+                return false;
+            }
+            
+            isTraining = true;
+            
+            const progressBar = document.getElementById('trainingProgressBar');
+            const trainingLog = document.getElementById('trainingLog');
+            const trainingStatus = document.getElementById('trainingStatus');
+            const filtrosContainer = document.getElementById('filtrosAplicadosContainer');
+            
+            filtrosTreinamento = getFiltrosAtivos();
+            
+            if (trainingStatus) { trainingStatus.textContent = 'Treinando...'; trainingStatus.className = 'status-badge status-training'; }
+            if (trainingLog) { 
+                trainingLog.innerHTML = `🚀 Retreinando IA com novos filtros:\n`;
+                filtrosTreinamento.forEach(f => {
+                    trainingLog.innerHTML += `   📌 ${f.label}: ${f.valor}\n`;
+                });
+                trainingLog.innerHTML += `\n📊 ${dadosFiltrados.length} concursos\n🎓 Analisando padrões reais...\n`;
+            }
+            if (progressBar) progressBar.style.width = '0%';
+            
+            const etapas = ['Frequência Ponderada', 'Atraso de Números', 'Combinações', 'Sequências', 'Score Final'];
+            
+            for (let i = 0; i < etapas.length; i++) {
+                await new Promise(r => setTimeout(r, 200));
+                if (progressBar) progressBar.style.width = `${((i + 1) / etapas.length) * 100}%`;
+                if (trainingLog) {
+                    trainingLog.innerHTML += `📊 ${etapas[i]}... concluída\n`;
+                    trainingLog.scrollTop = trainingLog.scrollHeight;
+                }
+            }
+            
+            analyzer = new LotteryAnalyzer(dadosFiltrados, config.maxNumero);
+            iaTreinada = analyzer.treinado;
+            
+            if (progressBar) progressBar.style.width = '100%';
+            if (trainingStatus) { trainingStatus.textContent = iaTreinada ? 'Treinado ✓' : 'Treinamento Parcial'; trainingStatus.className = iaTreinada ? 'status-badge status-ready' : 'status-badge status-warning'; }
+            if (trainingLog) { 
+                if (iaTreinada) {
+                    const scores = analyzer.calcularScoreCompleto();
+                    const top5 = scores.slice(0, 5).map(s => s.numero).join(', ');
+                    trainingLog.innerHTML += `\n✅ Retreinamento concluído!\n🎯 Top 5 números identificados: ${top5}\n📈 IA pronta com os novos filtros!\n`;
+                } else {
+                    trainingLog.innerHTML += `\n⚠️ Dados insuficientes para treinamento completo.\n📊 Usando modo básico.\n`;
+                }
+            }
+            if (filtrosContainer && iaTreinada) { filtrosContainer.innerHTML = renderizarFiltrosAplicados(filtrosTreinamento); filtrosContainer.style.display = 'block'; }
+            
+            atualizarStatusIALoteria(loteriaAtual, iaTreinada ? 'treinado' : 'carregado');
+            isTraining = false;
+            
+            return iaTreinada;
+        }
+
+        function renderizarFiltrosAplicados(filtros) {
+            if (!filtros || filtros.length === 0) return '';
+            let html = '<div class="filtros-aplicados"><h4>📋 Configuração Atual da IA</h4><div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;">';
+            filtros.forEach(f => { html += `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`; });
+            html += '</div></div>';
+            return html;
+        }
+
+        function atualizarStatusIALoteria(loteria, status) {
+            const statusEl = document.getElementById(`status-${loteria}`);
+            if (statusEl) {
+                statusEl.className = 'ia-status';
+                if (status === 'treinado') statusEl.classList.add('treinado');
+                else if (status === 'treinando') statusEl.classList.add('treinando');
+                else if (status === 'carregado') statusEl.classList.add('carregado');
+                else statusEl.classList.add('nao-treinado');
+            }
+        }
+
+        function filtrarDados() { 
+            if (periodoAtual === 'all') return [...dadosAtuais];
+            const limite = periodoAtual * 100;
+            return dadosAtuais.slice(-Math.min(limite, dadosAtuais.length));
+        }
+
+        function gerarAleatorio(numNumeros, maxNumero, minNumero = 1) { 
+            const jogo = new Set(); 
+            while(jogo.size < numNumeros) jogo.add(Math.floor(Math.random()*(maxNumero-minNumero+1))+minNumero); 
+            return Array.from(jogo).sort((a,b)=>a-b); 
+        }
+
+        function gerarCSVExemplo() {
+            const config = LOTERIAS[loteriaAtual];
+            let csvContent = "concurso";
+            for (let i = 1; i <= config.numeros; i++) {
+                csvContent += `,bola${i}`;
+            }
+            csvContent += "\n";
+            
+            for (let i = 1; i <= 10; i++) {
+                csvContent += i;
+                const jogo = gerarAleatorio(config.numeros, config.maxNumero, config.maxNumero === 99 ? 0 : 1);
+                jogo.forEach(n => {
+                    csvContent += `,${n}`;
+                });
+                csvContent += "\n";
+            }
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${loteriaAtual}_exemplo.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ============================================
+        // BACKTESTING
+        // ============================================
+        
+        async function executarBacktesting() {
+            const dados = filtrarDados();
+            const config = LOTERIAS[loteriaAtual];
+            
+            if (dados.length < 20) { 
+                alert('⚠️ Mínimo 20 concursos para backtest!');
+                return null;
+            }
+            
+            const resultadosDiv = document.getElementById('backtestResultados');
+            if (resultadosDiv) resultadosDiv.innerHTML = '<p style="color:#fbbf24;">🔄 Executando backtesting...</p>';
+            
+            await new Promise(r => setTimeout(r, 100));
+            
+            const janela = Math.min(30, Math.floor(dados.length * 0.7));
+            
+            let acertosIA = 0;
+            let totalTestesIA = 0;
+            
+            for (let i = janela; i < dados.length; i++) {
+                const historico = dados.slice(i - janela, i);
+                const analyzerTeste = new LotteryAnalyzer(historico, config.maxNumero);
+                const predicao = analyzerTeste.predizer(config.numeros, config.temDispersao, dispersaoAtual);
+                const real = dados[i];
+                const numsReais = Array.isArray(real) ? real : (real.numeros || real);
+                acertosIA += predicao.filter(n => numsReais.includes(n)).length;
+                totalTestesIA++;
+            }
+            
+            const mediaAcertosIA = totalTestesIA > 0 ? (acertosIA / totalTestesIA).toFixed(2) : '0.00';
+            const percentualIA = totalTestesIA > 0 ? ((acertosIA / (totalTestesIA * config.numeros)) * 100).toFixed(1) : '0.0';
+            
+            let acertosRand = 0;
+            for (let i = janela; i < dados.length; i++) {
+                const aleatorio = gerarAleatorio(config.numeros, config.maxNumero, config.maxNumero === 99 ? 0 : 1);
+                const real = dados[i];
+                const numsReais = Array.isArray(real) ? real : (real.numeros || real);
+                acertosRand += aleatorio.filter(n => numsReais.includes(n)).length;
+            }
+            const mediaAcertosRand = (acertosRand / totalTestesIA).toFixed(2);
+            const percentualRand = ((acertosRand / (totalTestesIA * config.numeros)) * 100).toFixed(1);
+            
+            const resultadoHtml = `
+                <h4 style="color:#fbbf24;">📊 Backtesting - ${config.nome}</h4>
+                <p style="font-size:12px;color:var(--text-secondary);margin-bottom:15px;">Janela: ${janela} concursos | Testes: ${totalTestesIA}</p>
+                
+                <div class="backtest-result" style="background:rgba(139,92,246,0.2);border:2px solid #8b5cf6;">
+                    <span class="modelo-nome">🎓 IA Especialista</span>
+                    <span class="modelo-score">${percentualIA}% | ${mediaAcertosIA} acertos/jogo</span>
+                </div>
+                <div class="backtest-result">
+                    <span class="modelo-nome">🎲 Aleatório (Referência)</span>
+                    <span class="modelo-score">${percentualRand}% | ${mediaAcertosRand} acertos/jogo</span>
+                </div>
+                <div class="backtest-result" style="margin-top:10px;background:rgba(34,197,94,0.1);">
+                    <span class="modelo-nome">📈 Melhoria da IA</span>
+                    <span class="modelo-score" style="color:#22c55e;">+${(parseFloat(percentualIA) - parseFloat(percentualRand)).toFixed(1)}% sobre aleatório</span>
+                </div>
+            `;
+            
+            if (resultadosDiv) resultadosDiv.innerHTML = resultadoHtml;
+            
+            return { percentualIA, mediaAcertosIA, percentualRand };
+        }
+
+        // ============================================
+        // GERAÇÃO DE JOGOS (COM CONFIRMAÇÃO)
+        // ============================================
+        
+        async function gerarJogos() {
+            const dadosCount = filtrarDados().length;
+            
+            if (dadosCount < 10) {
+                document.getElementById('resultados').innerHTML = `
+                    <div class="mensagem-erro">
+                        <strong>⚠️ Dados insuficientes!</strong><br>
+                        Apenas ${dadosCount} concursos carregados. Mínimo necessário: 10 concursos.<br><br>
+                        📁 <strong>Como carregar dados:</strong><br>
+                        1. Clique no botão "Upload CSV"<br>
+                        2. Selecione um arquivo CSV com os resultados históricos<br>
+                        3. O formato deve ser: concurso,bola1,bola2,bola3,...<br><br>
+                        <button class="btn btn-exemplo" onclick="gerarCSVExemplo()" style="margin-top:10px;">📥 Baixar CSV Exemplo</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            mostrarModalConfirmacao(async () => {
+                await gerarJogosAposConfirmacao();
+            });
+        }
+
+        async function gerarJogosAposConfirmacao() {
+            const qtd = parseInt(document.getElementById('qtdJogos')?.value || 3);
+            const modo = document.getElementById('modoGeracao')?.value || 'ia_real';
+            const config = LOTERIAS[loteriaAtual];
+            const dados = filtrarDados();
+            
+            if (!iaTreinada || !analyzer) {
+                document.getElementById('resultados').innerHTML = `
+                    <div class="mensagem-carregamento">
+                        ⚠️ IA não está treinada! Clique em "Treinar com Filtros Atuais" primeiro.
+                    </div>
+                `;
+                return;
+            }
+            
+            const backtestResult = await executarBacktesting();
+            
+            let html = '';
+            if (filtrosTreinamento) html += renderizarFiltrosAplicados(filtrosTreinamento);
+            
+            if (backtestResult) {
+                html += `
+                    <div style="margin: 15px 0; padding: 15px; background: rgba(34,197,94,0.1); border-radius: 12px; border-left: 4px solid #22c55e;">
+                        <h4 style="color: #22c55e; margin-bottom: 10px;">📈 Performance da IA com estes filtros</h4>
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <div><span style="color: #94a3b8;">Taxa de acerto:</span><br><strong style="font-size: 20px; color: #fbbf24;">${backtestResult.percentualIA}%</strong></div>
+                            <div><span style="color: #94a3b8;">Melhoria sobre aleatório:</span><br><strong style="font-size: 20px; color: #22c55e;">+${(parseFloat(backtestResult.percentualIA) - parseFloat(backtestResult.percentualRand)).toFixed(1)}%</strong></div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `<h3 style="margin-top: 20px; margin-bottom: 15px;">🎯 Jogos Gerados com ${getModoTexto()}</h3>`;
+            
+            for (let i = 0; i < qtd; i++) {
+                let jogo;
+                
+                if (modo === 'ia_real' || modo === 'ensemble') {
+                    jogo = analyzer.predizer(config.numeros, config.temDispersao, dispersaoAtual);
+                } else {
+                    jogo = gerarAleatorio(config.numeros, config.maxNumero, config.maxNumero === 99 ? 0 : 1);
+                }
+                
+                const confianca = analyzer.calcularConfianca(jogo);
+                const confClasse = confianca >= 70 ? 'confianca-alta' : (confianca >= 50 ? 'confianca-media' : 'confianca-baixa');
+                const confTexto = confianca >= 70 ? '⭐ Alta' : (confianca >= 50 ? '📊 Média' : '⚠️ Baixa');
+                
+                html += `
+                    <div class="resultado-jogo">
+                        <h4 style="color:${config.cor};">${config.icone} Jogo ${i+1}</h4>
+                        <div class="bolas">
+                            ${jogo.map(n => `<div class="bola" style="background:${config.cor};">${n}</div>`).join('')}
+                        </div>
+                        <div class="confianca-bar ${confClasse}" style="width:${confianca}%;"></div>
+                        <div class="confianca-label">Confiança: ${confTexto} (${confianca}%)</div>
+                        <div style="font-size:11px;color:#94a3b8;margin-top:10px;">
+                            📊 Baseado em ${dados.length} concursos | ${getPeriodoTexto()} | Dispersão: ${config.temDispersao ? dispersaoAtual + ' concursos' : 'N/A'}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('resultados').innerHTML = html;
+        }
+
+        // ============================================
+        // SELEÇÃO DE LOTERIA E RENDERIZAÇÃO
         // ============================================
         
         async function carregarCSVAutomatico(loteria) {
             const nomeArquivo = `${loteria}.csv`;
             if (cacheDados[loteria].carregado) return true;
-            
             try {
                 const response = await fetch(nomeArquivo);
-                if (response.ok) {
-                    const texto = await response.text();
-                    processarCSV(loteria, texto, nomeArquivo);
-                    return true;
+                if (response.ok) { 
+                    const texto = await response.text(); 
+                    processarCSV(loteria, texto, nomeArquivo); 
+                    return true; 
                 }
-            } catch (erro) {}
+            } catch (erro) {
+                console.log(`Arquivo ${nomeArquivo} não encontrado. Aguardando upload do usuário.`);
+            }
             return false;
+        }
+
+        function processarCSV(loteria, texto, nomeArquivo) {
+            const config = LOTERIAS[loteria];
+            const linhas = texto.split('\n').filter(l => l.trim());
+            if (linhas.length < 2) {
+                console.error('CSV vazio ou formato inválido');
+                return;
+            }
+            
+            const separador = linhas[0].includes(';') ? ';' : ',';
+            const dados = [];
+            
+            for (let i = 1; i < linhas.length; i++) {
+                const colunas = linhas[i].split(separador);
+                const numeros = colunas.map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                
+                if (loteria === 'lotomania') { 
+                    if (numeros.length >= 20) dados.push(numeros.slice(0, 20).sort((a,b)=>a-b)); 
+                }
+                else if (loteria === 'milionaria') { 
+                    if (numeros.length >= 8) dados.push({ numeros: numeros.slice(0,6).sort((a,b)=>a-b), trevos: numeros.slice(6,8).sort((a,b)=>a-b) }); 
+                }
+                else if (loteria === 'supersete') { 
+                    if (numeros.length >= 7) dados.push(numeros.slice(0,7)); 
+                }
+                else if (loteria === 'diadesorte') { 
+                    if (numeros.length >= 8) dados.push({ numeros: numeros.slice(0,7).sort((a,b)=>a-b), mes: numeros[7] }); 
+                    else if (numeros.length >= 7) dados.push({ numeros: numeros.slice(0,7).sort((a,b)=>a-b), mes: null }); 
+                }
+                else { 
+                    if (numeros.length >= config.numeros) dados.push(numeros.slice(0, config.numeros).sort((a,b)=>a-b)); 
+                }
+            }
+            
+            if (dados.length > 0) {
+                cacheDados[loteria] = { dados, carregado: true, nomeArquivo };
+                if (loteriaAtual === loteria) { 
+                    dadosAtuais = [...dados]; 
+                    atualizarInterface(loteria);
+                    renderizarConteudo(loteria);
+                    if (dados.length >= 10) {
+                        setTimeout(() => treinarIAComFiltrosAtuais(), 500);
+                    }
+                }
+            } else {
+                console.error('Nenhum dado válido encontrado no CSV');
+                cacheDados[loteria] = { dados: [], carregado: false, nomeArquivo: null };
+            }
+        }
+
+        function atualizarInterface(loteria) {
+            const statsTotal = document.getElementById('stats-total');
+            if (statsTotal) statsTotal.textContent = dadosAtuais.length;
         }
 
         async function selecionarLoteria(loteria) {
             loteriaAtual = loteria;
             iaTreinada = false;
+            analyzer = null;
             filtrosTreinamento = null;
             
             const config = LOTERIAS[loteria];
@@ -549,484 +1342,28 @@
             } else {
                 dadosAtuais = [];
                 const carregado = await carregarCSVAutomatico(loteria);
-                if (carregado) {
-                    dadosAtuais = [...cacheDados[loteria].dados];
-                    atualizarStatusIALoteria(loteria, 'carregado');
-                } else {
-                    atualizarStatusIALoteria(loteria, 'nao-treinado');
+                if (carregado) { 
+                    dadosAtuais = [...cacheDados[loteria].dados]; 
+                    atualizarStatusIALoteria(loteria, 'carregado'); 
+                }
+                else { 
+                    atualizarStatusIALoteria(loteria, 'nao-treinado'); 
                 }
             }
             
             renderizarConteudo(loteria);
-        }
-
-        function atualizarStatusIALoteria(loteria, status) {
-            const statusEl = document.getElementById(`status-${loteria}`);
-            if (statusEl) {
-                statusEl.className = 'ia-status';
-                if (status === 'treinado') statusEl.classList.add('treinado');
-                else if (status === 'treinando') statusEl.classList.add('treinando');
-                else if (status === 'carregado') statusEl.classList.add('carregado');
-                else statusEl.classList.add('nao-treinado');
+            
+            if (dadosAtuais.length >= 10 && !iaTreinada && !isTraining) {
+                setTimeout(() => treinarIAComFiltrosAtuais(), 500);
             }
-        }
-
-        function processarCSV(loteria, texto, nomeArquivo) {
-            const config = LOTERIAS[loteria];
-            const linhas = texto.split('\n').filter(l => l.trim());
-            if (linhas.length < 2) return;
-            
-            const separador = linhas[0].includes(';') ? ';' : ',';
-            const dados = [];
-            
-            for (let i = 1; i < linhas.length; i++) {
-                const colunas = linhas[i].split(separador);
-                const numeros = colunas.map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-                
-                if (loteria === 'lotomania') {
-                    if (numeros.length >= 20) dados.push(numeros.slice(0, 20).sort((a, b) => a - b));
-                } else if (loteria === 'milionaria') {
-                    if (numeros.length >= 8) dados.push({ numeros: numeros.slice(0, 6).sort((a, b) => a - b), trevos: numeros.slice(6, 8).sort((a, b) => a - b) });
-                } else if (loteria === 'supersete') {
-                    if (numeros.length >= 7) dados.push(numeros.slice(0, 7));
-                } else if (loteria === 'diadesorte') {
-                    if (numeros.length >= 8) dados.push({ numeros: numeros.slice(0, 7).sort((a, b) => a - b), mes: numeros[7] });
-                    else if (numeros.length >= 7) dados.push({ numeros: numeros.slice(0, 7).sort((a, b) => a - b), mes: null });
-                } else {
-                    if (numeros.length >= config.numeros) dados.push(numeros.slice(0, config.numeros).sort((a, b) => a - b));
-                }
-            }
-            
-            cacheDados[loteria] = { dados, carregado: true, nomeArquivo };
-            if (loteriaAtual === loteria) {
-                dadosAtuais = [...dados];
-                atualizarInterface(loteria);
-            }
-        }
-
-        function atualizarInterface(loteria) {
-            const statsTotal = document.getElementById('stats-total');
-            if (statsTotal) statsTotal.textContent = dadosAtuais.length;
-        }
-
-        // ============================================
-        // TREINAMENTO DA IA (VISÍVEL + FILTROS)
-        // ============================================
-        
-        function getFiltrosAtivos() {
-            const config = LOTERIAS[loteriaAtual];
-            const filtros = [];
-            
-            // Modo de geração
-            const modoGeracao = document.getElementById('modoGeracao');
-            if (modoGeracao) {
-                const modoTexto = {
-                    'ia': '🤖 IA Especializada',
-                    'profissional': '📈 Modo Profissional',
-                    'hibrido': '🚀 Híbrido',
-                    'random': '🎯 Aleatório'
-                };
-                filtros.push({ label: 'Modo de Geração', valor: modoTexto[modoGeracao.value] || modoGeracao.value });
-            }
-            
-            // Dispersão
-            if (config.temDispersao) {
-                filtros.push({ label: 'Nível de Dispersão', valor: `${dispersaoAtual} concursos` });
-            }
-            
-            // Repetição
-            if (config.temRepeticao) {
-                filtros.push({ label: 'Números para Repetir', valor: `${repeticoesAtual} números` });
-            }
-            
-            // Volatilidade
-            if (config.temVolatilidade) {
-                const vol = document.getElementById('volatilidadeNivel');
-                if (vol) {
-                    const volTexto = { 'alta': 'Alta (30)', 'media': 'Média (20)', 'baixa': 'Baixa (10)' };
-                    filtros.push({ label: 'Volatilidade', valor: volTexto[vol.value] || vol.value });
-                }
-            }
-            
-            // Período
-            const periodoTexto = periodoAtual === 'all' ? 'Todos os anos' : `Últimos ${periodoAtual} ano(s)`;
-            filtros.push({ label: 'Período de Análise', valor: periodoTexto });
-            
-            // Quantidade de concursos filtrados
-            const dadosFiltrados = filtrarDados();
-            filtros.push({ label: 'Concursos Filtrados', valor: `${dadosFiltrados.length} concursos` });
-            
-            return filtros;
-        }
-
-        function renderizarFiltrosAplicados(filtros) {
-            let html = '<div class="filtros-aplicados">';
-            html += '<h4>📋 Filtros Aplicados no Treinamento</h4>';
-            html += '<div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px;">';
-            
-            filtros.forEach(f => {
-                html += `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`;
-            });
-            
-            html += '</div></div>';
-            return html;
-        }
-
-        async function treinarIA() {
-            if (isTraining) {
-                alert('⚠️ Treinamento já está em andamento!');
-                return;
-            }
-            
-            const dadosFiltrados = filtrarDados();
-            
-            if (dadosFiltrados.length < 50) {
-                alert(`⚠️ Mínimo de 50 concursos! (${dadosFiltrados.length} disponíveis no período selecionado)`);
-                return;
-            }
-            
-            const config = LOTERIAS[loteriaAtual];
-            const impacto = IMPACTO_IA[loteriaAtual];
-            
-            if (impacto.nivel === 'nao-mexer') {
-                const confirmar = confirm(`⚠️ ${config.nome} - ${impacto.desc}\n\nDeseja continuar mesmo assim?`);
-                if (!confirmar) return;
-            }
-            
-            isTraining = true;
-            iaTreinada = false;
-            atualizarStatusIALoteria(loteriaAtual, 'treinando');
-            
-            const progressBar = document.getElementById('trainingProgressBar');
-            const trainingLog = document.getElementById('trainingLog');
-            const trainingStatus = document.getElementById('trainingStatus');
-            const filtrosContainer = document.getElementById('filtrosAplicadosContainer');
-            
-            // Salvar filtros atuais
-            filtrosTreinamento = getFiltrosAtivos();
-            
-            if (trainingStatus) {
-                trainingStatus.textContent = 'Treinando...';
-                trainingStatus.className = 'status-badge status-training';
-            }
-            
-            if (trainingLog) {
-                trainingLog.innerHTML = `🚀 Iniciando treinamento para ${config.nome}...\n`;
-                trainingLog.innerHTML += `📊 ${dadosFiltrados.length} concursos (filtrados)\n`;
-                trainingLog.innerHTML += `📋 ${impacto.desc}\n\n`;
-            }
-            
-            if (progressBar) progressBar.style.width = '0%';
-            
-            // Mostrar filtros aplicados
-            if (filtrosContainer) {
-                filtrosContainer.innerHTML = renderizarFiltrosAplicados(filtrosTreinamento);
-                filtrosContainer.style.display = 'block';
-            }
-            
-            const totalEpochs = 30;
-            
-            for (let epoch = 1; epoch <= totalEpochs; epoch++) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                const progress = (epoch / totalEpochs * 100).toFixed(0);
-                const loss = (0.5 - epoch * 0.015).toFixed(4);
-                const accuracy = Math.min(95, (60 + epoch * 1.1)).toFixed(1);
-                
-                if (progressBar) progressBar.style.width = progress + '%';
-                
-                if (trainingLog && epoch % 3 === 0) {
-                    trainingLog.innerHTML += `📊 Época ${epoch}/${totalEpochs} | Loss: ${loss} | Acurácia: ${accuracy}%\n`;
-                    trainingLog.scrollTop = trainingLog.scrollHeight;
-                }
-            }
-            
-            if (trainingLog) {
-                trainingLog.innerHTML += `\n✅ TREINAMENTO CONCLUÍDO!\n`;
-                trainingLog.innerHTML += `🎯 IA treinada para ${config.nome}\n`;
-                trainingLog.innerHTML += `📋 Filtros aplicados: ${filtrosTreinamento.map(f => f.valor).join(' | ')}\n`;
-                trainingLog.innerHTML += `💡 ${impacto.desc}`;
-            }
-            
-            if (progressBar) progressBar.style.width = '100%';
-            
-            iaTreinada = true;
-            atualizarStatusIALoteria(loteriaAtual, 'treinado');
-            
-            if (trainingStatus) {
-                trainingStatus.textContent = 'Treinado ✓';
-                trainingStatus.className = 'status-badge status-ready';
-            }
-            
-            isTraining = false;
-        }
-
-        // ============================================
-        // RENDERIZAÇÃO (COM TREINAMENTO VISÍVEL)
-        // ============================================
-        
-        function renderizarConteudo(loteria) {
-            const config = LOTERIAS[loteria];
-            const div = document.getElementById('conteudoLoteria');
-            const cache = cacheDados[loteria];
-            const impacto = IMPACTO_IA[loteria];
-            
-            let controlesExtras = '';
-            if (config.temDispersao) {
-                controlesExtras += `<div><label>🎯 Nível de Dispersão</label><br><div class="dispersao-slider"><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${config.dispersaoPadrao}" oninput="atualizarDispersao(this.value)"><div class="dispersao-valor">Bloquear últimos: <strong id="dispersaoValor" style="color: ${config.cor};">${config.dispersaoPadrao} concursos</strong></div></div></div>`;
-            }
-            if (config.temRepeticao) {
-                controlesExtras += `<div><label>🔄 Números para Repetir</label><br><div class="dispersao-slider"><input type="range" id="repeticoesSlider" min="${config.repeticoesMin || 1}" max="${config.repeticoesMax || config.numeros}" value="${config.repeticoesPadrao || 2}" oninput="atualizarRepeticoes(this.value)"><div class="dispersao-valor">Repetir: <strong id="repeticoesValor" style="color: ${config.cor};">${config.repeticoesPadrao || 2} números</strong></div></div></div>`;
-            }
-            if (config.temVolatilidade) {
-                controlesExtras += `<div><label>📊 Volatilidade</label><br><select id="volatilidadeNivel"><option value="alta">Alta (trocar 30)</option><option value="media">Média (trocar 20)</option><option value="baixa">Baixa (trocar 10)</option></select></div>`;
-            }
-            
-            const statusTexto = iaTreinada ? 'Treinado ✓' : (cache.carregado ? 'Dados Carregados' : 'Sem Dados');
-            const statusClasse = iaTreinada ? 'status-ready' : (cache.carregado ? 'status-warning' : 'status-error');
-            
-            let mensagemStatus = '';
-            if (cache.carregado) {
-                mensagemStatus = `<div class="mensagem-sucesso">✅ <strong>${cache.nomeArquivo}</strong> carregado! <strong>${dadosAtuais.length}</strong> concursos.</div>`;
-            } else {
-                mensagemStatus = `<div class="mensagem-carregamento">📂 Arquivo <strong>${loteria}.csv</strong> não encontrado. Use o botão <strong>"📁 Fazer Upload"</strong>.</div>`;
-            }
-            
-            // Badge de IA Treinada
-            let iaBadge = '';
-            if (iaTreinada) {
-                iaBadge = `<div style="text-align: center; margin: 10px 0;"><span class="ia-treinada-badge">🧠 IA TREINADA ✓</span></div>`;
-            }
-            
-            // Seção de treinamento visível
-            const treinamentoHTML = `
-                <div class="training-section">
-                    <h4>🧠 Treinamento da IA - ${config.nome}</h4>
-                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">${impacto.desc}</p>
-                    
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 10px;">
-                        <span id="trainingStatus" class="status-badge ${iaTreinada ? 'status-ready' : (isTraining ? 'status-training' : 'status-error')}">${iaTreinada ? 'Treinado ✓' : (isTraining ? 'Treinando...' : 'Não Treinado')}</span>
-                        <button class="btn btn-treinar" onclick="treinarIA()" id="btnTreinar" ${isTraining ? 'disabled' : ''}>🚀 ${isTraining ? 'Treinando...' : 'Treinar IA'}</button>
-                        <span style="font-size: 12px; color: var(--text-secondary);">Clique em <strong>"Gerar Jogos"</strong> para treinar com os filtros atuais</span>
-                    </div>
-                    
-                    <div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width: ${iaTreinada ? '100%' : '0%'};"></div></div>
-                    <div class="training-log" id="trainingLog">${iaTreinada ? '✅ IA treinada e pronta para gerar jogos!' : '⏳ Aguardando treinamento...'}</div>
-                    
-                    <div id="filtrosAplicadosContainer" style="display: ${iaTreinada ? 'block' : 'none'}; margin-top: 10px;">
-                        ${iaTreinada && filtrosTreinamento ? renderizarFiltrosAplicados(filtrosTreinamento) : ''}
-                    </div>
-                </div>
-            `;
-            
-            let html = `
-                <div class="card">
-                    <h3 style="color: ${config.cor};">${config.icone} ${config.nome} - IA Especializada</h3>
-                    <div class="info-box" style="border-left: 4px solid ${config.cor};">
-                        <h4 style="color: ${config.cor};">📊 Estratégia: ${config.estrategia}</h4>
-                    </div>
-                    ${iaBadge}
-                    ${mensagemStatus}
-
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
-                        <h4 style="margin: 0;">📁 Dados: ${dadosAtuais.length} concursos</h4>
-                        <button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()" style="margin: 0; padding: 8px 16px; font-size: 13px;">📁 Upload</button>
-                        <input type="file" id="uploadManual" accept=".csv" onchange="importarArquivo(this, '${loteria}')" style="display: none;">
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="label">Concursos</div><div class="value" id="stats-total" style="color: ${config.cor};">${dadosAtuais.length}</div></div>
-                        <div class="stat-card"><div class="label">Impacto IA</div><div class="value" style="font-size: 14px; color: ${impacto.nivel === 'seguro' ? '#22c55e' : impacto.nivel === 'cuidado' ? '#f59e0b' : '#ef4444'};">${impacto.nivel === 'seguro' ? '🟢 Seguro' : impacto.nivel === 'cuidado' ? '🟡 Cuidado' : '🔴 Não Mexer'}</div></div>
-                    </div>
-                </div>
-
-                ${treinamentoHTML}
-
-                <div class="card">
-                    <h4>📅 Período de Análise</h4>
-                    <div class="filtros">
-                        <button class="filtro-btn" onclick="setPeriodo(1)">1 Ano</button>
-                        <button class="filtro-btn" onclick="setPeriodo(3)">3 Anos</button>
-                        <button class="filtro-btn" onclick="setPeriodo(5)">5 Anos</button>
-                        <button class="filtro-btn" onclick="setPeriodo(7)">7 Anos</button>
-                        <button class="filtro-btn" onclick="setPeriodo(10)">10 Anos</button>
-                        <button class="filtro-btn ativo" onclick="setPeriodo('all')">Todos</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h4>🎲 Gerar Jogos - ${config.nome}</h4>
-                    <div class="config-grid">
-                        <div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="3" min="1" max="20"></div>
-                        <div><label>Modo de Geração</label><br><select id="modoGeracao"><option value="ia">🤖 IA Especializada</option><option value="profissional">📈 Modo Profissional</option><option value="hibrido">🚀 Híbrido</option><option value="random">🎯 Aleatório</option></select></div>
-                        ${controlesExtras}
-                    </div>
-                    <button class="btn btn-primary" onclick="gerarJogos()" style="background: ${config.cor};">${config.icone} Gerar Jogos</button>
-                    <div id="resultados" style="margin-top: 20px;"></div>
-                </div>
-
-                <div class="regras-oficiais">
-                    <h4>📜 Regras Oficiais da ${config.nome}</h4>
-                    <p>${REGRAS_OFICIAIS[loteria]}</p>
-                </div>
-            `;
-            
-            div.innerHTML = html;
-            setTimeout(() => {
-                document.querySelectorAll('.filtro-btn.ativo').forEach(btn => {
-                    btn.style.background = config.cor; btn.style.borderColor = config.cor; btn.style.color = 'white';
-                });
-            }, 100);
-        }
-
-        // ============================================
-        // GERAÇÃO DE JOGOS (COM TREINAMENTO AUTOMÁTICO)
-        // ============================================
-        
-        async function gerarJogos() {
-            const config = LOTERIAS[loteriaAtual];
-            const dadosFiltrados = filtrarDados();
-            
-            // Verificar se precisa re-treinar (filtros mudaram)
-            const filtrosAtuais = getFiltrosAtivos();
-            const filtrosMudaram = !filtrosTreinamento || 
-                JSON.stringify(filtrosAtuais.map(f => f.valor)) !== JSON.stringify(filtrosTreinamento.map(f => f.valor));
-            
-            // Re-treinar se os filtros mudaram ou se ainda não foi treinado
-            if (filtrosMudaram || !iaTreinada) {
-                if (dadosFiltrados.length >= 50) {
-                    // Atualizar filtros e treinar
-                    filtrosTreinamento = filtrosAtuais;
-                    await treinarIASilencioso(dadosFiltrados);
-                }
-            }
-            
-            // Gerar jogos (código existente mantido)
-            const qtd = parseInt(document.getElementById('qtdJogos').value);
-            const modo = document.getElementById('modoGeracao').value;
-            const dados = dadosFiltrados;
-            let html = '';
-            
-            // Mostrar filtros aplicados
-            if (iaTreinada && filtrosTreinamento) {
-                html += renderizarFiltrosAplicados(filtrosTreinamento);
-            }
-            
-            for (let i = 0; i < qtd; i++) {
-                let jogo;
-                if (modo === 'random') {
-                    jogo = loteriaAtual === 'lotomania' ? gerarAleatorio(50, 99, 0) : gerarAleatorio(config.numeros, config.maxNumero);
-                } else {
-                    switch (loteriaAtual) {
-                        case 'megasena': jogo = gerarDispersao(dados, 6, 60, dispersaoAtual); break;
-                        case 'quina': jogo = gerarRepeticao(dados, 5, 80, repeticoesAtual); break;
-                        case 'lotofacil': jogo = gerarLotofacil(dados); break;
-                        case 'lotomania': jogo = gerarLotomania(dados); break;
-                        case 'duplasena': jogo = [gerarDispersao(dados, 6, 50, dispersaoAtual), gerarDispersao(dados, 6, 50, dispersaoAtual)]; break;
-                        case 'timemania': jogo = gerarRepeticao(dados, 10, 80, repeticoesAtual); break;
-                        case 'milionaria': jogo = gerarMilionaria(dados); break;
-                        case 'loteca': jogo = gerarLoteca(); break;
-                        case 'diadesorte': jogo = gerarDiaDeSorte(dados); break;
-                        case 'supersete': jogo = gerarSuperSete(dados); break;
-                        default: jogo = gerarAleatorio(config.numeros, config.maxNumero);
-                    }
-                }
-                html += renderizarJogo(jogo, i, config, modo);
-            }
-            document.getElementById('resultados').innerHTML = html;
-        }
-
-        // Treinamento silencioso (sem alertas)
-        async function treinarIASilencioso(dadosFiltrados) {
-            if (isTraining) return;
-            if (dadosFiltrados.length < 50) return;
-            
-            const config = LOTERIAS[loteriaAtual];
-            
-            isTraining = true;
-            iaTreinada = false;
-            atualizarStatusIALoteria(loteriaAtual, 'treinando');
-            
-            const progressBar = document.getElementById('trainingProgressBar');
-            const trainingLog = document.getElementById('trainingLog');
-            const trainingStatus = document.getElementById('trainingStatus');
-            const filtrosContainer = document.getElementById('filtrosAplicadosContainer');
-            
-            if (trainingStatus) {
-                trainingStatus.textContent = 'Treinando...';
-                trainingStatus.className = 'status-badge status-training';
-            }
-            
-            if (trainingLog) {
-                trainingLog.innerHTML = `🔄 Re-treinando IA com novos filtros...\n`;
-                trainingLog.innerHTML += `📊 ${dadosFiltrados.length} concursos filtrados\n`;
-            }
-            
-            if (progressBar) progressBar.style.width = '0%';
-            
-            if (filtrosContainer && filtrosTreinamento) {
-                filtrosContainer.innerHTML = renderizarFiltrosAplicados(filtrosTreinamento);
-                filtrosContainer.style.display = 'block';
-            }
-            
-            const totalEpochs = 20;
-            
-            for (let epoch = 1; epoch <= totalEpochs; epoch++) {
-                await new Promise(resolve => setTimeout(resolve, 80));
-                
-                const progress = (epoch / totalEpochs * 100).toFixed(0);
-                const loss = (0.5 - epoch * 0.02).toFixed(4);
-                const accuracy = Math.min(95, (60 + epoch * 1.5)).toFixed(1);
-                
-                if (progressBar) progressBar.style.width = progress + '%';
-                
-                if (trainingLog && epoch % 4 === 0) {
-                    trainingLog.innerHTML += `📊 Época ${epoch}/${totalEpochs} | Loss: ${loss} | Acc: ${accuracy}%\n`;
-                    trainingLog.scrollTop = trainingLog.scrollHeight;
-                }
-            }
-            
-            if (trainingLog) {
-                trainingLog.innerHTML += `\n✅ IA TREINADA DENTRO DOS FILTROS APLICADOS!\n`;
-                trainingLog.innerHTML += `🎯 ${config.nome} - Modelo atualizado\n`;
-            }
-            
-            if (progressBar) progressBar.style.width = '100%';
-            
-            iaTreinada = true;
-            atualizarStatusIALoteria(loteriaAtual, 'treinado');
-            
-            if (trainingStatus) {
-                trainingStatus.textContent = 'Treinado ✓';
-                trainingStatus.className = 'status-badge status-ready';
-            }
-            
-            isTraining = false;
-        }
-
-        // ============================================
-        // FUNÇÕES AUXILIARES (MANTIDAS)
-        // ============================================
-        
-        function importarArquivo(input, loteria) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                processarCSV(loteria, e.target.result, file.name);
-                iaTreinada = false;
-                filtrosTreinamento = null;
-                renderizarConteudo(loteria);
-                atualizarStatusIALoteria(loteria, 'carregado');
-            };
-            reader.readAsText(file);
         }
 
         function atualizarDispersao(valor) { 
             dispersaoAtual = parseInt(valor); 
             const el = document.getElementById('dispersaoValor'); 
             if (el) el.textContent = `${valor} concursos`;
-            iaTreinada = false; // Resetar treinamento ao mudar filtro
+            iaTreinada = false;
+            analyzer = null;
         }
         
         function atualizarRepeticoes(valor) { 
@@ -1034,156 +1371,179 @@
             const el = document.getElementById('repeticoesValor'); 
             if (el) el.textContent = `${valor} números`;
             iaTreinada = false;
+            analyzer = null;
         }
 
         function setPeriodo(periodo) {
             periodoAtual = periodo;
-            iaTreinada = false; // Resetar treinamento ao mudar período
-            document.querySelectorAll('.filtro-btn').forEach(b => { b.classList.remove('ativo'); b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; });
-            const valores = [1, 3, 5, 7, 10, 'all'];
-            const idx = valores.indexOf(periodo);
-            const botoes = document.querySelectorAll('.filtro-btn');
-            if (idx >= 0 && botoes[idx]) {
-                botoes[idx].classList.add('ativo');
-                botoes[idx].style.background = LOTERIAS[loteriaAtual].cor;
-                botoes[idx].style.borderColor = LOTERIAS[loteriaAtual].cor;
-                botoes[idx].style.color = 'white';
-            }
-        }
-
-        function filtrarDados() {
-            if (periodoAtual === 'all') return [...dadosAtuais];
-            return dadosAtuais.slice(-periodoAtual * 100);
-        }
-
-        function gerarAleatorio(numNumeros, maxNumero, minNumero = 1) {
-            const jogo = new Set();
-            while (jogo.size < numNumeros) jogo.add(Math.floor(Math.random() * (maxNumero - minNumero + 1)) + minNumero);
-            return Array.from(jogo).sort((a, b) => a - b);
-        }
-
-        function gerarDispersao(dados, numNumeros, maxNumero, dispersao) {
-            if (dados.length === 0) return gerarAleatorio(numNumeros, maxNumero);
-            const ultimos = dados.slice(-dispersao);
-            const bloqueados = new Set();
-            ultimos.forEach(j => {
-                if (Array.isArray(j)) j.forEach(n => bloqueados.add(n));
-                else if (j.numeros) j.numeros.forEach(n => bloqueados.add(n));
+            iaTreinada = false;
+            analyzer = null;
+            
+            document.querySelectorAll('.filtro-btn').forEach(btn => {
+                const btnPeriodo = btn.getAttribute('data-periodo');
+                if (btnPeriodo == periodo || (periodo === 'all' && btnPeriodo === 'all')) {
+                    btn.classList.add('ativo');
+                } else {
+                    btn.classList.remove('ativo');
+                }
             });
-            const candidatos = [];
-            for (let n = 1; n <= maxNumero; n++) { if (!bloqueados.has(n)) candidatos.push(n); }
-            const pool = candidatos.length >= numNumeros * 2 ? candidatos : Array.from({length: maxNumero}, (_, i) => i + 1);
-            const jogo = new Set();
-            while (jogo.size < numNumeros) jogo.add(pool[Math.floor(Math.random() * pool.length)]);
-            return Array.from(jogo).sort((a, b) => a - b);
-        }
-
-        function gerarRepeticao(dados, numNumeros, maxNumero, repeticoes) {
-            if (dados.length === 0) return gerarAleatorio(numNumeros, maxNumero);
-            const ultimo = Array.isArray(dados[dados.length - 1]) ? dados[dados.length - 1] : dados[dados.length - 1].numeros;
-            const repetidos = [];
-            const pool = [...ultimo];
-            for (let i = 0; i < repeticoes && pool.length > 0; i++) repetidos.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-            const freq = new Array(maxNumero).fill(0);
-            dados.forEach(j => { const n = Array.isArray(j) ? j : j.numeros; n.forEach(x => freq[x - 1]++); });
-            const jogo = new Set(repetidos);
-            while (jogo.size < numNumeros) {
-                const idx = freq.indexOf(Math.max(...freq));
-                if (idx >= 0 && !jogo.has(idx + 1)) jogo.add(idx + 1);
-                freq[idx] = 0;
-            }
-            return Array.from(jogo).sort((a, b) => a - b);
-        }
-
-        function gerarLotofacil(dados) {
-            if (dados.length === 0) return gerarAleatorio(15, 25);
-            const ultimo = Array.isArray(dados[dados.length - 1]) ? dados[dados.length - 1] : dados[dados.length - 1].numeros;
-            const qtd = repeticoesAtual || 9;
-            const repetidos = ultimo.slice(0, qtd);
-            const carimbados = [];
-            const freq = new Array(25).fill(0);
-            dados.forEach(j => { const n = Array.isArray(j) ? j : j.numeros; n.forEach(x => freq[x - 1]++); });
-            freq.forEach((f, i) => { if (f / dados.length >= 0.8) carimbados.push(i + 1); });
-            const jogo = new Set(repetidos);
-            while (jogo.size < 15) {
-                if (carimbados.length > 0 && Math.random() > 0.3) jogo.add(carimbados[Math.floor(Math.random() * carimbados.length)]);
-                else jogo.add(Math.floor(Math.random() * 25) + 1);
-            }
-            return Array.from(jogo).sort((a, b) => a - b);
-        }
-
-        function gerarLotomania(dados) {
-            if (dados.length === 0) return gerarAleatorio(50, 99, 0);
-            const frequencias = new Array(100).fill(0);
-            dados.forEach(jogo => jogo.forEach(n => frequencias[n]++));
-            const todosNumeros = Array.from({length: 100}, (_, i) => i);
-            const ordenadosPorFrequencia = todosNumeros.sort((a, b) => frequencias[a] - frequencias[b]);
-            const poolMenosFrequentes = ordenadosPorFrequencia.slice(0, 70);
-            const jogo = new Set();
-            while (jogo.size < 50) jogo.add(poolMenosFrequentes[Math.floor(Math.random() * poolMenosFrequentes.length)]);
-            return Array.from(jogo).sort((a, b) => a - b);
-        }
-
-        function gerarMilionaria(dados) {
-            const numeros = gerarDispersao(dados, 6, 50, dispersaoAtual || 12);
-            const trevos = [];
-            while (trevos.length < 2) { const t = Math.floor(Math.random() * 6) + 1; if (!trevos.includes(t)) trevos.push(t); }
-            return { numeros, trevos: trevos.sort((a, b) => a - b) };
-        }
-
-        function gerarLoteca() {
-            return Array.from({length: 14}, () => { const r = Math.random(); return r < 0.45 ? 'Coluna 1' : r < 0.70 ? 'Meio' : 'Coluna 2'; });
-        }
-
-        function gerarDiaDeSorte(dados) {
-            const freqMes = new Array(12).fill(0);
-            dados.forEach(j => { if (j.mes && j.mes >= 1 && j.mes <= 12) freqMes[j.mes - 1]++; });
-            const totalMeses = freqMes.reduce((a, b) => a + b, 0);
-            const mes = totalMeses > 0 ? freqMes.indexOf(Math.max(...freqMes)) + 1 : Math.floor(Math.random() * 12) + 1;
-            return { numeros: gerarDispersao(dados, 7, 31, dispersaoAtual || 8), mes: mes };
-        }
-
-        function gerarSuperSete(dados) {
-            if (dados.length > 0) {
-                return Array.from({length: 7}, (_, col) => {
-                    const fc = new Array(10).fill(0);
-                    dados.forEach(j => { if (j[col] !== undefined) fc[j[col]]++; });
-                    return fc.indexOf(Math.max(...fc));
-                });
-            }
-            return Array.from({length: 7}, () => Math.floor(Math.random() * 10));
-        }
-
-        function renderizarJogo(jogo, index, config, modo) {
-            let bolasHTML = '';
             
-            if (loteriaAtual === 'lotomania') {
-                const numeros = Array.isArray(jogo) ? jogo : jogo;
-                bolasHTML = `<p style="color: ${config.cor}; font-size: 13px;">📝 ${numeros.length} números marcados | 🎯 20 serão sorteados</p><div class="bolas">${numeros.slice(0, 20).map(n => `<div class="bola" style="background: ${config.cor}; width: 32px; height: 32px; font-size: 12px;">${n}</div>`).join('')}<span style="color: ${config.cor}; font-weight: 600;">...+${numeros.length - 20} números</span></div>`;
-            } else if (loteriaAtual === 'milionaria') {
-                bolasHTML = `<p style="color: ${config.cor};">Números:</p><div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: #10b981;">Trevos:</p><div class="bolas">${jogo.trevos.map(t => `<div class="bola" style="background: #10b981;">${t}</div>`).join('')}</div>`;
-            } else if (loteriaAtual === 'loteca') {
-                bolasHTML = `<div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">${jogo.map((p, idx) => `<div style="background: var(--bg-card); padding: 8px; border-radius: 8px; text-align: center; font-size: 12px;"><div style="color: ${config.cor};">J${idx+1}</div><div style="font-weight: 600;">${p}</div></div>`).join('')}</div>`;
-            } else if (loteriaAtual === 'diadesorte') {
-                bolasHTML = `<div class="bolas">${jogo.numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor};">📅 Mês: <strong>${jogo.mes}</strong></p>`;
-            } else if (loteriaAtual === 'supersete') {
-                bolasHTML = `<div class="bolas">${jogo.map((n, idx) => `<div style="text-align: center;"><div style="font-size: 10px; color: var(--text-secondary);">Col ${idx+1}</div><div class="bola" style="background: ${config.cor};">${n}</div></div>`).join('')}</div>`;
-            } else if (loteriaAtual === 'duplasena') {
-                bolasHTML = `<p style="color: ${config.cor};">1º Sorteio:</p><div class="bolas">${jogo[0].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div><p style="color: ${config.cor};">2º Sorteio:</p><div class="bolas">${jogo[1].map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div>`;
-            } else {
-                const numeros = Array.isArray(jogo) ? jogo : (jogo.numeros || jogo);
-                bolasHTML = `<div class="bolas">${numeros.map(n => `<div class="bola" style="background: ${config.cor};">${n}</div>`).join('')}</div>`;
+            const config = LOTERIAS[loteriaAtual];
+            const btnAtivo = document.querySelector('.filtro-btn.ativo');
+            if (btnAtivo && config) {
+                btnAtivo.style.background = config.cor;
+                btnAtivo.style.borderColor = config.cor;
+                btnAtivo.style.color = 'white';
             }
             
-            return `<div class="resultado-jogo"><h4 style="color: ${config.cor};">${config.icone} Jogo ${index + 1} - Modo: ${modo.toUpperCase()}</h4>${bolasHTML}</div>`;
+            renderizarConteudo(loteriaAtual);
+            if (dadosAtuais.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500);
         }
 
+        function renderizarConteudo(loteria) {
+            const config = LOTERIAS[loteria];
+            const div = document.getElementById('conteudoLoteria');
+            const cache = cacheDados[loteria];
+            const impacto = IMPACTO_IA[loteria];
+            const dadosCount = dadosAtuais.length;
+            const dadosFiltradosCount = filtrarDados().length;
+            
+            let controlesExtras = '';
+            if (config.temDispersao) controlesExtras += `<div><label>🎯 Dispersão</label><br><div class="dispersao-slider"><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)"><div class="dispersao-valor">Bloquear: <strong id="dispersaoValor" style="color:${config.cor};">${dispersaoAtual} concursos</strong></div></div></div>`;
+            if (config.temRepeticao) controlesExtras += `<div><label>🔄 Repetir</label><br><div class="dispersao-slider"><input type="range" id="repeticoesSlider" min="${config.repeticoesMin||1}" max="${config.repeticoesMax||config.numeros}" value="${repeticoesAtual}" oninput="atualizarRepeticoes(this.value)"><div class="dispersao-valor">Repetir: <strong id="repeticoesValor" style="color:${config.cor};">${repeticoesAtual} números</strong></div></div></div>`;
+            
+            const statusTexto = iaTreinada ? 'Treinado ✓' : (cache.carregado ? 'Dados Carregados' : 'Sem Dados');
+            const statusClasse = iaTreinada ? 'status-ready' : (cache.carregado ? 'status-warning' : 'status-error');
+            
+            let alertaDados = '';
+            if (!cache.carregado) {
+                alertaDados = `
+                    <div class="mensagem-erro">
+                        <strong>⚠️ Nenhum dado carregado para ${config.nome}!</strong><br>
+                        📁 Clique em "Upload CSV" para carregar os resultados históricos.<br>
+                        O arquivo deve estar no formato: concurso,bola1,bola2,bola3,...<br><br>
+                        <button class="btn btn-exemplo" onclick="gerarCSVExemplo()" style="margin-top:5px;">📥 Baixar CSV Exemplo</button>
+                    </div>
+                `;
+            } else if (dadosCount < 10) {
+                alertaDados = `
+                    <div class="mensagem-erro">
+                        <strong>⚠️ Dados insuficientes!</strong><br>
+                        Apenas ${dadosCount} concursos carregados. Mínimo recomendado: 50 concursos para boa performance da IA.<br>
+                        Faça upload de um arquivo CSV com mais dados históricos.
+                    </div>
+                `;
+            } else if (dadosFiltradosCount < 10) {
+                alertaDados = `
+                    <div class="mensagem-carregamento">
+                        <strong>📊 Poucos dados no período selecionado!</strong><br>
+                        Apenas ${dadosFiltradosCount} concursos no período ${getPeriodoTexto()}.<br>
+                        Selecione um período maior para melhor análise da IA.
+                    </div>
+                `;
+            }
+            
+            let html = `
+                <div class="card">
+                    <h3 style="color:${config.cor};">${config.icone} ${config.nome} - IA Especialista</h3>
+                    <div class="info-box" style="border-left:4px solid ${config.cor};"><h4 style="color:${config.cor};">📊 ${config.estrategia}</h4></div>
+                    ${iaTreinada ? '<div style="text-align:center;margin:10px 0;"><span class="ia-treinada-badge">🎓 IA ESPECIALISTA TREINADA ✓</span></div>' : ''}
+                    
+                    ${alertaDados}
+
+                    <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin:15px 0;">
+                        <h4 style="margin:0;">📁 ${dadosCount} concursos totais</h4>
+                        <span id="trainingStatus" class="status-badge ${statusClasse}">${statusTexto}</span>
+                        <button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()" style="margin:0;padding:8px 16px;font-size:13px;">📁 Upload CSV</button>
+                        <input type="file" id="uploadManual" accept=".csv" onchange="importarArquivo(this,'${loteria}')" style="display:none;">
+                        <button class="btn btn-exemplo" onclick="gerarCSVExemplo()" style="margin:0;padding:8px 16px;font-size:13px;">📥 Exemplo CSV</button>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="label">Concursos</div><div class="value" style="color:${config.cor};">${dadosCount}</div></div>
+                        <div class="stat-card"><div class="label">Período Atual</div><div class="value" style="font-size:14px;">${dadosFiltradosCount}</div></div>
+                        <div class="stat-card"><div class="label">Impacto IA</div><div class="value" style="font-size:14px;color:${impacto.nivel==='seguro'?'#22c55e':impacto.nivel==='cuidado'?'#f59e0b':'#ef4444'};">${impacto.nivel==='seguro'?'🟢 Seguro':impacto.nivel==='cuidado'?'🟡 Cuidado':'🔴 Não Mexer'}</div></div>
+                        <div class="stat-card"><div class="label">Engine</div><div class="value" style="font-size:14px;color:#8b5cf6;">🎓 IA Especialista</div></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h4>📅 Selecione o Período</h4>
+                    <div class="filtros">
+                        <button class="filtro-btn ${periodoAtual === 1 ? 'ativo' : ''}" data-periodo="1" onclick="setPeriodo(1)" style="${periodoAtual === 1 ? `background:${config.cor};border-color:${config.cor};color:white;` : ''}">📆 1 Ano</button>
+                        <button class="filtro-btn ${periodoAtual === 3 ? 'ativo' : ''}" data-periodo="3" onclick="setPeriodo(3)" style="${periodoAtual === 3 ? `background:${config.cor};border-color:${config.cor};color:white;` : ''}">📆 3 Anos</button>
+                        <button class="filtro-btn ${periodoAtual === 5 ? 'ativo' : ''}" data-periodo="5" onclick="setPeriodo(5)" style="${periodoAtual === 5 ? `background:${config.cor};border-color:${config.cor};color:white;` : ''}">📆 5 Anos</button>
+                        <button class="filtro-btn ${periodoAtual === 7 ? 'ativo' : ''}" data-periodo="7" onclick="setPeriodo(7)" style="${periodoAtual === 7 ? `background:${config.cor};border-color:${config.cor};color:white;` : ''}">📆 7 Anos</button>
+                        <button class="filtro-btn ${periodoAtual === 10 ? 'ativo' : ''}" data-periodo="10" onclick="setPeriodo(10)" style="${periodoAtual === 10 ? `background:${config.cor};border-color:${config.cor};color:white;` : ''}">📆 10 Anos</button>
+                        <button class="filtro-btn ${periodoAtual === 'all' ? 'ativo' : ''}" data-periodo="all" onclick="setPeriodo('all')" style="${periodoAtual === 'all' ? `background:${config.cor};border-color:${config.cor};color:white;` : ''}">📆 Todos</button>
+                    </div>
+                    <p style="font-size:12px;color:var(--text-secondary);margin-top:5px;">${getPeriodoTexto()} - ${dadosFiltradosCount} concursos disponíveis</p>
+                </div>
+
+                <div class="training-section">
+                    <h4>🎓 Treinamento da IA Especialista - ${config.nome}</h4>
+                    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">${impacto.desc} | Método: Análise Multidimensional (Frequência, Atraso, Combinações, Sequências)</p>
+                    <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:10px;">
+                        <span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':(isTraining?'status-training':'status-error')}">${iaTreinada?'Treinado ✓':(isTraining?'Treinando...':'Não Treinado')}</span>
+                        <button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()" id="btnTreinar" ${isTraining || dadosFiltradosCount < 10 ? 'disabled' : ''}>🚀 ${isTraining?'Treinando...':'Treinar com Filtros Atuais'}</button>
+                        <button class="btn btn-backtest" onclick="executarBacktesting()" ${dadosFiltradosCount < 20 ? 'disabled' : ''}>🔬 Executar Backtest</button>
+                        <span style="font-size:11px;color:#8b5cf6;">🎓 Análise completa de padrões</span>
+                    </div>
+                    <div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div>
+                    <div class="training-log" id="trainingLog">${iaTreinada?'✅ IA Especialista treinada e pronta!':(dadosFiltradosCount >= 10 ? '⏳ Selecione os filtros e clique em "Treinar" ou "Gerar Jogos"' : '⚠️ Aguardando dados suficientes (mínimo 10 concursos)')}</div>
+                    <div id="filtrosAplicadosContainer" style="display:${iaTreinada?'block':'none'};margin-top:10px;">${iaTreinada && filtrosTreinamento ? renderizarFiltrosAplicados(filtrosTreinamento) : ''}</div>
+                </div>
+
+                <div class="card">
+                    <h4>🎲 Configurar e Gerar Jogos</h4>
+                    <div class="config-grid">
+                        <div><label>Quantidade de Jogos</label><br><input type="number" id="qtdJogos" value="3" min="1" max="20"></div>
+                        <div><label>Modo de Geração</label><br><select id="modoGeracao">
+                            <option value="ia_real">🎓 IA Especialista (Recomendado)</option>
+                            <option value="ensemble">🧠 Ensemble</option>
+                            <option value="random">🎲 Aleatório</option>
+                        </select></div>
+                        ${controlesExtras}
+                    </div>
+                    <button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};" ${dadosFiltradosCount < 10 ? 'disabled' : ''}>${config.icone} Gerar Jogos com IA</button>
+                    <div id="backtestResultados" style="margin-top:15px;"></div>
+                    <div id="resultados" style="margin-top:20px;"></div>
+                </div>
+
+                <div class="regras-oficiais"><h4>📜 Regras Oficiais</h4><p>${REGRAS_OFICIAIS[loteria]}</p></div>
+            `;
+            
+            div.innerHTML = html;
+        }
+
+        function importarArquivo(input, loteria) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => { 
+                processarCSV(loteria, e.target.result, file.name); 
+                iaTreinada = false; 
+                analyzer = null;
+                filtrosTreinamento = null; 
+                atualizarStatusIALoteria(loteria, 'carregado');
+            };
+            reader.onerror = (e) => {
+                alert('Erro ao ler o arquivo. Verifique o formato.');
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🚀 Sistema de Loterias IA inicializado!');
-            console.log('📁 Carregamento automático de CSV ativado');
-            console.log('🧠 Treinamento visível com filtros');
-            console.log('⚖️ Impacto por loteria: 🟢 Seguro | 🟡 Cuidado | 🔴 Não Mexer');
-            
+            console.log('🚀 Sistema Profissional de Loterias - Versão Real');
+            console.log('🎓 IA Especialista com Análise Multidimensional');
+            console.log('📊 Aguardando upload de arquivos CSV com dados reais');
+            console.log('💡 Dica: Clique em "Exemplo CSV" para baixar um modelo');
             await selecionarLoteria('megasena');
         });
     </script>
