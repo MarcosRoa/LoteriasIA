@@ -12,6 +12,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
     
+    <!-- Supabase SDK -->
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        window.supabaseClient = createClient(
+            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'sb_publishable_nA1FD4jJSCT0tOsnwrKqXQ_7R08DdYU'
+        );
+        console.log('✅ Supabase inicializado');
+    </script>
+    
     <!-- Bibliotecas existentes -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -54,6 +64,36 @@
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* TELA DE MANUTENÇÃO */
+        .maintenance-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0f172a, #020617);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        .maintenance-content {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-card);
+            border-radius: 30px;
+            border: 2px solid #f59e0b;
+            max-width: 500px;
+            margin: 20px;
+            animation: pulse 2s infinite;
+        }
+        .maintenance-icon { font-size: 80px; margin-bottom: 20px; }
+        .maintenance-title { font-size: 32px; color: #f59e0b; margin-bottom: 15px; }
+        .maintenance-text { color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+        .maintenance-time { font-size: 14px; color: #8b5cf6; margin-top: 20px; padding: 10px; background: rgba(139, 92, 246, 0.2); border-radius: 20px; }
 
         .header {
             background: linear-gradient(135deg, var(--bg-secondary), #0f2744);
@@ -118,6 +158,7 @@
         .btn-facebook { background: #4267B2; color: white; }
         .btn-logout { background: #64748b; color: white; }
         .btn-comprar { background: #10b981; color: white; }
+        .admin-badge { background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 10px; }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
         .toolbar { background: var(--bg-card); border-radius: var(--radius); padding: 12px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border: 2px solid var(--border); }
@@ -205,6 +246,19 @@
     </style>
 </head>
 <body>
+    <!-- TELA DE MANUTENÇÃO -->
+    <div id="maintenanceScreen" style="display: none;">
+        <div class="maintenance-overlay">
+            <div class="maintenance-content">
+                <div class="maintenance-icon">🔧⚙️</div>
+                <h1 class="maintenance-title">Sistema em Manutenção</h1>
+                <p class="maintenance-text">Estamos realizando melhorias no sistema para melhor atendê-lo.</p>
+                <p class="maintenance-text">Em breve estaremos de volta com novidades!</p>
+                <div class="maintenance-time">⏱️ Previsão: algumas horas<br>📧 Dúvidas: suporte@loteriasia.com</div>
+            </div>
+        </div>
+    </div>
+
     <div class="header">
         <div class="header-content">
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
@@ -251,7 +305,125 @@
 
     <script>
         // ============================================
-        // CONFIGURAÇÕES DO FIREBASE (SUAS CREDENCIAIS)
+        // 🚨 MODO MANUTENÇÃO
+        // ============================================
+        // Altere esta variável para true quando quiser ATIVAR a manutenção
+        // Altere para false quando quiser DESATIVAR a manutenção
+        let maintenanceMode = true;  // ⬅️ true = manutenção ATIVADA | false = sistema NORMAL
+        
+        // Função para verificar manutenção
+        function checkMaintenance() {
+            if (maintenanceMode === true) {
+                document.getElementById('maintenanceScreen').style.display = 'block';
+                document.querySelector('.container').style.display = 'none';
+                document.querySelector('.header').style.display = 'none';
+                return true;
+            } else {
+                document.getElementById('maintenanceScreen').style.display = 'none';
+                document.querySelector('.container').style.display = 'block';
+                document.querySelector('.header').style.display = 'block';
+                return false;
+            }
+        }
+        
+        // ============================================
+        // 👑 ADMIN TESTE - CONFIGURE AQUI
+        // ============================================
+        // ⬇️ COLOQUE AQUI O E-MAIL E SENHA DO ADMIN ⬇️
+        const ADMIN_EMAIL = "admin@teste.com";      // Altere para o email do admin
+        const ADMIN_PASSWORD = "admin123";          // Altere para a senha do admin
+        const ADMIN_CREDITS = 100;                  // Créditos do admin (não persiste)
+        
+        let isAdminMode = false;
+        
+        // Função para login do administrador
+        async function loginAdmin() {
+            if (maintenanceMode) {
+                alert('🔧 Sistema em manutenção. Tente mais tarde.');
+                return;
+            }
+            
+            // Criar usuário admin local (não vai para o Firebase)
+            usuarioAtual = {
+                uid: 'admin_' + Date.now(),
+                nome: 'Administrador Teste',
+                email: ADMIN_EMAIL,
+                foto: null,
+                isAdmin: true
+            };
+            isAdminMode = true;
+            creditosUsuario = ADMIN_CREDITS;
+            
+            // Salvar no localStorage apenas para sessão
+            localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+            
+            atualizarInterfaceUsuario();
+            mostrarToast(`👑 Modo Administrador ativado! Você tem ${creditosUsuario} créditos para testes.`, 'success');
+        }
+        
+        // Função para verificar se é admin
+        function isAdminUser() {
+            return usuarioAtual && usuarioAtual.isAdmin === true;
+        }
+        
+        // ============================================
+        // FUNÇÕES DO SUPABASE
+        // ============================================
+        
+        async function carregarCreditosSupabase(uid) {
+            if (!window.supabaseClient || isAdminUser()) return null;
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('usuarios')
+                    .select('creditos')
+                    .eq('uid', uid)
+                    .single();
+                if (error) throw error;
+                return data?.creditos || null;
+            } catch (error) {
+                console.log('Erro ao carregar do Supabase:', error);
+                return null;
+            }
+        }
+        
+        async function salvarCreditoSupabase(uid, novoSaldo) {
+            if (!window.supabaseClient || isAdminUser()) return;
+            try {
+                const { error } = await window.supabaseClient
+                    .from('usuarios')
+                    .upsert({ 
+                        uid: uid, 
+                        creditos: novoSaldo,
+                        updated_at: new Date()
+                    });
+                if (error) throw error;
+                console.log('✅ Créditos salvos no Supabase');
+            } catch (error) {
+                console.error('Erro ao salvar créditos no Supabase:', error);
+            }
+        }
+        
+        async function salvarHistoricoSupabase(uid, loteria, jogos, filtros) {
+            if (!window.supabaseClient || isAdminUser()) return;
+            try {
+                const { error } = await window.supabaseClient
+                    .from('historico_palpites')
+                    .insert({
+                        usuario_uid: uid,
+                        loteria: loteria,
+                        jogos: jogos,
+                        filtros: filtros,
+                        created_at: new Date()
+                    });
+                if (error) throw error;
+                console.log('✅ Histórico salvo no Supabase');
+            } catch (error) {
+                console.error('Erro ao salvar histórico no Supabase:', error);
+            }
+        }
+        
+        // ============================================
+        // CONFIGURAÇÕES DO FIREBASE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCA_FoID7Ch8LkcwK5TbQSK23lU7BxQMuE",
@@ -263,7 +435,6 @@
             measurementId: "G-PQ8XZ46SSD"
         };
         
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         
@@ -271,16 +442,14 @@
         // VERSÃO E CONFIGURAÇÕES
         // ============================================
         const VERSAO = "6.0.0";
-        console.log(`🚀 Loterias V.${VERSAO} - COM LOGIN E CRÉDITOS`);
+        console.log(`🚀 Loterias V.${VERSAO}`);
         
-        // CONCURSOS POR ANO PARA DATAS PRECISAS
         const CONCURSOS_POR_ANO = {
             megasena: 52, quina: 52, lotofacil: 52, lotomania: 52,
             duplasena: 52, timemania: 52, milionaria: 52,
             loteca: 26, diadesorte: 52, supersete: 52
         };
         
-        let maintenanceMode = false;
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
         let periodoAtual = 'all';
@@ -290,7 +459,6 @@
         let aiModel = null;
         let filtrosTreinamento = null;
         
-        // Usuário logado
         let usuarioAtual = null;
         let creditosUsuario = 0;
         
@@ -310,7 +478,6 @@
             supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24' }
         };
         
-        // Regras oficiais
         const REGRAS_OFICIAIS = {
             megasena: `<strong>Mega-Sena</strong> - 6 a 20 números, de 1 a 60.`,
             quina: `<strong>Quina</strong> - 5 a 15 números, de 1 a 80.`,
@@ -334,6 +501,10 @@
         // ============================================
         
         async function loginGoogle() {
+            if (maintenanceMode) {
+                alert('🔧 Sistema em manutenção. Tente mais tarde.');
+                return;
+            }
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await auth.signInWithPopup(provider);
@@ -345,6 +516,10 @@
         }
         
         async function loginFacebook() {
+            if (maintenanceMode) {
+                alert('🔧 Sistema em manutenção. Tente mais tarde.');
+                return;
+            }
             try {
                 const provider = new firebase.auth.FacebookAuthProvider();
                 const result = await auth.signInWithPopup(provider);
@@ -356,6 +531,14 @@
         }
         
         async function logout() {
+            if (isAdminUser()) {
+                usuarioAtual = null;
+                isAdminMode = false;
+                creditosUsuario = 0;
+                atualizarInterfaceUsuario();
+                mostrarToast('Logout do Admin realizado!', 'success');
+                return;
+            }
             try {
                 await auth.signOut();
                 usuarioAtual = null;
@@ -368,23 +551,30 @@
         }
         
         async function processarLogin(user) {
+            if (isAdminUser()) return;
             usuarioAtual = {
                 uid: user.uid,
                 nome: user.displayName || user.email?.split('@')[0] || 'Usuário',
                 email: user.email,
-                foto: user.photoURL || null
+                foto: user.photoURL || null,
+                isAdmin: false
             };
             
-            // Carregar créditos do localStorage
-            const savedCredits = localStorage.getItem(`creditos_${user.uid}`);
-            creditosUsuario = savedCredits ? parseInt(savedCredits) : 5;
+            let supabaseCredits = await carregarCreditosSupabase(user.uid);
             
-            // Carregar configurações salvas
+            if (supabaseCredits !== null && supabaseCredits > 0) {
+                creditosUsuario = supabaseCredits;
+                console.log('✅ Créditos carregados do Supabase:', creditosUsuario);
+            } else {
+                const savedCredits = localStorage.getItem(`creditos_${user.uid}`);
+                creditosUsuario = savedCredits ? parseInt(savedCredits) : 5;
+                console.log('📁 Créditos carregados do localStorage:', creditosUsuario);
+                await salvarCreditoSupabase(user.uid, creditosUsuario);
+            }
+            
             carregarConfiguracoesUsuario();
-            
             atualizarInterfaceUsuario();
             mostrarToast(`Bem-vindo(a) ${usuarioAtual.nome}! Você tem ${creditosUsuario} créditos.`, 'success');
-            
             localStorage.setItem(`creditos_${user.uid}`, creditosUsuario);
         }
         
@@ -403,7 +593,7 @@
                     <div class="user-info">
                         ${usuarioAtual.foto ? `<img src="${usuarioAtual.foto}" class="user-avatar" alt="Avatar">` : '<div class="user-avatar" style="background:#8b5cf6; display:flex;align-items:center;justify-content:center;">👤</div>'}
                         <div class="user-details">
-                            <h4>${usuarioAtual.nome}</h4>
+                            <h4>${usuarioAtual.nome} ${usuarioAtual.isAdmin ? '<span class="admin-badge">👑 ADMIN TESTE</span>' : ''}</h4>
                             <p>${usuarioAtual.email}</p>
                         </div>
                     </div>
@@ -418,6 +608,18 @@
                 loginArea.style.display = 'block';
                 userInfoArea.style.display = 'none';
                 userInfoArea.innerHTML = '';
+                // Adicionar botão Admin no painel de login
+                const loginDiv = document.getElementById('loginArea');
+                if (loginDiv && !document.getElementById('btnAdminLogin')) {
+                    const btnAdmin = document.createElement('button');
+                    btnAdmin.id = 'btnAdminLogin';
+                    btnAdmin.className = 'btn btn-primary';
+                    btnAdmin.style.background = '#8b5cf6';
+                    btnAdmin.style.marginTop = '10px';
+                    btnAdmin.innerHTML = '👑 Login Admin Teste';
+                    btnAdmin.onclick = () => loginAdmin();
+                    loginDiv.appendChild(btnAdmin);
+                }
             }
         }
         
@@ -465,10 +667,15 @@
             document.body.insertAdjacentHTML('beforeend', html);
         }
         
-        function simularCompra(qtd) {
+        async function simularCompra(qtd) {
             fecharModalCreditos();
             creditosUsuario += qtd;
-            localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+            
+            if (!isAdminUser()) {
+                localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+                await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+            }
+            
             document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
             mostrarToast(`✅ ${qtd} créditos adicionados! Saldo: ${creditosUsuario}`, 'success');
             
@@ -504,7 +711,7 @@
         
         function fecharModalHistorico() { document.getElementById('modalHistorico')?.remove(); }
         
-        function salvarHistoricoUsuario(jogos, filtros) {
+        async function salvarHistoricoUsuario(jogos, filtros) {
             if (!usuarioAtual) return;
             const historico = JSON.parse(localStorage.getItem(`historico_${usuarioAtual.uid}`) || '[]');
             historico.unshift({
@@ -516,10 +723,14 @@
                 creditosGastos: jogos.length
             });
             localStorage.setItem(`historico_${usuarioAtual.uid}`, JSON.stringify(historico.slice(0, 100)));
+            
+            if (!isAdminUser()) {
+                await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros);
+            }
         }
         
         // ============================================
-        // FUNÇÃO DE FILTRO POR ANOS (CORRIGIDA)
+        // FUNÇÃO DE FILTRO POR ANOS
         // ============================================
         function filtrarDados() {
             if (periodoAtual === 'all') return [...dadosAtuais];
@@ -549,7 +760,7 @@
         }
         
         // ============================================
-        // CLASSE IA (MANTIDA)
+        // CLASSE IA
         // ============================================
         
         class AdvancedLotteryAI {
@@ -777,6 +988,10 @@
         }
         
         async function gerarJogos() {
+            if (maintenanceMode) {
+                mostrarToast('🔧 Sistema em manutenção. Tente mais tarde.', 'error');
+                return;
+            }
             if (!usuarioAtual) {
                 mostrarToast('Faça login para gerar jogos!', 'warning');
                 return;
@@ -884,18 +1099,20 @@
                 </div>`;
             }
             
-            // Consumir créditos
-            creditosUsuario -= qtd;
-            localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+            // Consumir créditos (admin não consome)
+            if (!isAdminUser()) {
+                creditosUsuario -= qtd;
+                localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+                await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+            }
             document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
             
-            // Salvar histórico
-            salvarHistoricoUsuario(jogosGerados, filtrosTreinamento.map(f => `${f.label}:${f.valor}`).join(' | '));
+            await salvarHistoricoUsuario(jogosGerados, filtrosTreinamento.map(f => `${f.label}:${f.valor}`).join(' | '));
             salvarConfiguracoesUsuario();
             
-            html += `<div class="mensagem-sucesso" style="margin-top: 15px;">✅ ${jogosGerados.length} jogos gerados! Créditos restantes: ${creditosUsuario}</div>`;
+            html += `<div class="mensagem-sucesso" style="margin-top: 15px;">✅ ${jogosGerados.length} jogos gerados! ${isAdminUser() ? '(Modo Admin - créditos não consumidos)' : `Créditos restantes: ${creditosUsuario}`}</div>`;
             document.getElementById('resultados').innerHTML = html;
-            mostrarToast(`${jogosGerados.length} jogos gerados! Saldo: ${creditosUsuario} créditos`, 'success');
+            mostrarToast(`${jogosGerados.length} jogos gerados!`, 'success');
         }
         
         function exportarResultadosPDF() {
@@ -1069,6 +1286,9 @@
         // INICIALIZAÇÃO
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
+            // Verificar manutenção primeiro
+            checkMaintenance();
+            
             const temaSalvo = localStorage.getItem('tema');
             if (temaSalvo === 'light') document.body.classList.add('light-mode');
             carregarGridLoterias();
@@ -1076,9 +1296,15 @@
             
             // Monitorar autenticação
             auth.onAuthStateChanged(async (user) => {
-                if (user) await processarLogin(user);
+                if (user && !isAdminUser()) await processarLogin(user);
                 else atualizarInterfaceUsuario();
             });
+            
+            // Mostrar instruções no console
+            console.log('%c👑 ADMIN TESTE', 'color: #8b5cf6; font-size: 16px; font-weight: bold;');
+            console.log('Para ativar o modo Admin, clique no botão "👑 Login Admin Teste" na área de login');
+            console.log(`Email: ${ADMIN_EMAIL} | Senha: ${ADMIN_PASSWORD}`);
+            console.log('Os créditos do admin são fixos em 100 e não são consumidos ao gerar jogos!');
             
             mostrarToast(`Loterias V.${VERSAO} - Faça login para começar!`, 'info');
         });
