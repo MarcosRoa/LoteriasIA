@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loterias V.6.0 - Sistema Profissional com Login</title>
+    <title>Loterias V.6.1 - Sistema Profissional com Login</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -21,6 +21,9 @@
         );
         console.log('✅ Supabase inicializado');
     </script>
+    
+    <!-- Mercado Pago SDK (Sandbox - Modo Teste) -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
     
     <!-- Bibliotecas existentes -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
@@ -128,6 +131,59 @@
         .modal-login-btn { background: linear-gradient(135deg, #8b5cf6, #06b6d4); color: white; border: none; padding: 12px 30px; border-radius: 30px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .modal-login-btn:hover { transform: scale(1.05); opacity: 0.9; }
 
+        /* MODAL PIX */
+        .modal-pix-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-pix-container {
+            background: var(--bg-card);
+            border-radius: 30px;
+            padding: 30px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            animation: fadeIn 0.3s ease;
+            border: 2px solid #10b981;
+        }
+        .qr-code-area {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+        .qr-code-area img {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        .pix-copy-area {
+            background: var(--bg-primary);
+            padding: 12px;
+            border-radius: 12px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .btn-copiar {
+            background: var(--info);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
         /* Estilos para elementos extras das loterias */
         .extras-container {
             display: flex;
@@ -153,15 +209,6 @@
             font-size: 18px;
             font-weight: 700;
         }
-        .bolas-mes {
-            background: #f97316;
-        }
-        .bolas-time {
-            background: #ec4899;
-        }
-        .bolas-trevo {
-            background: #a855f7;
-        }
 
         .header {
             background: linear-gradient(135deg, var(--bg-secondary), #0f2744);
@@ -180,7 +227,7 @@
             gap: 20px;
         }
 
-        .header-logo img { width: 200px; height: auto; border-radius: 8px; }
+        .header-logo img { width: 150px; height: auto; border-radius: 8px; }
         .header-text { flex: 1; text-align: center; }
         .header h1 { font-size: 24px; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; color: white; }
@@ -318,7 +365,7 @@
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
             <div class="header-text">
                 <h1>🧠 Sistema Profissional de Loterias com IA Real <span class="version-badge">COM LOGIN E CRÉDITOS</span></h1>
-                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos</p>
+                <p class="header-subtitle">10 loterias • IA V.6.1 que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
             </div>
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
         </div>
@@ -346,7 +393,7 @@
             </div>
             <div class="toolbar-group">
                 <span id="statusConexao" class="status-badge status-ready">🟢 Online</span>
-                <span id="versaoBadge" class="status-badge status-ready">📌 V.6.0</span>
+                <span id="versaoBadge" class="status-badge status-ready">📌 V.6.1</span>
             </div>
         </div>
 
@@ -395,7 +442,7 @@
             overlay.innerHTML = `
                 <div class="modal-login-container">
                     <div class="modal-login-logo">🎲</div>
-                    <div class="modal-login-title">Loterias V.6.0</div>
+                    <div class="modal-login-title">Loterias V.6.1</div>
                     <div class="modal-login-message">
                         🔐 Para gerar seus palpites e salvar seu histórico,<br>
                         <strong>faça login utilizando Google ou Facebook</strong>.
@@ -421,20 +468,26 @@
         }
         
         // ============================================
-        // 👑 ADMIN TESTE
+        // 👑 ADMIN TESTE (CONFIGURÁVEL)
         // ============================================
-
-        //ADMIN_EMAIL = "admin@teste.com";
-        //ADMIN_PASSWORD = "admin123";
-        const ADMIN_EMAIL = "";
-        const ADMIN_PASSWORD = "";
+        // ⬇️ COLOQUE O EMAIL "admin@teste.com" E SENHA "admin123" PARA ATIVAR O ADMIN ⬇️
+        // ⬇️ DEIXE VAZIO ("") PARA DESATIVAR COMPLETAMENTE ⬇️
+        const ADMIN_EMAIL = "";      // Altere para o email do admin (ou deixe "" para desativar)
+        const ADMIN_PASSWORD = "";   // Altere para a senha do admin (ou deixe "" para desativar)
         const ADMIN_CREDITS = 100;
         
         let isAdminMode = false;
         
+        // Verifica se o admin está configurado (só mostra botão se tiver email e senha)
+        const isAdminConfigured = ADMIN_EMAIL && ADMIN_EMAIL !== "" && ADMIN_PASSWORD && ADMIN_PASSWORD !== "";
+        
         async function loginAdmin() {
             if (maintenanceMode) {
                 alert('🔧 Sistema em manutenção. Tente mais tarde.');
+                return;
+            }
+            if (!isAdminConfigured) {
+                mostrarToast('⚠️ Modo Admin não configurado!', 'error');
                 return;
             }
             usuarioAtual = {
@@ -452,6 +505,220 @@
         }
         
         function isAdminUser() { return usuarioAtual && usuarioAtual.isAdmin === true; }
+        
+        // ============================================
+        // 💳 MERCADO PAGO - PIX (MODO SANDBOX - TESTE)
+        // ============================================
+        // IMPORTANTE: Modo Sandbox - sem custos!
+        // Para ativar pagamentos reais, mude isSandbox para false e configure accessToken real
+        
+        const MP_SANDBOX = true;  // true = modo teste (grátis) | false = modo real (pagamentos reais)
+        
+        // Chave pública de teste do Mercado Pago (Sandbox)
+        // Em produção real, você precisará criar uma conta no Mercado Pago e obter suas próprias chaves
+        const MP_PUBLIC_KEY_SANDBOX = "TEST-12345678-1234-1234-1234-123456789012";
+        
+        // Valores disponíveis para compra (múltiplos de 3, já que cada jogo custa R$ 3)
+        const VALORES_PIX = [12, 24, 36, 48, 60, 120, 180, 240];
+        
+        // Função para iniciar pagamento PIX (simulado em sandbox)
+        async function iniciarPagamentoPix(valor) {
+            if (!verificarLoginEAcao(null)) return;
+            
+            if (MP_SANDBOX) {
+                // MODO TESTE - Simular pagamento PIX (sem custos reais)
+                mostrarModalPixSimulado(valor);
+            } else {
+                // MODO REAL - Integração com API do Mercado Pago
+                await criarPagamentoPixReal(valor);
+            }
+        }
+        
+        // Modo Sandbox - Simulação de PIX para testes
+        function mostrarModalPixSimulado(valor) {
+            // Remove modal existente
+            const existing = document.querySelector('.modal-pix-overlay');
+            if (existing) existing.remove();
+            
+            // Gerar QR Code simulado
+            const qrCodeSimulado = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=00020126580014br.gov.bcb.pix0136a7f8e9d0-1234-5678-9abc-def0123456785204000053039865404${valor}5802BR5913Loterias IA6009SAO PAULO62290525PIX${Date.now()}6304E2A8`;
+            
+            const pixCopiaCola = `00020126580014br.gov.bcb.pix0136a7f8e9d0-1234-5678-9abc-def0123456785204000053039865404${valor}5802BR5913Loterias IA6009SAO PAULO62290525PIX${Date.now()}6304E2A8`;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-pix-overlay';
+            overlay.innerHTML = `
+                <div class="modal-pix-container">
+                    <div style="font-size: 48px; margin-bottom: 10px;">💳🧪</div>
+                    <h3 style="color: #10b981;">MODO TESTE - PIX SIMULADO</h3>
+                    <p style="color: var(--text-secondary); margin: 10px 0;">Valor: <strong style="color: #fbbf24;">R$ ${valor.toFixed(2)}</strong></p>
+                    <p style="font-size: 12px; color: #f59e0b; margin: 5px 0;">⚠️ Ambiente de testes - Nenhum pagamento real será processado</p>
+                    <div class="qr-code-area">
+                        <img src="${qrCodeSimulado}" alt="QR Code PIX (Simulado)" style="width: 200px;">
+                    </div>
+                    <div class="pix-copy-area">
+                        <code style="font-size: 10px;">${pixCopiaCola.substring(0, 50)}...</code>
+                    </div>
+                    <button class="btn-copiar" onclick="copiarPixSimulado('${pixCopiaCola}')">📋 Copiar código PIX</button>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="simularPagamentoPix(${valor})" style="background: #10b981;">✅ Simular Pagamento (Teste)</button>
+                        <button class="btn" onclick="fecharModalPix()" style="background: #64748b;">Fechar</button>
+                    </div>
+                    <p style="font-size: 11px; margin-top: 15px; color: var(--text-secondary);">💡 Modo Sandbox - Para testar, clique em "Simular Pagamento"</p>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function copiarPixSimulado(codigo) {
+            navigator.clipboard.writeText(codigo);
+            mostrarToast('✅ Código PIX copiado! (Modo Teste)', 'success');
+        }
+        
+        function fecharModalPix() {
+            const modal = document.querySelector('.modal-pix-overlay');
+            if (modal) modal.remove();
+        }
+        
+        async function simularPagamentoPix(valor) {
+            fecharModalPix();
+            mostrarToast('🔄 Processando pagamento simulado...', 'info');
+            
+            // Simular delay de processamento
+            await new Promise(r => setTimeout(r, 1500));
+            
+            // Adicionar créditos
+            creditosUsuario += valor;
+            if (!isAdminUser()) {
+                localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+                await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+            }
+            
+            // Registrar transação no histórico
+            const transacao = { 
+                data: new Date().toISOString(), 
+                valor: valor, 
+                tipo: 'pix_simulado', 
+                saldo: creditosUsuario,
+                status: 'aprovado_teste'
+            };
+            const historicoTransacoes = JSON.parse(localStorage.getItem(`transacoes_${usuarioAtual.uid}`) || '[]');
+            historicoTransacoes.unshift(transacao);
+            localStorage.setItem(`transacoes_${usuarioAtual.uid}`, JSON.stringify(historicoTransacoes.slice(0, 50)));
+            
+            document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
+            mostrarToast(`✅ Pagamento simulado aprovado! R$ ${valor.toFixed(2)} adicionados. Saldo: R$ ${creditosUsuario}`, 'success');
+        }
+        
+        // Função real para criar pagamento PIX (será ativada quando MP_SANDBOX = false)
+        async function criarPagamentoPixReal(valor) {
+            mostrarToast('🔄 Gerando QR Code PIX...', 'info');
+            
+            try {
+                // Esta chamada faria requisição para seu backend no Vercel
+                // O backend chamaria a API do Mercado Pago
+                const response = await fetch('/api/criar-pix', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        valor: valor,
+                        usuarioId: usuarioAtual.uid,
+                        usuarioEmail: usuarioAtual.email
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    mostrarModalPixReal(data.qr_code, data.qr_code_base64, data.pix_copia_cola, valor, data.transaction_id);
+                } else {
+                    mostrarToast('Erro ao gerar PIX. Tente novamente.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao criar PIX:', error);
+                mostrarToast('Erro de conexão. Tente novamente.', 'error');
+            }
+        }
+        
+        function mostrarModalPixReal(qrCode, qrCodeBase64, pixCopiaCola, valor, transactionId) {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-pix-overlay';
+            overlay.innerHTML = `
+                <div class="modal-pix-container">
+                    <div style="font-size: 48px;">💳📱</div>
+                    <h3 style="color: #10b981;">Pague com PIX</h3>
+                    <p style="color: var(--text-secondary);">Valor: <strong style="color: #fbbf24;">R$ ${valor.toFixed(2)}</strong></p>
+                    <div class="qr-code-area">
+                        <img src="${qrCodeBase64 || qrCode}" alt="QR Code PIX">
+                    </div>
+                    <div class="pix-copy-area">
+                        <code style="font-size: 10px;">${pixCopiaCola.substring(0, 50)}...</code>
+                    </div>
+                    <button class="btn-copiar" onclick="copiarPix('${pixCopiaCola}')">📋 Copiar código PIX</button>
+                    <div style="margin-top: 20px;">
+                        <p style="font-size: 12px;">⏳ Após o pagamento, o sistema creditará automaticamente em até 30 segundos</p>
+                        <button class="btn" onclick="fecharModalPix()" style="background: #64748b; margin-top: 10px;">Fechar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            
+            // Iniciar verificação de pagamento
+            verificarPagamentoPix(transactionId, valor);
+        }
+        
+        function copiarPix(codigo) {
+            navigator.clipboard.writeText(codigo);
+            mostrarToast('✅ Código PIX copiado!', 'success');
+        }
+        
+        async function verificarPagamentoPix(transactionId, valor) {
+            let tentativas = 0;
+            const maxTentativas = 30; // 30 x 5 segundos = 2 minutos e 30 segundos
+            
+            const interval = setInterval(async () => {
+                tentativas++;
+                
+                try {
+                    const response = await fetch(`/api/verificar-pix?transaction_id=${transactionId}`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'approved') {
+                        clearInterval(interval);
+                        fecharModalPix();
+                        
+                        // Adicionar créditos
+                        creditosUsuario += valor;
+                        if (!isAdminUser()) {
+                            localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+                            await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+                        }
+                        
+                        const transacao = { 
+                            data: new Date().toISOString(), 
+                            valor: valor, 
+                            tipo: 'pix', 
+                            saldo: creditosUsuario,
+                            status: 'aprovado',
+                            transaction_id: transactionId
+                        };
+                        const historicoTransacoes = JSON.parse(localStorage.getItem(`transacoes_${usuarioAtual.uid}`) || '[]');
+                        historicoTransacoes.unshift(transacao);
+                        localStorage.setItem(`transacoes_${usuarioAtual.uid}`, JSON.stringify(historicoTransacoes.slice(0, 50)));
+                        
+                        document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
+                        mostrarToast(`✅ Pagamento aprovado! R$ ${valor.toFixed(2)} adicionados. Saldo: R$ ${creditosUsuario}`, 'success');
+                    }
+                } catch (error) {
+                    console.log('Verificando pagamento...');
+                }
+                
+                if (tentativas >= maxTentativas) {
+                    clearInterval(interval);
+                    mostrarToast('⏰ Tempo limite para pagamento. Se pagou, entre em contato.', 'warning');
+                }
+            }, 5000);
+        }
         
         // ============================================
         // FUNÇÕES DO SUPABASE
@@ -501,7 +768,7 @@
         // VERSÃO E CONFIGURAÇÕES
         // ============================================
         const VERSAO = "6.1.0";
-        console.log(`🚀 Loterias V.${VERSAO} - CORREÇÕES COMPLETAS`);
+        console.log(`🚀 Loterias V.${VERSAO} - COM PIX (MODO TESTE)`);
         
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
@@ -518,7 +785,7 @@
         const cacheDatas = {};
         
         // ============================================
-        // LOTERIAS CONFIGURADAS CORRETAMENTE
+        // LOTERIAS CONFIGURADAS
         // ============================================
         const LOTERIAS = {
             megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25 },
@@ -662,13 +929,14 @@
             }
             carregarConfiguracoesUsuario();
             atualizarInterfaceUsuario();
-            mostrarToast(`Bem-vindo ${usuarioAtual.nome}! Saldo: ${creditosUsuario} créditos`, 'success');
+            mostrarToast(`Bem-vindo ${usuarioAtual.nome}! Saldo: R$ ${creditosUsuario}`, 'success');
             localStorage.setItem(`creditos_${user.uid}`, creditosUsuario);
         }
         
         function atualizarInterfaceUsuario() {
             const loginArea = document.getElementById('loginArea');
             const userInfoArea = document.getElementById('userInfoArea');
+            
             if (usuarioAtual) {
                 loginArea.style.display = 'none';
                 userInfoArea.style.display = 'flex';
@@ -680,16 +948,18 @@
                         ${usuarioAtual.foto ? `<img src="${usuarioAtual.foto}" class="user-avatar">` : '<div class="user-avatar" style="background:#8b5cf6;">👤</div>'}
                         <div class="user-details"><h4>${usuarioAtual.nome} ${usuarioAtual.isAdmin ? '<span class="admin-badge">👑 ADMIN TESTE</span>' : ''}</h4><p>${usuarioAtual.email}</p></div>
                     </div>
-                    <div class="credits-box"><span>💰 MEUS CRÉDITOS</span><strong id="creditosDisplay">${creditosUsuario}</strong></div>
-                    <button class="btn btn-comprar" onclick="comprarCreditos()">➕ Comprar Créditos</button>
+                    <div class="credits-box"><span>💰 MEUS CRÉDITOS</span><strong id="creditosDisplay">R$ ${creditosUsuario}</strong></div>
+                    <button class="btn btn-comprar" onclick="abrirModalComprar()">➕ Comprar Créditos</button>
                     <button class="btn btn-logout" onclick="logout()">🚪 Sair</button>
                 `;
             } else {
                 loginArea.style.display = 'block';
                 userInfoArea.style.display = 'none';
                 userInfoArea.innerHTML = '';
+                
+                // Só mostra o botão de Admin se estiver configurado
                 const loginDiv = document.getElementById('loginArea');
-                if (loginDiv && !document.getElementById('btnAdminLogin')) {
+                if (loginDiv && !document.getElementById('btnAdminLogin') && isAdminConfigured) {
                     const btnAdmin = document.createElement('button');
                     btnAdmin.id = 'btnAdminLogin';
                     btnAdmin.className = 'btn btn-primary';
@@ -701,6 +971,27 @@
                 }
             }
         }
+        
+        function abrirModalComprar() {
+            if (!verificarLoginEAcao(null)) return;
+            
+            let html = `<div class="modal-overlay" id="modalComprar"><div class="modal-container"><div class="modal-header"><h3>💰 Comprar Créditos</h3></div><div class="modal-body">`;
+            html += `<p style="margin-bottom: 15px;">💡 Cada jogo custa <strong>R$ 3,00</strong></p><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">`;
+            
+            VALORES_PIX.forEach(valor => {
+                const qtdJogos = valor / 3;
+                html += `<button onclick="iniciarPagamentoPix(${valor})" style="background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 12px; padding: 15px; color: white; cursor: pointer; transition: transform 0.2s;">
+                            <strong style="font-size: 18px;">R$ ${valor}</strong><br>
+                            <small>${qtdJogos} jogos</small>
+                         </button>`;
+            });
+            
+            html += `</div><p style="font-size: 11px; margin-top: 20px; color: var(--text-secondary);">💳 Pagamento via PIX (${MP_SANDBOX ? 'Modo Teste - Sem custos' : 'Seguro e rápido'})</p>`;
+            html += `</div><div class="modal-footer"><button class="btn" onclick="fecharModalComprar()">Fechar</button></div></div></div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        
+        function fecharModalComprar() { document.getElementById('modalComprar')?.remove(); }
         
         function carregarConfiguracoesUsuario() {
             if (!usuarioAtual) return;
@@ -719,34 +1010,6 @@
             const config = { qtdJogos: document.getElementById('qtdJogos')?.value, modoGeracao: document.getElementById('modoGeracao')?.value, dispersao: dispersaoAtual, periodo: periodoSelecionado };
             localStorage.setItem(`config_${usuarioAtual.uid}`, JSON.stringify(config));
         }
-        
-        function comprarCreditos() {
-            if (!verificarLoginEAcao(null)) return;
-            const pacotes = [{ qtd: 10, preco: 4.90 }, { qtd: 50, preco: 19.90 }, { qtd: 100, preco: 34.90 }, { qtd: 500, preco: 149.90 }];
-            let html = `<div class="modal-overlay" id="modalCreditos"><div class="modal-container"><div class="modal-header"><h3>💰 Comprar Créditos</h3></div><div class="modal-body">`;
-            pacotes.forEach(p => {
-                html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;margin:8px 0;background:var(--bg-card);border-radius:12px;">
-                            <span><strong>${p.qtd} créditos</strong><br><small>≈ ${p.qtd} jogos</small></span>
-                            <span style="font-size:20px;color:#fbbf24;">R$ ${p.preco.toFixed(2)}</span>
-                            <button class="btn btn-primary" onclick="simularCompra(${p.qtd})" style="padding:8px 16px;">Comprar</button>
-                         </div>`;
-            });
-            html += `<p style="font-size:11px;margin-top:15px;">💡 Pagamento via Pix (em breve)</p></div><div class="modal-footer"><button onclick="fecharModalCreditos()">Fechar</button></div></div></div>`;
-            document.body.insertAdjacentHTML('beforeend', html);
-        }
-        
-        async function simularCompra(qtd) {
-            fecharModalCreditos();
-            creditosUsuario += qtd;
-            if (!isAdminUser()) {
-                localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
-                await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
-            }
-            document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
-            mostrarToast(`✅ ${qtd} créditos adicionados! Saldo: ${creditosUsuario}`, 'success');
-        }
-        
-        function fecharModalCreditos() { document.getElementById('modalCreditos')?.remove(); }
         
         function abrirHistorico() {
             if (!verificarLoginEAcao(null)) return;
@@ -775,7 +1038,7 @@
         }
         
         // ============================================
-        // CLASSE IA (ATUALIZADA PARA NOVAS LOTERIAS)
+        // CLASSE IA
         // ============================================
         class AdvancedLotteryAI {
             constructor(dados, maxNumero, loteriaNome) {
@@ -877,7 +1140,6 @@
                 return { loteria: this.loteriaNome, confiancaGeral: this.confianca, totalDados: this.dados.length, melhoresNumerosAtuais: this.calcularScoreCompleto().slice(0, 10).map(s => ({ numero: s.numero, pontuacao: s.score.toFixed(0) })) };
             }
             
-            // Métodos específicos para loterias com extras
             predizerMesSorte() { return Math.floor(Math.random() * 12) + 1; }
             predizerTimeSorte() { return Math.floor(Math.random() * 80) + 1; }
             predizerTrevos(qtd) { const trevos = new Set(); while (trevos.size < qtd) trevos.add(Math.floor(Math.random() * 6) + 1); return Array.from(trevos).sort((a,b)=>a-b); }
@@ -991,13 +1253,13 @@
         
         async function gerarJogos() {
             if (!verificarLoginEAcao(null)) return;
-            if (creditosUsuario <= 0) { mostrarToast('Créditos insuficientes!', 'error'); comprarCreditos(); return; }
+            if (creditosUsuario <= 0) { mostrarToast('Créditos insuficientes!', 'error'); abrirModalComprar(); return; }
             const dadosCount = filtrarDados().length;
             if (dadosCount < 10) { document.getElementById('resultados').innerHTML = `<div class="mensagem-erro"><strong>⚠️ Dados insuficientes!</strong><br>Apenas ${dadosCount} concursos. Mínimo: 10.</div>`; return; }
             if (!aiModel) { await treinarIAComFiltrosAtuais(); }
             
             const qtd = parseInt(document.getElementById('qtdJogos')?.value || 5);
-            if (creditosUsuario < qtd) { mostrarToast(`Precisa de ${qtd} créditos, tem apenas ${creditosUsuario}`, 'error'); comprarCreditos(); return; }
+            if (creditosUsuario < qtd) { mostrarToast(`Precisa de ${qtd} créditos, tem apenas R$ ${creditosUsuario}`, 'error'); abrirModalComprar(); return; }
             
             const modo = document.getElementById('modoGeracao')?.value || 'ia_especialista';
             const config = LOTERIAS[loteriaAtual];
@@ -1009,7 +1271,7 @@
             if (backtestResult) html += `<div style="margin:15px 0;padding:15px;background:rgba(34,197,94,0.1);border-left:4px solid #22c55e;"><h4>📈 Performance IA V.6.1</h4><div>Acerto: <strong>${backtestResult.percentualIA}%</strong></div></div>`;
             
             html += `<h3 style="margin-top:20px;">🎯 ${qtd} JOGOS - ${getModoTexto(modo)}</h3>`;
-            html += `<div style="margin-bottom:15px;padding:10px;background:rgba(56,189,248,0.2);border-radius:8px;"><span style="color:#38bdf8;">✅ V.6.1:</span> Créditos utilizados: ${qtd}</div>`;
+            html += `<div style="margin-bottom:15px;padding:10px;background:rgba(56,189,248,0.2);border-radius:8px;"><span style="color:#38bdf8;">✅ V.6.1:</span> Créditos utilizados: R$ ${qtd * 3}</div>`;
             
             const jogosGerados = [];
             const extrasGerados = [];
@@ -1064,16 +1326,9 @@
                     jogoFinal = todos.slice(0, config.numeros).sort((a,b)=>a-b);
                 }
                 
-                // Gerar extras conforme a loteria
-                if (config.temMes) {
-                    jogoExtras.mes = aiModel.predizerMesSorte();
-                }
-                if (config.temTime) {
-                    jogoExtras.time = aiModel.predizerTimeSorte();
-                }
-                if (config.temTrevos) {
-                    jogoExtras.trevos = aiModel.predizerTrevos(config.numTrevos || 2);
-                }
+                if (config.temMes) { jogoExtras.mes = aiModel.predizerMesSorte(); }
+                if (config.temTime) { jogoExtras.time = aiModel.predizerTimeSorte(); }
+                if (config.temTrevos) { jogoExtras.trevos = aiModel.predizerTrevos(config.numTrevos || 2); }
                 
                 jogosGerados.push(jogoFinal);
                 extrasGerados.push(jogoExtras);
@@ -1082,7 +1337,6 @@
                 const confClasse = confianca >= 70 ? 'confianca-alta' : (confianca >= 50 ? 'confianca-media' : 'confianca-baixa');
                 const confTexto = confianca >= 70 ? '⭐ Alta' : (confianca >= 50 ? '📊 Média' : '⚠️ Baixa');
                 
-                // Montar exibição do jogo
                 let numerosDisplay = jogoFinal.map(n => {
                     if (config.incluirZero && n === 0) return `<div class="bola" style="background:${config.cor};">00</div>`;
                     return `<div class="bola" style="background:${config.cor};">${formatarNumeroZero(n)}</div>`;
@@ -1116,7 +1370,7 @@
                 localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
                 await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
             }
-            document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
+            document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = `R$ ${creditosUsuario}`);
             
             let extrasString = '';
             if (config.temMes) extrasString += ' + Mês da Sorte';
@@ -1126,7 +1380,7 @@
             await salvarHistoricoUsuario(jogosGerados, filtrosTreinamento ? filtrosTreinamento.map(f => `${f.label}:${f.valor}`).join(' | ') : '', extrasString || null);
             salvarConfiguracoesUsuario();
             
-            html += `<div class="mensagem-sucesso" style="margin-top: 15px;">✅ ${jogosGerados.length} jogos gerados! ${isAdminUser() ? '(Modo Admin - sem consumo)' : `Créditos restantes: ${creditosUsuario}`}</div>`;
+            html += `<div class="mensagem-sucesso" style="margin-top: 15px;">✅ ${jogosGerados.length} jogos gerados! ${isAdminUser() ? '(Modo Admin - sem consumo)' : `Saldo restante: R$ ${creditosUsuario}`}</div>`;
             document.getElementById('resultados').innerHTML = html;
             mostrarToast(`${jogosGerados.length} jogos gerados!`, 'success');
         }
@@ -1264,7 +1518,6 @@
             html += `<div style="display:flex;gap:15px;flex-wrap:wrap;margin:15px 0;"><h4>📁 ${dadosCount} concursos</h4><span id="trainingStatus" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'✓ Treinada':'Pendente'}</span><button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()">📁 Upload CSV</button><input type="file" id="uploadManual" accept=".csv" onchange="importarArquivo(this,'${loteria}')" style="display:none;"></div>`;
             html += `<div class="stats-grid"><div class="stat-card">Concursos: ${dadosCount}</div><div class="stat-card">Período: ${dadosFiltradosCount}</div><div class="stat-card">Engine: 🧠 V.6.1</div></div></div>`;
             
-            // Botões de período 1,3,5,7,9 anos
             html += `<div class="card"><h4>📅 Período (Baseado em data real - Mês atual)</h4><div class="filtros">
                 <button class="filtro-btn ${periodoSelecionado === 1 ? 'ativo' : ''}" onclick="setPeriodo(1)">1 Ano</button>
                 <button class="filtro-btn ${periodoSelecionado === 3 ? 'ativo' : ''}" onclick="setPeriodo(3)">3 Anos</button>
@@ -1281,7 +1534,7 @@
             
             html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:200px; font-size:13px;">${iaTreinada?'✅ IA V.6.1 pronta!':'⏳ Clique em Treinar'}</div><div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
             
-            html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid"><div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="5" min="1" max="20"></div><div><label>Modo de IA</label><br><select id="modoGeracao"><option value="ia_especialista">🎓 IA Especialista</option><option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option><option value="probabilistico">📊 Probabilístico</option></select></div>${controlesExtras}</div><button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};">${config.icone} GERAR JOGOS</button><div id="backtestResultados" style="margin-top:15px;"></div><div id="resultados" style="margin-top:20px;"></div></div>`;
+            html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid"><div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="5" min="1" max="20"></div><div><label>Modo de IA</label><br><select id="modoGeracao"><option value="ia_especialista">🎓 IA Especialista</option><option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option><option value="probabilistico">📊 Probabilístico</option></select></div>${controlesExtras}</div><button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};">${config.icone} GERAR JOGOS (R$ 3,00/jogo)</button><div id="backtestResultados" style="margin-top:15px;"></div><div id="resultados" style="margin-top:20px;"></div></div>`;
             
             html += `<div class="regras-oficiais"><h4>📜 Regras Oficiais (Corrigidas)</h4><p>${REGRAS_OFICIAIS[loteria] || 'Consulte o site oficial.'}</p></div>`;
             div.innerHTML = html;
@@ -1302,13 +1555,15 @@
             carregarGridLoterias();
             selecionarLoteria('megasena');
             auth.onAuthStateChanged(async (user) => { if (user && !isAdminUser()) await processarLogin(user); else atualizarInterfaceUsuario(); });
-            console.log('%c✅ Loterias V.6.1 - CORREÇÕES COMPLETAS', 'color: #22c55e; font-size: 14px;');
-            console.log('📌 Dia da Sorte: ✅ Mês incluído (Janeiro a Dezembro)');
-            console.log('📌 Timemania: ✅ Time do Coração incluído');
-            console.log('📌 +Milionária: ✅ 2 Trevos incluídos (1-6)');
-            console.log('📌 Lotomania/Super Sete: ✅ Inclui número 0/00');
-            console.log('📌 Área de treinamento aumentada');
-            mostrarToast(`Loterias V.${VERSAO} - Todas as correções aplicadas!`, 'info');
+            
+            console.log('%c✅ Loterias V.6.1 - COM PIX (MODO TESTE)', 'color: #22c55e; font-size: 14px;');
+            console.log('📌 Modo PIX: Sandbox (testes) - NENHUM PAGAMENTO REAL');
+            if (isAdminConfigured) {
+                console.log('👑 Admin Teste: ATIVADO');
+            } else {
+                console.log('👑 Admin Teste: DESATIVADO (configure ADMIN_EMAIL para ativar)');
+            }
+            mostrarToast(`Loterias V.${VERSAO} - PIX em modo teste!`, 'info');
         });
     </script>
 </body>
