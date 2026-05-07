@@ -15,8 +15,9 @@
     <!-- Supabase SDK -->
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        // URL CORRETA DO SUPABASE ATUALIZADA
         window.supabaseClient = createClient(
-            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'https://fulaikymshjgdghojjhq.supabase.co',
             'sb_publishable_nA1FD4jJSCT0tOsnwrKqXQ_7R08DdYU'
         );
         console.log('✅ Supabase inicializado');
@@ -43,6 +44,7 @@
             --warning: #f59e0b;
             --error: #ef4444;
             --info: #3b82f6;
+            --ferrari: #ff2800;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -227,7 +229,11 @@
             gap: 20px;
         }
 
-        .header-logo img { width: 150px; height: auto; border-radius: 8px; }
+        .header-logo img { 
+            width: 200px; 
+            height: auto; 
+            border-radius: 8px;
+        }
         .header-text { flex: 1; text-align: center; }
         .header h1 { font-size: 24px; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; color: white; }
@@ -249,14 +255,60 @@
         .user-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; }
         .user-details h4 { font-size: 16px; margin-bottom: 4px; }
         .user-details p { font-size: 12px; color: var(--text-secondary); }
-        .credits-box { background: linear-gradient(135deg, #f59e0b, #eab308); padding: 10px 20px; border-radius: 30px; text-align: center; }
+        .credits-box { 
+            background: linear-gradient(135deg, #f59e0b, #eab308); 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .credits-box:hover { transform: scale(1.02); }
         .credits-box span { font-size: 12px; opacity: 0.9; }
         .credits-box strong { font-size: 24px; display: block; color: #1e293b; }
+        
+        .btn-perfil {
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-perfil:hover { transform: scale(1.02); opacity: 0.9; }
+        
+        .btn-comprar {
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-comprar:hover { transform: scale(1.02); opacity: 0.9; }
+        
+        .btn-logout {
+            background: #ff2800;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-logout:hover { transform: scale(1.02); opacity: 0.9; }
+        
         .login-buttons { display: flex; gap: 10px; }
-        .btn-google { background: #db4437; color: white; }
-        .btn-facebook { background: #4267B2; color: white; }
-        .btn-logout { background: #64748b; color: white; }
-        .btn-comprar { background: #10b981; color: white; }
+        .btn-google { background: #db4437; color: white; padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-facebook { background: #4267B2; color: white; padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; }
         .admin-badge { background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 10px; }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -343,6 +395,7 @@
             .modal-login-container { padding: 25px; }
             .modal-login-logo { width: 60px; height: 60px; font-size: 30px; }
             .modal-login-title { font-size: 20px; }
+            .header-logo img { width: 120px; }
         }
     </style>
 </head>
@@ -364,8 +417,8 @@
         <div class="header-content">
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
             <div class="header-text">
-                <h1>🧠 Sistema Profissional de Loterias com IA Real <span class="version-badge">COM LOGIN E CRÉDITOS</span></h1>
-                <p class="header-subtitle">10 loterias • IA V.6.1 que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
+                <h1>🧠 Loterias V.6.1 <span class="version-badge">COM LOGIN E CRÉDITOS</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
             </div>
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
         </div>
@@ -375,8 +428,8 @@
         <div id="userPanel" class="user-panel">
             <div id="loginArea">
                 <div class="login-buttons">
-                    <button class="btn btn-google" onclick="loginGoogle()">🔐 Entrar com Google</button>
-                    <button class="btn btn-facebook" onclick="loginFacebook()">🔐 Entrar com Facebook</button>
+                    <button class="btn-google" onclick="loginGoogle()">🔐 Entrar com Google</button>
+                    <button class="btn-facebook" onclick="loginFacebook()">🔐 Entrar com Facebook</button>
                 </div>
                 <p style="font-size: 12px; margin-top: 10px; color: var(--text-secondary);">Faça login para gerar jogos e salvar seu histórico</p>
             </div>
@@ -470,15 +523,11 @@
         // ============================================
         // 👑 ADMIN TESTE (CONFIGURÁVEL)
         // ============================================
-        // ⬇️ COLOQUE O EMAIL "admin@teste.com" E SENHA "admin123" PARA ATIVAR O ADMIN ⬇️
-        // ⬇️ DEIXE VAZIO ("") PARA DESATIVAR COMPLETAMENTE ⬇️
-        const ADMIN_EMAIL = "";      // Altere para o email do admin (ou deixe "" para desativar)
-        const ADMIN_PASSWORD = "";   // Altere para a senha do admin (ou deixe "" para desativar)
+        const ADMIN_EMAIL = "admin@teste.com";
+        const ADMIN_PASSWORD = "admin123";
         const ADMIN_CREDITS = 100;
         
         let isAdminMode = false;
-        
-        // Verifica se o admin está configurado (só mostra botão se tiver email e senha)
         const isAdminConfigured = ADMIN_EMAIL && ADMIN_EMAIL !== "" && ADMIN_PASSWORD && ADMIN_PASSWORD !== "";
         
         async function loginAdmin() {
@@ -499,9 +548,8 @@
             };
             isAdminMode = true;
             creditosUsuario = ADMIN_CREDITS;
-            localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
             atualizarInterfaceUsuario();
-            mostrarToast(`👑 Modo Administrador ativado! Você tem ${creditosUsuario} créditos para testes.`, 'success');
+            mostrarToast(`👑 Modo Administrador ativado! Você tem R$ ${creditosUsuario} créditos para testes.`, 'success');
         }
         
         function isAdminUser() { return usuarioAtual && usuarioAtual.isAdmin === true; }
@@ -509,40 +557,25 @@
         // ============================================
         // 💳 MERCADO PAGO - PIX (MODO SANDBOX - TESTE)
         // ============================================
-        // IMPORTANTE: Modo Sandbox - sem custos!
-        // Para ativar pagamentos reais, mude isSandbox para false e configure accessToken real
-        
-        const MP_SANDBOX = true;  // true = modo teste (grátis) | false = modo real (pagamentos reais)
-        
-        // Chave pública de teste do Mercado Pago (Sandbox)
-        // Em produção real, você precisará criar uma conta no Mercado Pago e obter suas próprias chaves
+        const MP_SANDBOX = true;
         const MP_PUBLIC_KEY_SANDBOX = "TEST-12345678-1234-1234-1234-123456789012";
-        
-        // Valores disponíveis para compra (múltiplos de 3, já que cada jogo custa R$ 3)
         const VALORES_PIX = [12, 24, 36, 48, 60, 120, 180, 240];
         
-        // Função para iniciar pagamento PIX (simulado em sandbox)
         async function iniciarPagamentoPix(valor) {
             if (!verificarLoginEAcao(null)) return;
             
             if (MP_SANDBOX) {
-                // MODO TESTE - Simular pagamento PIX (sem custos reais)
                 mostrarModalPixSimulado(valor);
             } else {
-                // MODO REAL - Integração com API do Mercado Pago
                 await criarPagamentoPixReal(valor);
             }
         }
         
-        // Modo Sandbox - Simulação de PIX para testes
         function mostrarModalPixSimulado(valor) {
-            // Remove modal existente
             const existing = document.querySelector('.modal-pix-overlay');
             if (existing) existing.remove();
             
-            // Gerar QR Code simulado
             const qrCodeSimulado = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=00020126580014br.gov.bcb.pix0136a7f8e9d0-1234-5678-9abc-def0123456785204000053039865404${valor}5802BR5913Loterias IA6009SAO PAULO62290525PIX${Date.now()}6304E2A8`;
-            
             const pixCopiaCola = `00020126580014br.gov.bcb.pix0136a7f8e9d0-1234-5678-9abc-def0123456785204000053039865404${valor}5802BR5913Loterias IA6009SAO PAULO62290525PIX${Date.now()}6304E2A8`;
             
             const overlay = document.createElement('div');
@@ -584,17 +617,15 @@
             fecharModalPix();
             mostrarToast('🔄 Processando pagamento simulado...', 'info');
             
-            // Simular delay de processamento
             await new Promise(r => setTimeout(r, 1500));
             
-            // Adicionar créditos
             creditosUsuario += valor;
+            
+            // Salvar apenas no Supabase (sem localStorage)
             if (!isAdminUser()) {
-                localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
                 await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
             }
             
-            // Registrar transação no histórico
             const transacao = { 
                 data: new Date().toISOString(), 
                 valor: valor, 
@@ -602,21 +633,19 @@
                 saldo: creditosUsuario,
                 status: 'aprovado_teste'
             };
-            const historicoTransacoes = JSON.parse(localStorage.getItem(`transacoes_${usuarioAtual.uid}`) || '[]');
-            historicoTransacoes.unshift(transacao);
-            localStorage.setItem(`transacoes_${usuarioAtual.uid}`, JSON.stringify(historicoTransacoes.slice(0, 50)));
             
-            document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
+            // Salvar transação no Supabase
+            if (!isAdminUser()) {
+                await salvarTransacaoSupabase(usuarioAtual.uid, transacao);
+            }
+            
+            document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = `R$ ${creditosUsuario}`);
             mostrarToast(`✅ Pagamento simulado aprovado! R$ ${valor.toFixed(2)} adicionados. Saldo: R$ ${creditosUsuario}`, 'success');
         }
         
-        // Função real para criar pagamento PIX (será ativada quando MP_SANDBOX = false)
         async function criarPagamentoPixReal(valor) {
             mostrarToast('🔄 Gerando QR Code PIX...', 'info');
-            
             try {
-                // Esta chamada faria requisição para seu backend no Vercel
-                // O backend chamaria a API do Mercado Pago
                 const response = await fetch('/api/criar-pix', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -626,9 +655,7 @@
                         usuarioEmail: usuarioAtual.email
                     })
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     mostrarModalPixReal(data.qr_code, data.qr_code_base64, data.pix_copia_cola, valor, data.transaction_id);
                 } else {
@@ -662,8 +689,6 @@
                 </div>
             `;
             document.body.appendChild(overlay);
-            
-            // Iniciar verificação de pagamento
             verificarPagamentoPix(transactionId, valor);
         }
         
@@ -674,11 +699,10 @@
         
         async function verificarPagamentoPix(transactionId, valor) {
             let tentativas = 0;
-            const maxTentativas = 30; // 30 x 5 segundos = 2 minutos e 30 segundos
+            const maxTentativas = 30;
             
             const interval = setInterval(async () => {
                 tentativas++;
-                
                 try {
                     const response = await fetch(`/api/verificar-pix?transaction_id=${transactionId}`);
                     const data = await response.json();
@@ -687,10 +711,8 @@
                         clearInterval(interval);
                         fecharModalPix();
                         
-                        // Adicionar créditos
                         creditosUsuario += valor;
                         if (!isAdminUser()) {
-                            localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
                             await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
                         }
                         
@@ -702,11 +724,12 @@
                             status: 'aprovado',
                             transaction_id: transactionId
                         };
-                        const historicoTransacoes = JSON.parse(localStorage.getItem(`transacoes_${usuarioAtual.uid}`) || '[]');
-                        historicoTransacoes.unshift(transacao);
-                        localStorage.setItem(`transacoes_${usuarioAtual.uid}`, JSON.stringify(historicoTransacoes.slice(0, 50)));
                         
-                        document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = creditosUsuario);
+                        if (!isAdminUser()) {
+                            await salvarTransacaoSupabase(usuarioAtual.uid, transacao);
+                        }
+                        
+                        document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = `R$ ${creditosUsuario}`);
                         mostrarToast(`✅ Pagamento aprovado! R$ ${valor.toFixed(2)} adicionados. Saldo: R$ ${creditosUsuario}`, 'success');
                     }
                 } catch (error) {
@@ -721,31 +744,110 @@
         }
         
         // ============================================
-        // FUNÇÕES DO SUPABASE
+        // 🗄️ FUNÇÕES DO SUPABASE (APENAS BANCO, SEM LOCALSTORAGE)
         // ============================================
-        async function carregarCreditosSupabase(uid) {
-            if (!window.supabaseClient || isAdminUser()) return null;
+        
+        // Salvar transação no Supabase
+        async function salvarTransacaoSupabase(uid, transacao) {
+            if (!window.supabaseClient || isAdminUser()) return;
             try {
-                const { data, error } = await window.supabaseClient.from('usuarios').select('creditos').eq('uid', uid).single();
-                if (error) throw error;
-                return data?.creditos || null;
-            } catch (error) { console.log('Erro Supabase:', error); return null; }
+                await window.supabaseClient.from('transacoes').insert({
+                    usuario_uid: uid,
+                    tipo: transacao.tipo,
+                    quantidade: transacao.valor,
+                    saldo_apos: transacao.saldo,
+                    transaction_id: transacao.transaction_id || null,
+                    data: new Date()
+                });
+                console.log('✅ Transação salva no Supabase');
+            } catch (error) {
+                console.error('Erro ao salvar transação:', error);
+            }
         }
         
+        // Carregar créditos do Supabase (sem localStorage)
+        async function carregarCreditosSupabase(uid) {
+            if (!window.supabaseClient || isAdminUser()) return 5;
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('usuarios')
+                    .select('creditos')
+                    .eq('uid', uid)
+                    .single();
+                if (error && error.code === 'PGRST116') {
+                    // Usuário não existe - criar
+                    await window.supabaseClient.from('usuarios').insert({
+                        uid: uid,
+                        nome: usuarioAtual?.nome || '',
+                        email: usuarioAtual?.email || '',
+                        creditos: 5,
+                        created_at: new Date()
+                    });
+                    return 5;
+                }
+                if (error) throw error;
+                return data?.creditos || 5;
+            } catch (error) { 
+                console.log('Erro Supabase:', error); 
+                return 5;
+            }
+        }
+        
+        // Salvar créditos no Supabase (sem localStorage)
         async function salvarCreditoSupabase(uid, novoSaldo) {
             if (!window.supabaseClient || isAdminUser()) return;
             try {
-                await window.supabaseClient.from('usuarios').upsert({ uid: uid, creditos: novoSaldo, updated_at: new Date() });
-                console.log('✅ Créditos salvos no Supabase');
-            } catch (error) { console.error('Erro:', error); }
+                const { error } = await window.supabaseClient
+                    .from('usuarios')
+                    .upsert({ 
+                        uid: uid, 
+                        creditos: novoSaldo,
+                        updated_at: new Date()
+                    });
+                if (error) throw error;
+                console.log('✅ Créditos salvos no Supabase:', novoSaldo);
+            } catch (error) { 
+                console.error('Erro ao salvar créditos:', error); 
+            }
         }
         
+        // Salvar histórico no Supabase
         async function salvarHistoricoSupabase(uid, loteria, jogos, filtros, extras = null) {
             if (!window.supabaseClient || isAdminUser()) return;
             try {
-                await window.supabaseClient.from('historico_palpites').insert({ usuario_uid: uid, loteria: loteria, jogos: jogos, filtros: filtros, extras: extras, created_at: new Date() });
+                const { error } = await window.supabaseClient
+                    .from('historico_palpites')
+                    .insert({ 
+                        usuario_uid: uid, 
+                        loteria: loteria, 
+                        jogos: jogos, 
+                        filtros: filtros, 
+                        extras: extras, 
+                        created_at: new Date() 
+                    });
+                if (error) throw error;
                 console.log('✅ Histórico salvo no Supabase');
-            } catch (error) { console.error('Erro:', error); }
+            } catch (error) { 
+                console.error('Erro ao salvar histórico:', error); 
+            }
+        }
+        
+        // Carregar histórico do Supabase
+        async function carregarHistoricoSupabase(uid) {
+            if (!window.supabaseClient || isAdminUser()) return [];
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('historico_palpites')
+                    .select('*')
+                    .eq('usuario_uid', uid)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+                if (error) throw error;
+                return data || [];
+            } catch (error) { 
+                console.error('Erro ao carregar histórico:', error); 
+                return [];
+            }
         }
         
         // ============================================
@@ -768,11 +870,11 @@
         // VERSÃO E CONFIGURAÇÕES
         // ============================================
         const VERSAO = "6.1.0";
-        console.log(`🚀 Loterias V.${VERSAO} - COM PIX (MODO TESTE)`);
+        console.log(`🚀 Loterias V.${VERSAO} - COM PIX (MODO TESTE) - APENAS SUPABASE`);
         
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
-        let periodoSelecionado = 1;
+        let periodoSelecionado = 'all';  // 'all' ou número de anos
         let dispersaoAtual = 15;
         let isTraining = false;
         let iaTreinada = false;
@@ -801,7 +903,7 @@
         };
         
         const REGRAS_OFICIAIS = {
-            megasena: `<strong>Mega-Sena</strong> - 6 números (1 a 60). Valor: R$ 5,00 (sistema: R$ 3,00)`,
+            megasena: `<strong>Mega-Sena</strong> - 6 números (1 a 60). Valor: R$ 3,00 por jogo`,
             quina: `<strong>Quina</strong> - 5 números (1 a 80).`,
             lotofacil: `<strong>Lotofácil</strong> - 15 números (1 a 25).`,
             lotomania: `<strong>Lotomania</strong> - 50 números (00 a 99). ✅ Inclui zero`,
@@ -819,7 +921,7 @@
         });
         
         // ============================================
-        // FILTRO POR DATA REAL
+        // FILTRO POR DATA REAL (COM SUPORTE A "TODOS")
         // ============================================
         function getDataCortePorAnos(anos) {
             const dataAtual = new Date();
@@ -837,7 +939,6 @@
                     if (partes.length === 3) {
                         const dataConcurso = new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
                         if (dataConcurso >= dataCorte) dadosFiltrados.push(dadosAtuais[i]);
-                        else dadosFiltrados.push(dadosAtuais[i]);
                     } else { dadosFiltrados.push(dadosAtuais[i]); }
                 } else { dadosFiltrados.push(dadosAtuais[i]); }
             }
@@ -845,6 +946,10 @@
         }
         
         function filtrarDados() {
+            // Se for "all", retorna todos os dados
+            if (periodoSelecionado === 'all') return [...dadosAtuais];
+            
+            // Caso contrário, filtra pelo número de anos
             if (periodoSelecionado === 1) return filtrarDadosPorData(1);
             if (periodoSelecionado === 3) return filtrarDadosPorData(3);
             if (periodoSelecionado === 5) return filtrarDadosPorData(5);
@@ -854,6 +959,9 @@
         }
         
         function getPeriodoTexto() {
+            if (periodoSelecionado === 'all') {
+                return `Todos os concursos (${dadosAtuais.length} concursos)`;
+            }
             const anosMap = {1:'1',3:'3',5:'5',7:'7',9:'9'};
             const dadosFiltrados = filtrarDados();
             return `${anosMap[periodoSelecionado] || '1'} ano(s) (${dadosFiltrados.length} concursos)`;
@@ -863,6 +971,14 @@
             const dadosFiltrados = filtrarDados();
             const datasFiltradas = cacheDatas[loteriaAtual]?.datas || [];
             if (datasFiltradas.length === 0 || dadosFiltrados.length === 0) return { inicio: 'N/A', fim: 'N/A' };
+            
+            if (periodoSelecionado === 'all') {
+                return {
+                    inicio: datasFiltradas[0] || 'N/A',
+                    fim: datasFiltradas[datasFiltradas.length - 1] || 'N/A'
+                };
+            }
+            
             const indicesFiltrados = [];
             const dataCorte = getDataCortePorAnos(periodoSelecionado);
             for (let i = 0; i < datasFiltradas.length; i++) {
@@ -876,11 +992,14 @@
                 }
             }
             if (indicesFiltrados.length === 0) return { inicio: 'N/A', fim: 'N/A' };
-            return { inicio: datasFiltradas[indicesFiltrados[0]] || 'N/A', fim: datasFiltradas[indicesFiltrados[indicesFiltrados.length-1]] || 'N/A' };
+            return {
+                inicio: datasFiltradas[indicesFiltrados[0]] || 'N/A',
+                fim: datasFiltradas[indicesFiltrados[indicesFiltrados.length - 1]] || 'N/A'
+            };
         }
         
         // ============================================
-        // FUNÇÕES DE AUTENTICAÇÃO
+        // FUNÇÕES DE AUTENTICAÇÃO (COM MIGRAÇÃO LOCALSTORAGE -> SUPABASE)
         // ============================================
         async function loginGoogle() {
             if (maintenanceMode) { alert('🔧 Sistema em manutenção.'); return; }
@@ -917,20 +1036,56 @@
             } catch (error) { console.error(error); }
         }
         
+        function abrirPerfil() {
+            if (!usuarioAtual) {
+                mostrarModalLogin();
+                return;
+            }
+            // Salvar dados do usuário para a página de perfil via sessionStorage (temporário)
+            sessionStorage.setItem('perfil_usuario', JSON.stringify({
+                uid: usuarioAtual.uid,
+                nome: usuarioAtual.nome,
+                email: usuarioAtual.email,
+                foto: usuarioAtual.foto,
+                creditos: creditosUsuario
+            }));
+            window.location.href = 'perfil.html';
+        }
+        
         async function processarLogin(user) {
             if (isAdminUser()) return;
-            usuarioAtual = { uid: user.uid, nome: user.displayName || user.email?.split('@')[0] || 'Usuário', email: user.email, foto: user.photoURL || null, isAdmin: false };
+            usuarioAtual = { 
+                uid: user.uid, 
+                nome: user.displayName || user.email?.split('@')[0] || 'Usuário', 
+                email: user.email, 
+                foto: user.photoURL || null, 
+                isAdmin: false 
+            };
+            
+            // Carregar créditos APENAS do Supabase
             let supabaseCredits = await carregarCreditosSupabase(user.uid);
-            if (supabaseCredits !== null && supabaseCredits > 0) { creditosUsuario = supabaseCredits; }
-            else {
-                const savedCredits = localStorage.getItem(`creditos_${user.uid}`);
-                creditosUsuario = savedCredits ? parseInt(savedCredits) : 5;
-                await salvarCreditoSupabase(user.uid, creditosUsuario);
+            creditosUsuario = supabaseCredits;
+            
+            // MIGRAÇÃO: Se existia dado no localStorage, migrar para Supabase e limpar
+            const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
+            if (oldCredits && !isAdminUser()) {
+                const oldValue = parseInt(oldCredits);
+                if (oldValue > 0 && creditosUsuario === 5) {
+                    // Migrar créditos antigos
+                    creditosUsuario = oldValue;
+                    await salvarCreditoSupabase(user.uid, creditosUsuario);
+                    console.log('✅ Créditos migrados do localStorage:', oldValue);
+                }
+                // Limpar localStorage após migração
+                localStorage.removeItem(`creditos_${user.uid}`);
+                localStorage.removeItem(`historico_${user.uid}`);
+                localStorage.removeItem(`config_${user.uid}`);
+                localStorage.removeItem(`transacoes_${user.uid}`);
             }
+            
             carregarConfiguracoesUsuario();
             atualizarInterfaceUsuario();
             mostrarToast(`Bem-vindo ${usuarioAtual.nome}! Saldo: R$ ${creditosUsuario}`, 'success');
-            localStorage.setItem(`creditos_${user.uid}`, creditosUsuario);
         }
         
         function atualizarInterfaceUsuario() {
@@ -948,23 +1103,28 @@
                         ${usuarioAtual.foto ? `<img src="${usuarioAtual.foto}" class="user-avatar">` : '<div class="user-avatar" style="background:#8b5cf6;">👤</div>'}
                         <div class="user-details"><h4>${usuarioAtual.nome} ${usuarioAtual.isAdmin ? '<span class="admin-badge">👑 ADMIN TESTE</span>' : ''}</h4><p>${usuarioAtual.email}</p></div>
                     </div>
-                    <div class="credits-box"><span>💰 MEUS CRÉDITOS</span><strong id="creditosDisplay">R$ ${creditosUsuario}</strong></div>
-                    <button class="btn btn-comprar" onclick="abrirModalComprar()">➕ Comprar Créditos</button>
-                    <button class="btn btn-logout" onclick="logout()">🚪 Sair</button>
+                    <div class="credits-box" onclick="abrirPerfil()">
+                        <span>💰 MEUS CRÉDITOS</span>
+                        <strong id="creditosDisplay">R$ ${creditosUsuario}</strong>
+                    </div>
+                    <button class="btn-comprar" onclick="abrirModalComprar()">➕ Comprar Créditos</button>
+                    <button class="btn-perfil" onclick="abrirPerfil()">👤 Meu Perfil</button>
+                    <button class="btn-logout" onclick="logout()">🚪 Sair</button>
                 `;
             } else {
                 loginArea.style.display = 'block';
                 userInfoArea.style.display = 'none';
                 userInfoArea.innerHTML = '';
                 
-                // Só mostra o botão de Admin se estiver configurado
                 const loginDiv = document.getElementById('loginArea');
                 if (loginDiv && !document.getElementById('btnAdminLogin') && isAdminConfigured) {
                     const btnAdmin = document.createElement('button');
                     btnAdmin.id = 'btnAdminLogin';
-                    btnAdmin.className = 'btn btn-primary';
+                    btnAdmin.className = 'btn-google';
                     btnAdmin.style.background = '#8b5cf6';
                     btnAdmin.style.marginTop = '10px';
+                    btnAdmin.style.display = 'block';
+                    btnAdmin.style.width = '100%';
                     btnAdmin.innerHTML = '👑 Login Admin Teste';
                     btnAdmin.onclick = () => loginAdmin();
                     loginDiv.appendChild(btnAdmin);
@@ -995,6 +1155,8 @@
         
         function carregarConfiguracoesUsuario() {
             if (!usuarioAtual) return;
+            // Configurações agora são salvas no Supabase também
+            // Por enquanto, manter em localStorage para configurações não críticas
             const saved = localStorage.getItem(`config_${usuarioAtual.uid}`);
             if (saved) {
                 const config = JSON.parse(saved);
@@ -1007,19 +1169,32 @@
         
         function salvarConfiguracoesUsuario() {
             if (!usuarioAtual) return;
-            const config = { qtdJogos: document.getElementById('qtdJogos')?.value, modoGeracao: document.getElementById('modoGeracao')?.value, dispersao: dispersaoAtual, periodo: periodoSelecionado };
+            const config = { 
+                qtdJogos: document.getElementById('qtdJogos')?.value, 
+                modoGeracao: document.getElementById('modoGeracao')?.value, 
+                dispersao: dispersaoAtual, 
+                periodo: periodoSelecionado 
+            };
             localStorage.setItem(`config_${usuarioAtual.uid}`, JSON.stringify(config));
         }
         
-        function abrirHistorico() {
+        async function abrirHistorico() {
             if (!verificarLoginEAcao(null)) return;
-            const historico = JSON.parse(localStorage.getItem(`historico_${usuarioAtual.uid}`) || '[]');
-            if (historico.length === 0) { mostrarToast('Nenhum histórico', 'info'); return; }
-            let html = `<div class="modal-overlay" id="modalHistorico"><div class="modal-container" style="max-width:700px;"><div class="modal-header"><h3>📜 Meu Histórico</h3></div><div class="modal-body" style="max-height:500px;overflow-y:auto;">`;
+            
+            // Buscar histórico do Supabase em vez do localStorage
+            const historico = await carregarHistoricoSupabase(usuarioAtual.uid);
+            
+            if (historico.length === 0) { 
+                mostrarToast('Nenhum histórico encontrado. Gere alguns palpites!', 'info'); 
+                return; 
+            }
+            
+            let html = `<div class="modal-overlay" id="modalHistorico"><div class="modal-container" style="max-width:700px;"><div class="modal-header"><h3>📜 Meu Histórico de Palpites</h3></div><div class="modal-body" style="max-height:500px;overflow-y:auto;">`;
             historico.slice(0, 30).forEach(item => {
+                const jogosArray = item.jogos || [];
                 html += `<div style="padding:12px;margin:8px 0;background:var(--bg-card);border-radius:12px;">
-                            <div><span>🎲 ${item.loteria}</span> - ${new Date(item.data).toLocaleString()}</div>
-                            <div><strong>Jogos:</strong> ${item.jogos.map(j => Array.isArray(j) ? `[${j.join(',')}]` : j).join(', ')}</div>
+                            <div><span>🎲 ${item.loteria}</span> - ${new Date(item.created_at).toLocaleString()}</div>
+                            <div><strong>Jogos:</strong> ${jogosArray.map(j => Array.isArray(j) ? `[${j.join(',')}]` : j).join(', ')}</div>
                             ${item.extras ? `<div><strong>Extras:</strong> ${item.extras}</div>` : ''}
                          </div>`;
             });
@@ -1031,10 +1206,8 @@
         
         async function salvarHistoricoUsuario(jogos, filtros, extras = null) {
             if (!usuarioAtual) return;
-            const historico = JSON.parse(localStorage.getItem(`historico_${usuarioAtual.uid}`) || '[]');
-            historico.unshift({ data: new Date().toISOString(), loteria: LOTERIAS[loteriaAtual].nome, loteriaId: loteriaAtual, jogos: jogos, filtros: filtros, extras: extras, creditosGastos: jogos.length });
-            localStorage.setItem(`historico_${usuarioAtual.uid}`, JSON.stringify(historico.slice(0, 100)));
-            if (!isAdminUser()) await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras);
+            // Salvar apenas no Supabase (sem localStorage)
+            await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras);
         }
         
         // ============================================
@@ -1253,13 +1426,27 @@
         
         async function gerarJogos() {
             if (!verificarLoginEAcao(null)) return;
-            if (creditosUsuario <= 0) { mostrarToast('Créditos insuficientes!', 'error'); abrirModalComprar(); return; }
+            if (creditosUsuario < 3) { 
+                mostrarToast('Saldo insuficiente! Mínimo R$ 3,00 para gerar 1 jogo', 'error'); 
+                abrirModalComprar(); 
+                return; 
+            }
+            
             const dadosCount = filtrarDados().length;
-            if (dadosCount < 10) { document.getElementById('resultados').innerHTML = `<div class="mensagem-erro"><strong>⚠️ Dados insuficientes!</strong><br>Apenas ${dadosCount} concursos. Mínimo: 10.</div>`; return; }
+            if (dadosCount < 10) { 
+                document.getElementById('resultados').innerHTML = `<div class="mensagem-erro"><strong>⚠️ Dados insuficientes!</strong><br>Apenas ${dadosCount} concursos. Mínimo: 10.</div>`; 
+                return; 
+            }
             if (!aiModel) { await treinarIAComFiltrosAtuais(); }
             
-            const qtd = parseInt(document.getElementById('qtdJogos')?.value || 5);
-            if (creditosUsuario < qtd) { mostrarToast(`Precisa de ${qtd} créditos, tem apenas R$ ${creditosUsuario}`, 'error'); abrirModalComprar(); return; }
+            const qtd = parseInt(document.getElementById('qtdJogos')?.value || 1);
+            const valorTotal = qtd * 3;
+            
+            if (creditosUsuario < valorTotal) { 
+                mostrarToast(`Saldo insuficiente! Você tem R$ ${creditosUsuario} e precisa de R$ ${valorTotal}`, 'error'); 
+                abrirModalComprar(); 
+                return; 
+            }
             
             const modo = document.getElementById('modoGeracao')?.value || 'ia_especialista';
             const config = LOTERIAS[loteriaAtual];
@@ -1271,7 +1458,7 @@
             if (backtestResult) html += `<div style="margin:15px 0;padding:15px;background:rgba(34,197,94,0.1);border-left:4px solid #22c55e;"><h4>📈 Performance IA V.6.1</h4><div>Acerto: <strong>${backtestResult.percentualIA}%</strong></div></div>`;
             
             html += `<h3 style="margin-top:20px;">🎯 ${qtd} JOGOS - ${getModoTexto(modo)}</h3>`;
-            html += `<div style="margin-bottom:15px;padding:10px;background:rgba(56,189,248,0.2);border-radius:8px;"><span style="color:#38bdf8;">✅ V.6.1:</span> Créditos utilizados: R$ ${qtd * 3}</div>`;
+            html += `<div style="margin-bottom:15px;padding:10px;background:rgba(56,189,248,0.2);border-radius:8px;"><span style="color:#38bdf8;">✅ V.6.1:</span> Créditos utilizados: R$ ${valorTotal}</div>`;
             
             const jogosGerados = [];
             const extrasGerados = [];
@@ -1365,10 +1552,18 @@
                 </div>`;
             }
             
+            // Consumir créditos (salvar APENAS no Supabase)
             if (!isAdminUser()) {
-                creditosUsuario -= qtd;
-                localStorage.setItem(`creditos_${usuarioAtual.uid}`, creditosUsuario);
+                creditosUsuario -= valorTotal;
                 await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+                
+                // Registrar consumo
+                await salvarTransacaoSupabase(usuarioAtual.uid, {
+                    tipo: 'uso',
+                    quantidade: valorTotal,
+                    saldo: creditosUsuario,
+                    data: new Date()
+                });
             }
             document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = `R$ ${creditosUsuario}`);
             
@@ -1432,7 +1627,13 @@
         
         function toggleTema() { document.body.classList.toggle('light-mode'); localStorage.setItem('tema', document.body.classList.contains('light-mode') ? 'light' : 'dark'); }
         
-        function setPeriodo(anos) { periodoSelecionado = anos; iaTreinada = false; aiModel = null; renderizarConteudo(loteriaAtual); if (dadosAtuais.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); }
+        function setPeriodo(periodo) { 
+            periodoSelecionado = periodo; 
+            iaTreinada = false; 
+            aiModel = null; 
+            renderizarConteudo(loteriaAtual); 
+            if (dadosAtuais.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); 
+        }
         
         function atualizarDispersao(valor) { dispersaoAtual = parseInt(valor); document.getElementById('dispersaoValor') && (document.getElementById('dispersaoValor').textContent = `${valor} concursos`); iaTreinada = false; aiModel = null; }
         
@@ -1519,6 +1720,7 @@
             html += `<div class="stats-grid"><div class="stat-card">Concursos: ${dadosCount}</div><div class="stat-card">Período: ${dadosFiltradosCount}</div><div class="stat-card">Engine: 🧠 V.6.1</div></div></div>`;
             
             html += `<div class="card"><h4>📅 Período (Baseado em data real - Mês atual)</h4><div class="filtros">
+                <button class="filtro-btn ${periodoSelecionado === 'all' ? 'ativo' : ''}" onclick="setPeriodo('all')">Todos</button>
                 <button class="filtro-btn ${periodoSelecionado === 1 ? 'ativo' : ''}" onclick="setPeriodo(1)">1 Ano</button>
                 <button class="filtro-btn ${periodoSelecionado === 3 ? 'ativo' : ''}" onclick="setPeriodo(3)">3 Anos</button>
                 <button class="filtro-btn ${periodoSelecionado === 5 ? 'ativo' : ''}" onclick="setPeriodo(5)">5 Anos</button>
@@ -1534,7 +1736,7 @@
             
             html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:200px; font-size:13px;">${iaTreinada?'✅ IA V.6.1 pronta!':'⏳ Clique em Treinar'}</div><div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
             
-            html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid"><div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="5" min="1" max="20"></div><div><label>Modo de IA</label><br><select id="modoGeracao"><option value="ia_especialista">🎓 IA Especialista</option><option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option><option value="probabilistico">📊 Probabilístico</option></select></div>${controlesExtras}</div><button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};">${config.icone} GERAR JOGOS (R$ 3,00/jogo)</button><div id="backtestResultados" style="margin-top:15px;"></div><div id="resultados" style="margin-top:20px;"></div></div>`;
+            html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid"><div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="1" min="1" max="20"></div><div><label>Modo de IA</label><br><select id="modoGeracao"><option value="ia_especialista">🎓 IA Especialista</option><option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option><option value="probabilistico">📊 Probabilístico</option></select></div>${controlesExtras}</div><button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};">${config.icone} GERAR JOGOS (R$ 3,00/jogo)</button><div id="backtestResultados" style="margin-top:15px;"></div><div id="resultados" style="margin-top:20px;"></div></div>`;
             
             html += `<div class="regras-oficiais"><h4>📜 Regras Oficiais (Corrigidas)</h4><p>${REGRAS_OFICIAIS[loteria] || 'Consulte o site oficial.'}</p></div>`;
             div.innerHTML = html;
@@ -1556,14 +1758,16 @@
             selecionarLoteria('megasena');
             auth.onAuthStateChanged(async (user) => { if (user && !isAdminUser()) await processarLogin(user); else atualizarInterfaceUsuario(); });
             
-            console.log('%c✅ Loterias V.6.1 - COM PIX (MODO TESTE)', 'color: #22c55e; font-size: 14px;');
-            console.log('📌 Modo PIX: Sandbox (testes) - NENHUM PAGAMENTO REAL');
+            console.log('%c✅ Loterias V.6.1 - APENAS SUPABASE (SEM LOCALSTORAGE)', 'color: #22c55e; font-size: 14px;');
+            console.log('📌 Todas as informações agora são salvas no banco de dados!');
+            console.log('📌 Botão "Meu Perfil" adicionado!');
+            console.log('📌 Período "Todos" reativado!');
             if (isAdminConfigured) {
                 console.log('👑 Admin Teste: ATIVADO');
             } else {
-                console.log('👑 Admin Teste: DESATIVADO (configure ADMIN_EMAIL para ativar)');
+                console.log('👑 Admin Teste: DESATIVADO');
             }
-            mostrarToast(`Loterias V.${VERSAO} - PIX em modo teste!`, 'info');
+            mostrarToast(`Loterias V.${VERSAO} - Dados salvos no banco!`, 'info');
         });
     </script>
 </body>
