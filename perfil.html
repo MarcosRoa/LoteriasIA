@@ -313,103 +313,97 @@
             renderizarPerfil(historico || [], transacoes || []);
         }
         
-        function renderizarPerfil(historico, transacoes) {
-            const avatarHtml = usuario.foto 
-                ? `<img src="${usuario.foto}" alt="Avatar" onerror="this.parentElement.innerHTML='👤'">`
-                : '👤';
-            
-            // Formatar histórico
-            let historicoHtml = '';
-            if (historico.length === 0) {
-                historicoHtml = '<div class="empty-message">Nenhum palpite gerado ainda</div>';
-            } else {
-                historicoHtml = `<div class="scroll-area">${historico.map(item => `
-                    <div class="historico-item">
-                        <div class="historico-header">
-                            <span class="historico-loteria">🎲 ${item.loteria || 'Loteria'}</span>
-                            <span class="historico-data">${item.created_at ? new Date(item.created_at).toLocaleString() : 'Data desconhecida'}</span>
-                        </div>
-                        <div class="historico-jogos">
-                            📊 ${item.jogos?.map(j => Array.isArray(j) ? `[${j.join(', ')}]` : j).join(', ') || 'Nenhum'}
-                            ${item.extras ? `<br>✨ ${item.extras}` : ''}
-                        </div>
-                    </div>
-                `).join('')}</div>`;
-            }
-            
-            // Formatar transações
-            let transacoesHtml = '';
-            if (transacoes.length === 0) {
-                transacoesHtml = '<div class="empty-message">Nenhuma transação registrada</div>';
-            } else {
-                transacoesHtml = `
-                    <div class="scroll-area">
-                        <table class="transacoes-table">
-                            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
-                            <tbody>
-                                ${transacoes.map(t => `
-                                    <tr>
-                                        <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
-                                        <td>${t.tipo === 'compra' ? '💳 Compra' : t.tipo === 'uso' ? '🎲 Jogos' : t.tipo === 'pix_simulado' ? '🧪 PIX Teste' : t.tipo || '-'}</td>
-                                        <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
-                                        <td>R$ ${t.saldo_apos || 0}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            }
-            
-            const html = `
-                <!-- CARD DE PERFIL (2 colunas de largura) -->
-                <div class="profile-grid">
-                    <div class="card card-full">
-                        <div class="perfil-header">
-                            <div class="avatar">${avatarHtml}</div>
-                            <div class="info">
-                                <h2>${usuario.nome || 'Usuário'}</h2>
-                                <p>${usuario.email || 'Email não disponível'}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- CARD DE SALDO -->
-                    <div class="card">
-                        <div class="card-title">💰 SALDO ATUAL</div>
-                        <div class="saldo-card">
-                            <strong>R$ ${creditos}</strong>
-                        </div>
-                    </div>
-                    
-                    <!-- CARD DE ESTATÍSTICAS RÁPIDAS -->
-                    <div class="card">
-                        <div class="card-title">📊 ESTATÍSTICAS</div>
-                        <div style="text-align: center; padding: 10px;">
-                            <div style="font-size: 32px; color: #38bdf8;">${historico.length}</div>
-                            <div style="color: var(--text-secondary);">Palpites gerados</div>
-                            <hr style="margin: 15px 0; border-color: var(--border);">
-                            <div style="font-size: 32px; color: #f59e0b;">${transacoes.filter(t => t.tipo === 'compra' || t.tipo === 'pix_simulado').length}</div>
-                            <div style="color: var(--text-secondary);">Transações realizadas</div>
-                        </div>
-                    </div>
-                    
-                    <!-- HISTÓRICO DE PALPITES -->
-                    <div class="card">
-                        <div class="card-title">📜 HISTÓRICO DE PALPITES</div>
-                        ${historicoHtml}
-                    </div>
-                    
-                    <!-- HISTÓRICO DE TRANSAÇÕES -->
-                    <div class="card">
-                        <div class="card-title">💰 HISTÓRICO DE TRANSAÇÕES</div>
-                        ${transacoesHtml}
+       function renderizarPerfil(historico, transacoes) {
+    const avatarHtml = usuario.foto 
+        ? `<img src="${usuario.foto}" alt="Avatar" onerror="this.parentElement.innerHTML='👤'">`
+        : '👤';
+    
+    // Formatar histórico de palpites
+    let historicoHtml = '';
+    if (historico.length === 0) {
+        historicoHtml = '<div class="empty-message">Nenhum palpite gerado ainda. Gere alguns no sistema!</div>';
+    } else {
+        historicoHtml = `<div class="scroll-area">${historico.map(item => `
+            <div class="historico-item">
+                <div class="historico-header">
+                    <span class="historico-loteria">🎲 ${item.loteria || 'Loteria'}</span>
+                    <span class="historico-data">${item.data ? new Date(item.data).toLocaleString() : 'Data desconhecida'}</span>
+                </div>
+                <div class="historico-jogos">
+                    📊 ${item.jogos?.map(j => Array.isArray(j) ? `[${j.join(', ')}]` : j).join(', ') || 'Nenhum'}
+                    ${item.extras ? `<br>✨ ${item.extras}` : ''}
+                </div>
+            </div>
+        `).join('')}</div>`;
+    }
+    
+    // Formatar transações
+    let transacoesHtml = '';
+    if (transacoes.length === 0) {
+        transacoesHtml = '<div class="empty-message">Nenhuma transação registrada</div>';
+    } else {
+        transacoesHtml = `
+            <div class="scroll-area">
+                <table class="transacoes-table">
+                    <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
+                    <tbody>
+                        ${transacoes.map(t => `
+                            <tr>
+                                <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
+                                <td>${t.tipo === 'compra' ? '💳 Compra' : t.tipo === 'uso' ? '🎲 Jogos' : t.tipo === 'pix_simulado' ? '🧪 PIX Teste' : t.tipo || '-'}</td>
+                                <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
+                                <td>R$ ${t.saldo_apos || 0}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    const html = `
+        <div class="profile-grid">
+            <div class="card card-full">
+                <div class="perfil-header">
+                    <div class="avatar">${avatarHtml}</div>
+                    <div class="info">
+                        <h2>${usuario.nome || 'Usuário'}</h2>
+                        <p>${usuario.email || 'Email não disponível'}</p>
                     </div>
                 </div>
-            `;
+            </div>
             
-            document.getElementById('perfilContent').innerHTML = html;
-        }
+            <div class="card">
+                <div class="card-title">💰 SALDO ATUAL</div>
+                <div class="saldo-card"><strong>R$ ${creditos}</strong></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📊 ESTATÍSTICAS</div>
+                <div style="text-align: center; padding: 10px;">
+                    <div style="font-size: 28px; color: #38bdf8; font-weight: 700;">${historico.length}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Palpites gerados</div>
+                    <hr style="margin: 10px 0; border-color: var(--border);">
+                    <div style="font-size: 28px; color: #f59e0b; font-weight: 700;">${transacoes.filter(t => t.tipo === 'compra' || t.tipo === 'pix_simulado').length}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">Compras realizadas</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📜 HISTÓRICO DE PALPITES</div>
+                ${historicoHtml}
+            </div>
+            
+            <div class="card">
+                <div class="card-title">💰 TRANSAÇÕES</div>
+                ${transacoesHtml}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('perfilContent').innerHTML = html;
+}
+        
         
         const firebaseConfig = {
             apiKey: "AIzaSyCA_FoID7Ch8LkcwK5TbQSK23lU7BxQMuE",
