@@ -840,7 +840,7 @@
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
             if (oldCredits && !isAdminUser()) { 
                 const old = parseInt(oldCredits); 
-                if (old > 0 && creditosUsuario === 5) { 
+                if (old > 0 && creditosUsuario === 0) { 
                     creditosUsuario = old; 
                     await salvarCreditoSupabase(user.uid, creditosUsuario); 
                 } 
