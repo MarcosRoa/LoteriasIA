@@ -10,12 +10,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     
+    <!-- Supabase SDK - Carregado primeiro -->
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         window.supabaseClient = createClient(
             'https://fuiaikymhsjdgdhojjhq.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
         );
+        window.supabaseReady = true;
         console.log('✅ Supabase perfil conectado');
     </script>
     
@@ -64,10 +66,34 @@
         let usuario = null;
         let creditos = 0;
         
+        // Função para aguardar o Supabase ficar pronto
+        function aguardarSupabase() {
+            return new Promise((resolve) => {
+                if (window.supabaseClient) {
+                    resolve();
+                    return;
+                }
+                const checkInterval = setInterval(() => {
+                    if (window.supabaseClient) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                // Timeout de 5 segundos
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve();
+                }, 5000);
+            });
+        }
+        
         // ============================================
         // FUNÇÃO PRINCIPAL - CARREGA DADOS DO PERFIL
         // ============================================
         async function carregarPerfil() {
+            // Aguarda Supabase ficar pronto
+            await aguardarSupabase();
+            
             // Tenta pegar dados do sessionStorage (vindo do index.html)
             const storedUser = sessionStorage.getItem('perfil_usuario');
             if (storedUser) {
@@ -112,7 +138,10 @@
         // CARREGA CRÉDITOS DO SUPABASE
         // ============================================
         async function carregarCreditosDoBanco() {
-            if (!window.supabaseClient || !usuario) return;
+            if (!window.supabaseClient || !usuario) {
+                console.log('⚠️ Supabase não disponível ainda');
+                return;
+            }
             try {
                 const { data, error } = await window.supabaseClient
                     .from('usuarios')
@@ -137,7 +166,14 @@
         // ============================================
         async function carregarDadosCompletos() {
             if (!window.supabaseClient || !usuario) {
-                console.log('❌ Supabase não disponível');
+                console.log('❌ Supabase não disponível para carregar dados');
+                document.getElementById('perfilContent').innerHTML = `
+                    <div class="empty-message">
+                        <h3>⚠️ Erro de conexão</h3>
+                        <p>Não foi possível conectar ao banco de dados.</p>
+                        <button class="btn-voltar" style="margin-top:20px;" onclick="window.location.href='index.html'">Voltar ao sistema</button>
+                    </div>
+                `;
                 return;
             }
             
