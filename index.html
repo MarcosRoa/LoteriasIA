@@ -792,19 +792,25 @@
         
         // Salva histórico de palpites no Supabase
         async function salvarHistoricoSupabase(uid, loteria, jogos, filtros, extras) {
-            if (!window.supabaseClient || isAdminUser()) return;
-            try {
-                await window.supabaseClient.from('historico_palpites').insert({ 
-                    usuario_uid: uid, 
-                    loteria: loteria, 
-                    jogos: jogos, 
-                    filtros: filtros, 
-                    extras: extras, 
-                    created_at: new Date() 
-                });
-                console.log('✅ Histórico salvo');
-            } catch (error) { console.error('Erro histórico:', error); }
-        }
+    console.log('🔍 Chamando salvarHistoricoSupabase:', {uid, loteria, jogos, filtros, extras});
+    if (!window.supabaseClient || isAdminUser()) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('historico_palpites')
+            .insert({ 
+                usuario_uid: uid, 
+                loteria: loteria, 
+                jogos: jogos, 
+                filtros: filtros, 
+                extras: extras, 
+                data: new Date()
+            });
+        if (error) throw error;
+        console.log('✅ Histórico salvo!', data);
+    } catch (error) { 
+        console.error('❌ Erro ao salvar histórico:', error); 
+    }
+}
         
         // Carrega histórico de palpites do Supabase
         async function carregarHistoricoSupabase(uid) {
