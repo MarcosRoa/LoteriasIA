@@ -721,15 +721,24 @@
         
         // Salva transação (compra/uso) no Supabase
         async function salvarTransacaoSupabase(uid, transacao) {
-            if (!window.supabaseClient || isAdminUser()) return;
-            try {
-                await window.supabaseClient.from('transacoes').insert({
-                    usuario_uid: uid, tipo: transacao.tipo, quantidade: transacao.quantidade,
-                    saldo_apos: transacao.saldo, data: new Date()
-                });
-                console.log('✅ Transação salva');
-            } catch (error) { console.error('Erro transação:', error); }
-        }
+    if (!window.supabaseClient || isAdminUser()) return;
+    try {
+        console.log('💳 Salvando transação:', transacao);
+        const { error } = await window.supabaseClient
+            .from('transacoes')
+            .insert({
+                usuario_uid: uid,
+                tipo: transacao.tipo,
+                quantidade: transacao.quantidade,
+                saldo_apos: transacao.saldo,
+                data: new Date()
+            });
+        if (error) throw error;
+        console.log('✅ Transação salva');
+    } catch (error) { 
+        console.error('❌ Erro transação:', error); 
+    }
+}
         
         // Carrega créditos do Supabase (ou cria usuário se não existir)
         async function carregarCreditosSupabase(uid) {
