@@ -95,7 +95,11 @@
         async function carregarCreditosDoBanco() {
             if (!window.supabaseClient || !usuario) return;
             try {
-                const { data, error } = await window.supabaseClient.from('usuarios').select('creditos').eq('uid', usuario.uid).single();
+                const { data, error } = await window.supabaseClient
+                    .from('usuarios')
+                    .select('creditos')
+                    .eq('uid', usuario.uid)
+                    .maybeSingle();
                 if (!error && data) creditos = data.creditos;
             } catch(e) { console.error(e); }
         }
@@ -103,8 +107,19 @@
         async function carregarDadosCompletos() {
             if (!window.supabaseClient || !usuario) return;
             
-            const { data: historico } = await window.supabaseClient.from('historico_palpites').select('*').eq('usuario_uid', usuario.uid).order('created_at', { ascending: false }).limit(50);
-            const { data: transacoes } = await window.supabaseClient.from('transacoes').select('*').eq('usuario_uid', usuario.uid).order('data', { ascending: false }).limit(30);
+            const { data: historico } = await window.supabaseClient
+                .from('historico_palpites')
+                .select('*')
+                .eq('usuario_uid', usuario.uid)
+                .order('created_at', { ascending: false })
+                .limit(50);
+            
+            const { data: transacoes } = await window.supabaseClient
+                .from('transacoes')
+                .select('*')
+                .eq('usuario_uid', usuario.uid)
+                .order('data', { ascending: false })
+                .limit(30);
             
             renderizarPerfil(historico || [], transacoes || []);
         }
