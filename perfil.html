@@ -291,27 +291,37 @@
         }
         
         async function carregarDadosCompletos() {
-            if (!window.supabaseClient || !usuario) {
-                document.getElementById('perfilContent').innerHTML = `<div class="empty-message"><h3>⚠️ Erro de conexão</h3><button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button></div>`;
-                return;
-            }
-            
-            const { data: historico } = await window.supabaseClient
-                .from('historico_palpites')
-                .select('*')
-                .eq('usuario_uid', usuario.uid)
-                .order('created_at', { ascending: false })
-                .limit(50);
-            
-            const { data: transacoes } = await window.supabaseClient
-                .from('transacoes')
-                .select('*')
-                .eq('usuario_uid', usuario.uid)
-                .order('data', { ascending: false })
-                .limit(30);
-            
-            renderizarPerfil(historico || [], transacoes || []);
-        }
+    if (!window.supabaseClient || !usuario) {
+        console.log('❌ Supabase não disponível');
+        return;
+    }
+    
+    console.log('📡 Buscando dados para:', usuario.uid);
+    
+    // Buscar histórico de palpites - USANDO 'data' não 'created_at'
+    const { data: historico, error: histError } = await window.supabaseClient
+        .from('historico_palpites')
+        .select('*')
+        .eq('usuario_uid', usuario.uid)
+        .order('data', { ascending: false })  // ← CORRIGIDO
+        .limit(50);
+    
+    if (histError) console.error('Erro histórico:', histError);
+    console.log(`📜 Histórico: ${historico?.length || 0} registros`);
+    
+    // Buscar transações
+    const { data: transacoes, error: transError } = await window.supabaseClient
+        .from('transacoes')
+        .select('*')
+        .eq('usuario_uid', usuario.uid)
+        .order('data', { ascending: false })
+        .limit(30);
+    
+    if (transError) console.error('Erro transações:', transError);
+    console.log(`💰 Transações: ${transacoes?.length || 0} registros`);
+    
+    renderizarPerfil(historico || [], transacoes || []);
+}
         
        function renderizarPerfil(historico, transacoes) {
     const avatarHtml = usuario.foto 
