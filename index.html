@@ -811,21 +811,25 @@
         console.error('❌ Erro ao salvar histórico:', error); 
     }
 }
-        
         // Carrega histórico de palpites do Supabase
-        async function carregarHistoricoSupabase(uid) {
-            if (!window.supabaseClient || isAdminUser()) return [];
-            try {
-                const { data, error } = await window.supabaseClient
-                    .from('historico_palpites')
-                    .select('*')
-                    .eq('usuario_uid', uid)
-                    .order('created_at', { ascending: false })
-                    .limit(50);
-                if (error) throw error;
-                return data || [];
-            } catch (error) { console.error('Erro ao carregar histórico:', error); return []; }
-        }
+        // Carrega histórico de palpites do Supabase
+async function carregarHistoricoSupabase(uid) {
+    if (!window.supabaseClient || isAdminUser()) return [];
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('historico_palpites')
+            .select('*')
+            .eq('usuario_uid', uid)
+            .order('data', { ascending: false })  // ← MUDOU de created_at para data
+            .limit(50);
+        if (error) throw error;
+        console.log('📜 Histórico carregado:', data?.length || 0, 'registros');
+        return data || [];
+    } catch (error) { 
+        console.error('Erro ao carregar histórico:', error); 
+        return []; 
+    }
+}
         
         // ============================================
         // FIREBASE AUTH (Autenticação)
