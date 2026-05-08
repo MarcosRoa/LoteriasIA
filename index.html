@@ -12,14 +12,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
     
-    <!-- Supabase SDK - URL CORRETA -->
+    <!-- Supabase SDK -->
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
         window.supabaseClient = createClient(
             'https://fuiaikymhsjdgdhojjhq.supabase.co',
             'sb_publishable_nA1FD4jJSCT0tOsnwrKqXQ_7R08DdYU'
         );
-        console.log('✅ Supabase inicializado com URL correta');
+        console.log('✅ Supabase inicializado');
     </script>
     
     <!-- Mercado Pago SDK -->
@@ -392,6 +392,9 @@
     </div>
 
     <script>
+        // ============================================
+        // CONFIGURAÇÕES GLOBAIS
+        // ============================================
         let maintenanceMode = false;
         
         function checkMaintenance() {
@@ -408,6 +411,9 @@
             }
         }
         
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
         function getNomeMes(numero) {
             const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             return meses[numero - 1] || 'Desconhecido';
@@ -437,14 +443,23 @@
             document.body.appendChild(overlay);
         }
         
-        function fecharModalLogin() { const modal = document.querySelector('.modal-login-overlay'); if (modal) modal.remove(); }
+        function fecharModalLogin() {
+            const modal = document.querySelector('.modal-login-overlay');
+            if (modal) modal.remove();
+        }
         
         function verificarLoginEAcao(acao) {
-            if (!usuarioAtual) { mostrarModalLogin(); return false; }
+            if (!usuarioAtual) {
+                mostrarModalLogin();
+                return false;
+            }
             if (typeof acao === 'function') acao();
             return true;
         }
         
+        // ============================================
+        // ADMIN TESTE
+        // ============================================
         const ADMIN_EMAIL = "admin@teste.com";
         const ADMIN_PASSWORD = "admin123";
         const ADMIN_CREDITS = 100;
@@ -463,6 +478,9 @@
         
         function isAdminUser() { return usuarioAtual && usuarioAtual.isAdmin === true; }
         
+        // ============================================
+        // PIX - MERCADO PAGO (MODO TESTE)
+        // ============================================
         const MP_SANDBOX = true;
         const VALORES_PIX = [12, 24, 36, 48, 60, 120, 180, 240];
         
@@ -514,6 +532,9 @@
         
         async function criarPagamentoPixReal(valor) { mostrarToast('PIX real em desenvolvimento', 'info'); }
         
+        // ============================================
+        // SUPABASE - FUNÇÕES DE BANCO DE DADOS (CORRIGIDAS)
+        // ============================================
         async function salvarTransacaoSupabase(uid, transacao) {
             if (!window.supabaseClient || isAdminUser()) return;
             try {
@@ -521,46 +542,103 @@
                     usuario_uid: uid, tipo: transacao.tipo, quantidade: transacao.quantidade,
                     saldo_apos: transacao.saldo, data: new Date()
                 });
+                console.log('✅ Transação salva');
             } catch (error) { console.error('Erro transação:', error); }
         }
         
         async function carregarCreditosSupabase(uid) {
             if (!window.supabaseClient || isAdminUser()) return 5;
             try {
-                const { data, error } = await window.supabaseClient.from('usuarios').select('creditos').eq('uid', uid).single();
-                if (error && error.code === 'PGRST116') {
-                    await window.supabaseClient.from('usuarios').insert({ uid: uid, nome: usuarioAtual?.nome || '', email: usuarioAtual?.email || '', creditos: 5, created_at: new Date() });
+                const { data, error } = await window.supabaseClient
+                    .from('usuarios')
+                    .select('creditos')
+                    .eq('uid', uid)
+                    .maybeSingle();
+                
+                if (error) throw error;
+                
+                if (!data) {
+                    // Usuário não existe - criar com saldo padrão 5
+                    await window.supabaseClient
+                        .from('usuarios')
+                        .insert({ uid: uid, nome: usuarioAtual?.nome || '', email: usuarioAtual?.email || '', creditos: 5, created_at: new Date(), updated_at: new Date() });
+                    console.log('✅ Usuário criado com saldo 5');
                     return 5;
                 }
-                if (error) throw error;
-                return data?.creditos || 5;
-            } catch (error) { console.log('Erro:', error); return 5; }
+                
+                return data.creditos || 5;
+            } catch (error) { 
+                console.log('Erro ao carregar créditos:', error); 
+                return 5; 
+            }
         }
         
         async function salvarCreditoSupabase(uid, novoSaldo) {
             if (!window.supabaseClient || isAdminUser()) return;
             try {
-                await window.supabaseClient.from('usuarios').upsert({ uid: uid, creditos: novoSaldo, updated_at: new Date() });
-                console.log('✅ Créditos salvos:', novoSaldo);
-            } catch (error) { console.error('Erro:', error); }
+                // Verificar se o usuário já existe
+                const { data: existe, error: buscaError } = await window.supabaseClient
+                    .from('usuarios')
+                    .select('uid')
+                    .eq('uid', uid)
+                    .maybeSingle();
+                
+                if (buscaError) throw buscaError;
+                
+                if (existe) {
+                    // Atualizar créditos
+                    const { error: updateError } = await window.supabaseClient
+                        .from('usuarios')
+                        .update({ creditos: novoSaldo, updated_at: new Date() })
+                        .eq('uid', uid);
+                    if (updateError) throw updateError;
+                    console.log('✅ Créditos ATUALIZADOS:', novoSaldo);
+                } else {
+                    // Inserir novo usuário
+                    const { error: insertError } = await window.supabaseClient
+                        .from('usuarios')
+                        .insert({ uid: uid, creditos: novoSaldo, created_at: new Date(), updated_at: new Date() });
+                    if (insertError) throw insertError;
+                    console.log('✅ Usuário CRIADO com créditos:', novoSaldo);
+                }
+            } catch (error) { 
+                console.error('❌ Erro ao salvar créditos:', error); 
+                mostrarToast('Erro ao salvar no banco. Tente novamente.', 'error');
+            }
         }
         
         async function salvarHistoricoSupabase(uid, loteria, jogos, filtros, extras) {
             if (!window.supabaseClient || isAdminUser()) return;
             try {
-                await window.supabaseClient.from('historico_palpites').insert({ usuario_uid: uid, loteria: loteria, jogos: jogos, filtros: filtros, extras: extras, created_at: new Date() });
-            } catch (error) { console.error('Erro:', error); }
+                await window.supabaseClient.from('historico_palpites').insert({ 
+                    usuario_uid: uid, 
+                    loteria: loteria, 
+                    jogos: jogos, 
+                    filtros: filtros, 
+                    extras: extras, 
+                    created_at: new Date() 
+                });
+                console.log('✅ Histórico salvo');
+            } catch (error) { console.error('Erro histórico:', error); }
         }
         
         async function carregarHistoricoSupabase(uid) {
             if (!window.supabaseClient || isAdminUser()) return [];
             try {
-                const { data, error } = await window.supabaseClient.from('historico_palpites').select('*').eq('usuario_uid', uid).order('created_at', { ascending: false }).limit(50);
+                const { data, error } = await window.supabaseClient
+                    .from('historico_palpites')
+                    .select('*')
+                    .eq('usuario_uid', uid)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
                 if (error) throw error;
                 return data || [];
-            } catch (error) { console.error('Erro:', error); return []; }
+            } catch (error) { console.error('Erro ao carregar histórico:', error); return []; }
         }
         
+        // ============================================
+        // FIREBASE AUTH
+        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCA_FoID7Ch8LkcwK5TbQSK23lU7BxQMuE",
             authDomain: "loteriasia.firebaseapp.com",
@@ -573,8 +651,11 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         
+        // ============================================
+        // VERSÃO E CONFIGURAÇÕES INICIAIS
+        // ============================================
         const VERSAO = "6.1.0";
-        console.log(`🚀 Loterias V.${VERSAO} - URL Supabase Corrigida`);
+        console.log(`🚀 Loterias V.${VERSAO} - Supabase Corrigido`);
         
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
@@ -590,6 +671,9 @@
         const cacheDados = {};
         const cacheDatas = {};
         
+        // ============================================
+        // LOTERIAS CONFIGURADAS
+        // ============================================
         const LOTERIAS = {
             megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25 },
             quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', temDispersao: false },
@@ -616,19 +700,34 @@
             supersete: `<strong>Super Sete</strong> - 7 colunas (0 a 9). ✅ Inclui zero`
         };
         
-        Object.keys(LOTERIAS).forEach(key => { cacheDados[key] = { dados: [], carregado: false, nomeArquivo: null }; cacheDatas[key] = { datas: [] }; });
+        Object.keys(LOTERIAS).forEach(key => { 
+            cacheDados[key] = { dados: [], carregado: false, nomeArquivo: null }; 
+            cacheDatas[key] = { datas: [] }; 
+        });
         
-        function getDataCortePorAnos(anos) { return new Date(new Date().getFullYear() - anos, new Date().getMonth(), new Date().getDate()); }
+        // ============================================
+        // FILTRO POR DATA REAL
+        // ============================================
+        function getDataCortePorAnos(anos) {
+            const dataAtual = new Date();
+            return new Date(dataAtual.getFullYear() - anos, dataAtual.getMonth(), dataAtual.getDate());
+        }
         
         function filtrarDadosPorData(anos) {
             if (!cacheDatas[loteriaAtual]?.datas?.length) return dadosAtuais;
             const dataCorte = getDataCortePorAnos(anos);
-            return dadosAtuais.filter((_, i) => {
-                const dataStr = cacheDatas[loteriaAtual].datas[i];
-                if (!dataStr) return true;
-                const [d, m, a] = dataStr.split('/');
-                return new Date(parseInt(a), parseInt(m)-1, parseInt(d)) >= dataCorte;
-            });
+            const dadosFiltrados = [];
+            for (let i = 0; i < dadosAtuais.length; i++) {
+                const dataConcursoStr = cacheDatas[loteriaAtual].datas[i];
+                if (dataConcursoStr) {
+                    const partes = dataConcursoStr.split('/');
+                    if (partes.length === 3) {
+                        const dataConcurso = new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+                        if (dataConcurso >= dataCorte) dadosFiltrados.push(dadosAtuais[i]);
+                    } else { dadosFiltrados.push(dadosAtuais[i]); }
+                } else { dadosFiltrados.push(dadosAtuais[i]); }
+            }
+            return dadosFiltrados;
         }
         
         function filtrarDados() {
@@ -642,56 +741,113 @@
         }
         
         function getPeriodoTexto() {
-            if (periodoSelecionado === 'all') return `Todos os concursos (${dadosAtuais.length} concursos)`;
+            if (periodoSelecionado === 'all') {
+                return `Todos os concursos (${dadosAtuais.length} concursos)`;
+            }
             const dadosFiltrados = filtrarDados();
             return `${periodoSelecionado} ano(s) (${dadosFiltrados.length} concursos)`;
         }
         
         function getDatasPeriodo() {
             const dadosFiltrados = filtrarDados();
-            const datas = cacheDatas[loteriaAtual]?.datas || [];
-            if (datas.length === 0 || dadosFiltrados.length === 0) return { inicio: 'N/A', fim: 'N/A' };
-            if (periodoSelecionado === 'all') return { inicio: datas[0] || 'N/A', fim: datas[datas.length-1] || 'N/A' };
-            const dataCorte = getDataCortePorAnos(periodoSelecionado);
-            const indices = [];
-            for (let i = 0; i < datas.length; i++) {
-                const d = datas[i];
-                if (d) { const [dia, mes, ano] = d.split('/'); if (new Date(parseInt(ano), parseInt(mes)-1, parseInt(dia)) >= dataCorte) indices.push(i); }
+            const datasFiltradas = cacheDatas[loteriaAtual]?.datas || [];
+            if (datasFiltradas.length === 0 || dadosFiltrados.length === 0) return { inicio: 'N/A', fim: 'N/A' };
+            
+            if (periodoSelecionado === 'all') {
+                return { inicio: datasFiltradas[0] || 'N/A', fim: datasFiltradas[datasFiltradas.length-1] || 'N/A' };
             }
-            if (indices.length === 0) return { inicio: 'N/A', fim: 'N/A' };
-            return { inicio: datas[indices[0]] || 'N/A', fim: datas[indices[indices.length-1]] || 'N/A' };
+            
+            const indicesFiltrados = [];
+            const dataCorte = getDataCortePorAnos(periodoSelecionado);
+            for (let i = 0; i < datasFiltradas.length; i++) {
+                const dataConcursoStr = datasFiltradas[i];
+                if (dataConcursoStr) {
+                    const partes = dataConcursoStr.split('/');
+                    if (partes.length === 3) {
+                        const dataConcurso = new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+                        if (dataConcurso >= dataCorte) indicesFiltrados.push(i);
+                    }
+                }
+            }
+            if (indicesFiltrados.length === 0) return { inicio: 'N/A', fim: 'N/A' };
+            return {
+                inicio: datasFiltradas[indicesFiltrados[0]] || 'N/A',
+                fim: datasFiltradas[indicesFiltrados[indicesFiltrados.length-1]] || 'N/A'
+            };
         }
         
+        // ============================================
+        // FUNÇÕES DE LOGIN
+        // ============================================
         async function loginGoogle() {
             if (maintenanceMode) { alert('Manutenção'); return; }
-            try { const result = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); await processarLogin(result.user); fecharModalLogin(); } 
-            catch(e) { mostrarToast('Erro login', 'error'); }
+            try { 
+                const result = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); 
+                await processarLogin(result.user); 
+                fecharModalLogin(); 
+            } catch(e) { mostrarToast('Erro login', 'error'); }
         }
         
         async function loginFacebook() {
             if (maintenanceMode) { alert('Manutenção'); return; }
-            try { const result = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); await processarLogin(result.user); fecharModalLogin(); } 
-            catch(e) { mostrarToast('Erro login', 'error'); }
+            try { 
+                const result = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); 
+                await processarLogin(result.user); 
+                fecharModalLogin(); 
+            } catch(e) { showingToast('Erro login', 'error'); }
         }
         
         async function logout() {
-            if (isAdminUser()) { usuarioAtual = null; isAdminMode = false; creditosUsuario = 0; atualizarInterfaceUsuario(); mostrarToast('Logout Admin', 'success'); return; }
-            try { await auth.signOut(); usuarioAtual = null; creditosUsuario = 0; atualizarInterfaceUsuario(); mostrarToast('Logout realizado!', 'success'); } 
-            catch(e) { console.error(e); }
+            if (isAdminUser()) { 
+                usuarioAtual = null; isAdminMode = false; creditosUsuario = 0; 
+                atualizarInterfaceUsuario(); 
+                mostrarToast('Logout Admin', 'success'); 
+                return; 
+            }
+            try { 
+                await auth.signOut(); 
+                usuarioAtual = null; creditosUsuario = 0; 
+                atualizarInterfaceUsuario(); 
+                mostrarToast('Logout realizado!', 'success'); 
+            } catch(e) { console.error(e); }
         }
         
         function abrirPerfil() {
             if (!usuarioAtual) { mostrarModalLogin(); return; }
-            sessionStorage.setItem('perfil_usuario', JSON.stringify({ uid: usuarioAtual.uid, nome: usuarioAtual.nome, email: usuarioAtual.email, foto: usuarioAtual.foto, creditos: creditosUsuario }));
+            sessionStorage.setItem('perfil_usuario', JSON.stringify({ 
+                uid: usuarioAtual.uid, 
+                nome: usuarioAtual.nome, 
+                email: usuarioAtual.email, 
+                foto: usuarioAtual.foto, 
+                creditos: creditosUsuario 
+            }));
             window.location.href = 'perfil.html';
         }
         
         async function processarLogin(user) {
             if (isAdminUser()) return;
-            usuarioAtual = { uid: user.uid, nome: user.displayName || user.email?.split('@')[0] || 'Usuário', email: user.email, foto: user.photoURL, isAdmin: false };
+            usuarioAtual = { 
+                uid: user.uid, 
+                nome: user.displayName || user.email?.split('@')[0] || 'Usuário', 
+                email: user.email, 
+                foto: user.photoURL, 
+                isAdmin: false 
+            };
+            
             creditosUsuario = await carregarCreditosSupabase(user.uid);
+            
+            // Migração de localStorage (apenas uma vez)
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
-            if (oldCredits && !isAdminUser()) { const old = parseInt(oldCredits); if (old > 0 && creditosUsuario === 5) { creditosUsuario = old; await salvarCreditoSupabase(user.uid, creditosUsuario); } localStorage.removeItem(`creditos_${user.uid}`); }
+            if (oldCredits && !isAdminUser()) { 
+                const old = parseInt(oldCredits); 
+                if (old > 0 && creditosUsuario === 5) { 
+                    creditosUsuario = old; 
+                    await salvarCreditoSupabase(user.uid, creditosUsuario); 
+                } 
+                localStorage.removeItem(`creditos_${user.uid}`);
+                localStorage.removeItem(`historico_${user.uid}`);
+            }
+            
             carregarConfiguracoesUsuario();
             atualizarInterfaceUsuario();
             mostrarToast(`Bem-vindo ${usuarioAtual.nome}! Saldo: R$ ${creditosUsuario}`, 'success');
@@ -700,6 +856,7 @@
         function atualizarInterfaceUsuario() {
             const loginArea = document.getElementById('loginArea');
             const userInfoArea = document.getElementById('userInfoArea');
+            
             if (usuarioAtual) {
                 loginArea.style.display = 'none';
                 userInfoArea.style.display = 'flex';
@@ -722,6 +879,8 @@
             } else {
                 loginArea.style.display = 'block';
                 userInfoArea.style.display = 'none';
+                userInfoArea.innerHTML = '';
+                
                 const loginDiv = document.getElementById('loginArea');
                 if (loginDiv && !document.getElementById('btnAdminLogin') && isAdminConfigured) {
                     const btn = document.createElement('button');
@@ -741,7 +900,10 @@
             if (!verificarLoginEAcao(null)) return;
             let html = `<div class="modal-overlay" id="modalComprar"><div class="modal-container"><div class="modal-header"><h3>💰 Comprar Créditos</h3></div><div class="modal-body">`;
             html += `<p>💡 Cada jogo custa <strong>R$ 3,00</strong></p><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">`;
-            VALORES_PIX.forEach(v => { const q = v/3; html += `<button onclick="iniciarPagamentoPix(${v})" style="background: linear-gradient(135deg,#10b981,#059669);border:none;border-radius:12px;padding:15px;color:white;cursor:pointer;"><strong>R$ ${v}</strong><br><small>${q} jogos</small></button>`; });
+            VALORES_PIX.forEach(v => { 
+                const q = v/3; 
+                html += `<button onclick="iniciarPagamentoPix(${v})" style="background: linear-gradient(135deg,#10b981,#059669);border:none;border-radius:12px;padding:15px;color:white;cursor:pointer;"><strong>R$ ${v}</strong><br><small>${q} jogos</small></button>`; 
+            });
             html += `</div><p style="font-size:11px;margin-top:20px;">💳 Pagamento via PIX (Modo Teste)</p></div><div class="modal-footer"><button onclick="fecharModalComprar()">Fechar</button></div></div></div>`;
             document.body.insertAdjacentHTML('beforeend', html);
         }
@@ -762,7 +924,12 @@
         
         function salvarConfiguracoesUsuario() {
             if (!usuarioAtual) return;
-            localStorage.setItem(`config_${usuarioAtual.uid}`, JSON.stringify({ qtdJogos: document.getElementById('qtdJogos')?.value, modoGeracao: document.getElementById('modoGeracao')?.value, dispersao: dispersaoAtual, periodo: periodoSelecionado }));
+            localStorage.setItem(`config_${usuarioAtual.uid}`, JSON.stringify({ 
+                qtdJogos: document.getElementById('qtdJogos')?.value, 
+                modoGeracao: document.getElementById('modoGeracao')?.value, 
+                dispersao: dispersaoAtual, 
+                periodo: periodoSelecionado 
+            }));
         }
         
         async function abrirHistorico() {
@@ -788,33 +955,60 @@
             await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras);
         }
         
+        // ============================================
+        // CLASSE IA
+        // ============================================
         class AdvancedLotteryAI {
-            constructor(dados, maxNumero, loteriaNome) { this.dados = dados; this.maxNumero = maxNumero; this.loteriaNome = loteriaNome; this.treinado = false; this.confianca = 0; }
+            constructor(dados, maxNumero, loteriaNome) { 
+                this.dados = dados; 
+                this.maxNumero = maxNumero; 
+                this.loteriaNome = loteriaNome; 
+                this.treinado = false; 
+                this.confianca = 0; 
+            }
+            
             calcularFrequenciaPonderada() {
                 const total = this.dados.length;
                 const freq = new Array(this.maxNumero + 1).fill(0);
-                for (let i = 0; i < this.dados.length; i++) { const peso = Math.pow(1.2, i / total); for (const n of this.dados[i]) if (n >= 0 && n <= this.maxNumero) freq[n] += peso; }
+                for (let i = 0; i < this.dados.length; i++) { 
+                    const peso = Math.pow(1.2, i / total); 
+                    for (const n of this.dados[i]) if (n >= 0 && n <= this.maxNumero) freq[n] += peso; 
+                }
                 const maxFreq = Math.max(...freq.slice(1));
                 const res = [];
                 for (let n = 0; n <= this.maxNumero; n++) res.push({ numero: n, frequencia: maxFreq > 0 ? freq[n] / maxFreq : 0, probabilidade: (freq[n] / total) * 100 });
                 return res;
             }
+            
             calcularAtraso() {
                 const atraso = new Array(this.maxNumero + 1).fill(this.dados.length);
-                for (let n = 0; n <= this.maxNumero; n++) for (let i = this.dados.length-1; i >= 0; i--) if (this.dados[i].includes(n)) { atraso[n] = this.dados.length - 1 - i; break; }
+                for (let n = 0; n <= this.maxNumero; n++) 
+                    for (let i = this.dados.length-1; i >= 0; i--) 
+                        if (this.dados[i].includes(n)) { atraso[n] = this.dados.length - 1 - i; break; }
                 const maxAtraso = Math.max(...atraso);
                 const res = [];
                 for (let n = 0; n <= this.maxNumero; n++) res.push({ numero: n, atraso: atraso[n], fator: maxAtraso > 0 ? atraso[n] / maxAtraso : 0 });
                 return res;
             }
+            
             calcularScoreCompleto() {
                 const freq = this.calcularFrequenciaPonderada();
                 const atraso = this.calcularAtraso();
                 const scores = [];
-                for (let n = 0; n <= this.maxNumero; n++) { let score = (1 - freq[n].frequencia) * 50 + atraso[n].fator * 50; scores.push({ numero: n, score: score, atraso: atraso[n].atraso }); }
+                for (let n = 0; n <= this.maxNumero; n++) { 
+                    let score = (1 - freq[n].frequencia) * 50 + atraso[n].fator * 50; 
+                    scores.push({ numero: n, score: score, atraso: atraso[n].atraso }); 
+                }
                 return scores.sort((a,b) => b.score - a.score);
             }
-            treinar() { if (this.dados.length < 10) return false; this.treinado = true; this.confianca = Math.min(95, Math.floor(this.dados.length / 10) + 50); return true; }
+            
+            treinar() { 
+                if (this.dados.length < 10) return false; 
+                this.treinado = true; 
+                this.confianca = Math.min(95, Math.floor(this.dados.length / 10) + 50); 
+                return true; 
+            }
+            
             predizerIAEspecialista(qtd, usarDispersao = true, windowDispersao = 10, seed = 0) {
                 if (!this.treinado) return this.predizerAleatorio(qtd, seed);
                 const scores = this.calcularScoreCompleto();
@@ -828,11 +1022,29 @@
                 scoresRuido.sort((a,b) => b.score - a.score);
                 const candidatos = scoresRuido.slice(0, Math.max(qtd * 2, 20));
                 const resultado = new Set();
-                while (resultado.size < qtd && candidatos.length > 0) { const idx = Math.floor(Math.random() * candidatos.length); resultado.add(candidatos[idx].numero); candidatos.splice(idx, 1); }
-                if (resultado.size < qtd) { const todos = Array.from({ length: this.maxNumero + 1 }, (_, i) => i); const disp = todos.filter(n => !resultado.has(n)); while (resultado.size < qtd && disp.length > 0) { const idx = Math.floor(Math.random() * disp.length); resultado.add(disp[idx]); disp.splice(idx, 1); } }
+                while (resultado.size < qtd && candidatos.length > 0) { 
+                    const idx = Math.floor(Math.random() * candidatos.length); 
+                    resultado.add(candidatos[idx].numero); 
+                    candidatos.splice(idx, 1); 
+                }
+                if (resultado.size < qtd) { 
+                    const todos = Array.from({ length: this.maxNumero + 1 }, (_, i) => i); 
+                    const disp = todos.filter(n => !resultado.has(n)); 
+                    while (resultado.size < qtd && disp.length > 0) { 
+                        const idx = Math.floor(Math.random() * disp.length); 
+                        resultado.add(disp[idx]); 
+                        disp.splice(idx, 1); 
+                    } 
+                }
                 return Array.from(resultado).sort((a,b) => a - b);
             }
-            predizerAleatorio(qtd) { const res = new Set(); while (res.size < qtd) res.add(Math.floor(Math.random() * (this.maxNumero + 1))); return Array.from(res).sort((a,b)=>a-b); }
+            
+            predizerAleatorio(qtd) { 
+                const res = new Set(); 
+                while (res.size < qtd) res.add(Math.floor(Math.random() * (this.maxNumero + 1))); 
+                return Array.from(res).sort((a,b)=>a-b); 
+            }
+            
             calcularConfiancaJogo(jogo) {
                 if (!this.treinado) return 50;
                 const freq = this.calcularFrequenciaPonderada();
@@ -841,12 +1053,24 @@
                 for (const n of jogo) conf += (1 - freq[n].frequencia) * 40 + atraso[n].fator * 60;
                 return Math.min(100, Math.max(0, Math.floor(conf / jogo.length)));
             }
-            gerarRelatorio() { return { loteria: this.loteriaNome, confiancaGeral: this.confianca, totalDados: this.dados.length, melhoresNumerosAtuais: this.calcularScoreCompleto().slice(0,10).map(s => ({ numero: s.numero, pontuacao: s.score.toFixed(0) })) }; }
+            
+            gerarRelatorio() { 
+                return { 
+                    loteria: this.loteriaNome, 
+                    confiancaGeral: this.confianca, 
+                    totalDados: this.dados.length, 
+                    melhoresNumerosAtuais: this.calcularScoreCompleto().slice(0,10).map(s => ({ numero: s.numero, pontuacao: s.score.toFixed(0) })) 
+                }; 
+            }
+            
             predizerMesSorte() { return Math.floor(Math.random() * 12) + 1; }
             predizerTimeSorte() { return Math.floor(Math.random() * 80) + 1; }
             predizerTrevos(qtd) { const t = new Set(); while (t.size < qtd) t.add(Math.floor(Math.random() * 6) + 1); return Array.from(t).sort((a,b)=>a-b); }
         }
         
+        // ============================================
+        // FUNÇÕES DO SISTEMA
+        // ============================================
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -856,7 +1080,10 @@
             setTimeout(() => toast.remove(), 4000);
         }
         
-        function getModoTexto(modo) { const modos = { 'ia_especialista': '🎓 IA Especialista', 'probabilistico': '📊 Probabilístico', 'aleatorio_inteligente': '🎲 Aleatório Inteligente' }; return modos[modo] || modo; }
+        function getModoTexto(modo) { 
+            const modos = { 'ia_especialista': '🎓 IA Especialista', 'probabilistico': '📊 Probabilístico', 'aleatorio_inteligente': '🎲 Aleatório Inteligente' }; 
+            return modos[modo] || modo; 
+        }
         
         function getFiltrosAtivos() {
             const config = LOTERIAS[loteriaAtual];
@@ -902,7 +1129,7 @@
             const percIA = total > 0 ? ((acertosIA / (total * config.numeros)) * 100).toFixed(1) : '0.0';
             let acertosRand = 0;
             for (let i = janela; i < dados.length; i++) {
-                const rand = []; while (rand.length < config.numeros) rand.push(Math.floor(Math.random() * (config.maxNumero + 1))); rand.sort((a,b)=>a-b);
+                const rand = []; while (rand.length < config.numeros) rand.push(Math.floor(Math.random() * (config.maxNumero + (config.incluirZero ? 1 : 0)))); rand.sort((a,b)=>a-b);
                 acertosRand += rand.filter(n => dados[i].includes(n)).length;
             }
             const percRand = ((acertosRand / (total * config.numeros)) * 100).toFixed(1);
@@ -923,7 +1150,11 @@
             if (status) { status.textContent = 'Aprendendo...'; status.className = 'status-badge status-training'; }
             if (log) log.innerHTML = `🧠 IA iniciando...\n📊 ${dadosFiltrados.length} concursos\n`;
             if (pb) pb.style.width = '0%';
-            for (let i = 0; i < 4; i++) { await new Promise(r => setTimeout(r, 150)); if (pb) pb.style.width = `${((i+1)/4)*100}%`; if (log) log.innerHTML += `📊 Etapa ${i+1}... ok\n`; }
+            for (let i = 0; i < 4; i++) { 
+                await new Promise(r => setTimeout(r, 150)); 
+                if (pb) pb.style.width = `${((i+1)/4)*100}%`; 
+                if (log) log.innerHTML += `📊 Etapa ${i+1}... ok\n`; 
+            }
             aiModel = new AdvancedLotteryAI(dadosFiltrados, config.maxNumero, config.nome);
             const sucesso = aiModel.treinar();
             iaTreinada = sucesso;
@@ -1194,6 +1425,9 @@
             grid.innerHTML = Object.entries(LOTERIAS).map(([id, c]) => `<div class="lottery-card ${id==='megasena'?'active':''}" onclick="selecionarLoteria('${id}')" id="card-${id}"><div class="ia-status nao-treinado" id="status-${id}"></div><h3>${c.icone} ${c.nome}</h3><p class="rules">${c.numeros} números • 1 a ${c.maxNumero}${c.temMes ? ' + Mês' : ''}${c.temTime ? ' + Time' : ''}${c.temTrevos ? ' + Trevos' : ''}</p></div>`).join('');
         }
         
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             checkMaintenance();
             const tema = localStorage.getItem('tema');
@@ -1201,7 +1435,7 @@
             carregarGridLoterias();
             selecionarLoteria('megasena');
             auth.onAuthStateChanged(async (user) => { if (user && !isAdminUser()) await processarLogin(user); else atualizarInterfaceUsuario(); });
-            console.log('%c✅ Loterias V.6.1 - URL Supabase CORRIGIDA!', 'color: #22c55e; font-size: 14px;');
+            console.log('%c✅ Loterias V.6.1 - CRÉDITOS CORRIGIDOS!', 'color: #22c55e; font-size: 14px;');
             console.log('URL: https://fuaikymhsjdgdhojhq.supabase.co');
             mostrarToast(`Versão ${VERSAO} - Banco de dados conectado!`, 'info');
         });
