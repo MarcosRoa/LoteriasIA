@@ -561,8 +561,8 @@
                     // Usuário não existe - criar com saldo padrão 5
                     await window.supabaseClient
                         .from('usuarios')
-                        .insert({ uid: uid, nome: usuarioAtual?.nome || '', email: usuarioAtual?.email || '', creditos: 5, created_at: new Date(), updated_at: new Date() });
-                    console.log('✅ Usuário criado com saldo 5');
+                        .insert({ uid: uid, nome: usuarioAtual?.nome || '', email: usuarioAtual?.email || '', creditos: 0, created_at: new Date(), updated_at: new Date() });
+                    console.log('✅ Usuário criado com saldo 0');
                     return 5;
                 }
                 
