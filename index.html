@@ -13,14 +13,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
     
     <!-- Supabase SDK -->
-   <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-    window.supabaseClient = createClient(
-        'https://fuiaikymhsjdgdhojjhq.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
-    );
-    console.log('✅ Supabase inicializado');
-</script>
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        window.supabaseClient = createClient(
+            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
+        );
+        console.log('✅ Supabase inicializado');
+    </script>
     
     <!-- Mercado Pago SDK -->
     <script src="https://sdk.mercadopago.com/js/v2"></script>
@@ -69,6 +69,60 @@
         @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* ANIMAÇÃO DE TREINAMENTO DA IA */
+        @keyframes trainingPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.01); }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes textFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; letter-spacing: 2px; }
+        }
+        
+        .ia-training-animation {
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
+            background-size: 400% 100%;
+            animation: gradientShift 4s ease infinite;
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .ia-training-animation.treinado {
+            background: linear-gradient(90deg, #22c55e, #10b981, #059669, #22c55e);
+            background-size: 300% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        .ia-training-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            animation: textFlicker 1.5s ease infinite;
+        }
+        
+        .ia-training-text.treinado {
+            animation: none;
+            font-size: 20px;
+        }
+        
+        .ia-training-subtext {
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-top: 10px;
+        }
 
         .maintenance-overlay {
             position: fixed;
@@ -195,54 +249,85 @@
             border: 2px solid var(--border);
         }
         .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; }
+        .user-avatar { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid #38bdf8;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
         .user-details h4 { font-size: 16px; margin-bottom: 4px; }
         .user-details p { font-size: 12px; color: var(--text-secondary); }
         .credits-box { 
             background: linear-gradient(135deg, #f59e0b, #eab308); 
-            padding: 10px 20px; 
+            padding: 12px 24px; 
             border-radius: 30px; 
             text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
+            min-width: 140px;
         }
         .credits-box:hover { transform: scale(1.02); }
         .credits-box span { font-size: 12px; opacity: 0.9; }
-        .credits-box strong { font-size: 24px; display: block; color: #1e293b; }
+        .credits-box strong { font-size: 20px; display: block; color: #1e293b; }
         
+        /* BOTÕES IGUALADOS */
         .btn-perfil {
             background: linear-gradient(135deg, #8b5cf6, #06b6d4);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             border: none;
+            min-width: 160px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .btn-perfil:hover { transform: scale(1.02); opacity: 0.9; }
         
         .btn-comprar {
             background: #10b981;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             border: none;
+            min-width: 160px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .btn-comprar:hover { transform: scale(1.02); opacity: 0.9; }
         
         .btn-logout {
             background: #ff2800;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             border: none;
+            min-width: 140px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .btn-logout:hover { transform: scale(1.02); opacity: 0.9; }
         
@@ -291,7 +376,18 @@
         .backtest-result { background: var(--bg-card); padding: 12px; border-radius: var(--radius); margin: 5px 0; display: flex; justify-content: space-between; align-items: center; }
         .training-progress { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin: 10px 0; overflow: hidden; }
         .training-progress-bar { height: 100%; background: linear-gradient(90deg, #f59e0b, #22c55e); width: 0%; transition: width 0.3s; }
-        .training-log { background: var(--bg-primary); padding: 15px; border-radius: var(--radius); font-family: monospace; font-size: 12px; color: #86efac; max-height: 200px; overflow-y: auto; margin-top: 10px; }
+        .training-log { 
+            background: var(--bg-primary); 
+            padding: 15px; 
+            border-radius: var(--radius); 
+            font-family: monospace; 
+            font-size: 14px; 
+            color: #86efac; 
+            min-height: 200px; 
+            overflow-y: auto; 
+            margin-top: 10px; 
+            line-height: 1.6;
+        }
 
         .filtros-aplicados { background: rgba(56, 189, 248, 0.1); border: 2px solid #38bdf8; padding: 15px; border-radius: var(--radius); margin: 15px 0; }
         .filtro-item { display: inline-block; background: var(--bg-card); padding: 5px 12px; border-radius: 15px; margin: 3px; font-size: 12px; }
@@ -334,6 +430,9 @@
             .info-periodo { flex-direction: column; gap: 8px; }
             .header-logo img { width: 120px; }
             .login-buttons { justify-content: center; }
+            .btn-perfil, .btn-comprar, .btn-logout { min-width: 120px; padding: 10px 16px; font-size: 12px; }
+            .credits-box { min-width: 120px; padding: 10px 16px; }
+            .credits-box strong { font-size: 18px; }
         }
     </style>
 </head>
@@ -533,7 +632,7 @@
         async function criarPagamentoPixReal(valor) { mostrarToast('PIX real em desenvolvimento', 'info'); }
         
         // ============================================
-        // SUPABASE - FUNÇÕES DE BANCO DE DADOS (CORRIGIDAS)
+        // SUPABASE - FUNÇÕES DE BANCO DE DADOS
         // ============================================
         async function salvarTransacaoSupabase(uid, transacao) {
             if (!window.supabaseClient || isAdminUser()) return;
@@ -558,11 +657,10 @@
                 if (error) throw error;
                 
                 if (!data) {
-                    // Usuário não existe - criar com saldo padrão 5
                     await window.supabaseClient
                         .from('usuarios')
-                        .insert({ uid: uid, nome: usuarioAtual?.nome || '', email: usuarioAtual?.email || '', creditos: 0, created_at: new Date(), updated_at: new Date() });
-                    console.log('✅ Usuário criado com saldo 0');
+                        .insert({ uid: uid, nome: usuarioAtual?.nome || '', email: usuarioAtual?.email || '', creditos: 5, created_at: new Date(), updated_at: new Date() });
+                    console.log('✅ Usuário criado com saldo 5');
                     return 5;
                 }
                 
@@ -576,7 +674,6 @@
         async function salvarCreditoSupabase(uid, novoSaldo) {
             if (!window.supabaseClient || isAdminUser()) return;
             try {
-                // Verificar se o usuário já existe
                 const { data: existe, error: buscaError } = await window.supabaseClient
                     .from('usuarios')
                     .select('uid')
@@ -586,7 +683,6 @@
                 if (buscaError) throw buscaError;
                 
                 if (existe) {
-                    // Atualizar créditos
                     const { error: updateError } = await window.supabaseClient
                         .from('usuarios')
                         .update({ creditos: novoSaldo, updated_at: new Date() })
@@ -594,7 +690,6 @@
                     if (updateError) throw updateError;
                     console.log('✅ Créditos ATUALIZADOS:', novoSaldo);
                 } else {
-                    // Inserir novo usuário
                     const { error: insertError } = await window.supabaseClient
                         .from('usuarios')
                         .insert({ uid: uid, creditos: novoSaldo, created_at: new Date(), updated_at: new Date() });
@@ -655,7 +750,7 @@
         // VERSÃO E CONFIGURAÇÕES INICIAIS
         // ============================================
         const VERSAO = "6.1.0";
-        console.log(`🚀 Loterias V.${VERSAO} - Supabase Corrigido`);
+        console.log(`🚀 Loterias V.${VERSAO} - Atualizado`);
         
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
@@ -794,7 +889,7 @@
                 const result = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()); 
                 await processarLogin(result.user); 
                 fecharModalLogin(); 
-            } catch(e) { showingToast('Erro login', 'error'); }
+            } catch(e) { mostrarToast('Erro login', 'error'); }
         }
         
         async function logout() {
@@ -840,7 +935,7 @@
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
             if (oldCredits && !isAdminUser()) { 
                 const old = parseInt(oldCredits); 
-                if (old > 0 && creditosUsuario === 0) { 
+                if (old > 0 && creditosUsuario === 5) { 
                     creditosUsuario = old; 
                     await salvarCreditoSupabase(user.uid, creditosUsuario); 
                 } 
@@ -861,11 +956,17 @@
                 loginArea.style.display = 'none';
                 userInfoArea.style.display = 'flex';
                 userInfoArea.style.alignItems = 'center';
-                userInfoArea.style.gap = '15px';
+                userInfoArea.style.gap = '12px';
                 userInfoArea.style.flexWrap = 'wrap';
+                
+                // Avatar com foto do usuário ou padrão
+                const avatarHtml = usuarioAtual.foto 
+                    ? `<img src="${usuarioAtual.foto}" class="user-avatar" alt="Avatar" style="object-fit: cover;">`
+                    : `<div class="user-avatar" style="background: linear-gradient(135deg, #8b5cf6, #06b6d4); display: flex; align-items: center; justify-content: center;">👤</div>`;
+                
                 userInfoArea.innerHTML = `
                     <div class="user-info">
-                        ${usuarioAtual.foto ? `<img src="${usuarioAtual.foto}" class="user-avatar">` : '<div class="user-avatar" style="background:#8b5cf6;">👤</div>'}
+                        ${avatarHtml}
                         <div class="user-details"><h4>${usuarioAtual.nome} ${usuarioAtual.isAdmin ? '<span class="admin-badge">👑 ADMIN TESTE</span>' : ''}</h4><p>${usuarioAtual.email}</p></div>
                     </div>
                     <div class="credits-box" onclick="abrirPerfil()">
@@ -953,6 +1054,30 @@
         async function salvarHistoricoUsuario(jogos, filtros, extras) {
             if (!usuarioAtual) return;
             await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras);
+        }
+        
+        // ============================================
+        // FUNÇÕES DE ANIMAÇÃO DE TREINAMENTO
+        // ============================================
+        function atualizarAnimacaoTreinamento(status, texto = null) {
+            const container = document.getElementById('iaTrainingAnimation');
+            if (!container) return;
+            
+            if (status === 'training') {
+                container.className = 'ia-training-animation';
+                container.innerHTML = `
+                    <div class="ia-training-text">🧠 INTELIGÊNCIA ARTIFICIAL EM TREINAMENTO...</div>
+                    <div class="ia-training-subtext">Analisando padrões e processando dados históricos</div>
+                `;
+            } else if (status === 'trained') {
+                container.className = 'ia-training-animation treinado';
+                container.innerHTML = `
+                    <div class="ia-training-text treinado">✅ INTELIGÊNCIA ARTIFICIAL TREINADA!</div>
+                    <div class="ia-training-subtext">Pronto para gerar palpites com alta precisão</div>
+                `;
+            } else {
+                container.style.display = 'none';
+            }
         }
         
         // ============================================
@@ -1147,6 +1272,10 @@
             const log = document.getElementById('trainingLog');
             const status = document.getElementById('trainingStatus');
             filtrosTreinamento = getFiltrosAtivos();
+            
+            // Ativar animação de treinamento
+            atualizarAnimacaoTreinamento('training');
+            
             if (status) { status.textContent = 'Aprendendo...'; status.className = 'status-badge status-training'; }
             if (log) log.innerHTML = `🧠 IA iniciando...\n📊 ${dadosFiltrados.length} concursos\n`;
             if (pb) pb.style.width = '0%';
@@ -1161,6 +1290,15 @@
             if (pb) pb.style.width = '100%';
             if (status) status.textContent = sucesso ? '✓ Treinado' : 'Falha';
             if (log) log.innerHTML += `\n✅ Confiança: ${aiModel.confianca}%\n`;
+            
+            // Atualizar animação para treinado
+            if (sucesso) {
+                atualizarAnimacaoTreinamento('trained');
+            } else {
+                const container = document.getElementById('iaTrainingAnimation');
+                if (container) container.style.display = 'none';
+            }
+            
             isTraining = false;
             return sucesso;
         }
@@ -1389,8 +1527,8 @@
             const dadosFiltradosCount = filtrarDados().length;
             const datasPeriodo = getDatasPeriodo();
             
-            let extras = '';
-            if (config.temDispersao) extras += `<div><label>🎯 Dispersão</label><div class="dispersao-slider"><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)"><div>Bloquear: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div></div></div>`;
+            let controlesExtras = '';
+            if (config.temDispersao) controlesExtras += `<div><label>🎯 Dispersão</label><div class="dispersao-slider"><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)"><div>Bloquear: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div></div></div>`;
             
             let html = `<div class="card"><h3 style="color:${config.cor};">${config.icone} ${config.nome} - IA V.6.1</h3>`;
             if (!cache.carregado) html += `<div class="mensagem-erro"><strong>⚠️ Nenhum dado!</strong><br>📁 Upload do CSV</div>`;
@@ -1412,9 +1550,26 @@
             </div>
             </div>`;
             
-            html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:200px;">${iaTreinada?'✅ IA pronta!':'⏳ Clique em Treinar'}</div><div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
+            // Área de treinamento com animação
+            const animacaoStatus = iaTreinada ? 'trained' : (isTraining ? 'training' : 'none');
+            let animacaoHtml = '';
+            if (animacaoStatus === 'training') {
+                animacaoHtml = `<div id="iaTrainingAnimation" class="ia-training-animation">
+                    <div class="ia-training-text">🧠 INTELIGÊNCIA ARTIFICIAL EM TREINAMENTO...</div>
+                    <div class="ia-training-subtext">Analisando padrões e processando dados históricos</div>
+                </div>`;
+            } else if (animacaoStatus === 'trained') {
+                animacaoHtml = `<div id="iaTrainingAnimation" class="ia-training-animation treinado">
+                    <div class="ia-training-text treinado">✅ INTELIGÊNCIA ARTIFICIAL TREINADA!</div>
+                    <div class="ia-training-subtext">Pronto para gerar palpites com alta precisão</div>
+                </div>`;
+            } else {
+                animacaoHtml = `<div id="iaTrainingAnimation" style="display: none;"></div>`;
+            }
             
-            html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid"><div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="1" min="1" max="20"></div><div><label>Modo de IA</label><br><select id="modoGeracao"><option value="ia_especialista">🎓 IA Especialista</option><option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option><option value="probabilistico">📊 Probabilístico</option></select></div>${extras}</div><button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};">${config.icone} GERAR JOGOS (R$ 3,00/jogo)</button><div id="backtestResultados" style="margin-top:15px;"></div><div id="resultados" style="margin-top:20px;"></div></div>`;
+            html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:200px; font-size:14px;">${iaTreinada?'✅ IA pronta!':'⏳ Clique em Treinar'}</div>${animacaoHtml}<div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
+            
+            html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid"><div><label>Quantidade</label><br><input type="number" id="qtdJogos" value="1" min="1" max="20"></div><div><label>Modo de IA</label><br><select id="modoGeracao"><option value="ia_especialista">🎓 IA Especialista</option><option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option><option value="probabilistico">📊 Probabilístico</option></select></div>${controlesExtras}</div><button class="btn btn-primary" onclick="gerarJogos()" style="background:${config.cor};">${config.icone} GERAR JOGOS (R$ 3,00/jogo)</button><div id="backtestResultados" style="margin-top:15px;"></div><div id="resultados" style="margin-top:20px;"></div></div>`;
             
             html += `<div class="regras-oficiais"><h4>📜 Regras</h4><p>${REGRAS_OFICIAIS[loteria]}</p></div>`;
             div.innerHTML = html;
@@ -1435,9 +1590,9 @@
             carregarGridLoterias();
             selecionarLoteria('megasena');
             auth.onAuthStateChanged(async (user) => { if (user && !isAdminUser()) await processarLogin(user); else atualizarInterfaceUsuario(); });
-            console.log('%c✅ Loterias V.6.1 - CRÉDITOS CORRIGIDOS!', 'color: #22c55e; font-size: 14px;');
-            console.log('URL: https://fuaikymhsjdgdhojhq.supabase.co');
-            mostrarToast(`Versão ${VERSAO} - Banco de dados conectado!`, 'info');
+            console.log('%c✅ Loterias V.6.1 - Interface Melhorada!', 'color: #22c55e; font-size: 14px;');
+            console.log('✅ Botões igualados | ✅ Avatar com foto | ✅ Fonte aumentada | ✅ Animação de Treinamento');
+            mostrarToast(`Versão ${VERSAO} - Interface atualizada!`, 'info');
         });
     </script>
 </body>
