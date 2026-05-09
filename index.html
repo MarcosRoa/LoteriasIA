@@ -71,7 +71,7 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* ANIMAÇÃO DE TREINAMENTO DA IA - MAIS LENTA (6 segundos) */
+        /* ANIMAÇÃO DE TREINAMENTO DA IA */
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -83,7 +83,6 @@
             50% { opacity: 0.6; letter-spacing: 2px; }
         }
         
-        /* ANIMAÇÃO DO BOTÃO DE PERÍODO ATIVO E SLIDER */
         @keyframes pulseIA {
             0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
             50% { opacity: 0.9; transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
@@ -93,11 +92,22 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
             50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
         }
+        
+        @keyframes badgeGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 5px rgba(245, 158, 11, 0); }
+        }
 
         .ia-training-animation {
             background: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
             background-size: 400% 100%;
-            animation: gradientShift 6s ease infinite;  /* 6 segundos - mais lento */
+            animation: gradientShift 6s ease infinite;
             border-radius: 16px;
             padding: 20px 20px;
             text-align: center;
@@ -130,6 +140,21 @@
             font-size: 11px;
             color: rgba(255,255,255,0.8);
             margin-top: 6px;
+        }
+
+        .version-badge { 
+            display: inline-block; 
+            background: linear-gradient(135deg, #ef4444, #f59e0b, #eab308, #ef4444);
+            background-size: 200% 100%;
+            animation: badgeGradient 3s ease infinite, badgePulse 2s ease infinite;
+            padding: 6px 16px; 
+            border-radius: 30px; 
+            font-size: 14px; 
+            font-weight: 700; 
+            margin-left: 10px; 
+            color: white; 
+            text-shadow: 0 0 5px rgba(0,0,0,0.3);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
         }
 
         .maintenance-overlay {
@@ -241,10 +266,8 @@
         .header-logo img { width: 140px; height: auto; border-radius: 8px; }
         .header-text { flex: 1; text-align: center; }
         .header h1 { font-size: 22px; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 8px; color: white; }
-        .header-subtitle { color: var(--text-secondary); font-size: 11px; margin-top: 5px; }
+        .header-subtitle { color: var(--text-secondary); font-size: 15px; margin-top: 5px; }
 
-        /* PAINEL DO USUÁRIO - CENTRALIZADO ABAIXO DO CABEÇALHO */
         .user-panel {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -285,10 +308,10 @@
         .credits-box span { font-size: 10px; opacity: 0.9; }
         .credits-box strong { font-size: 16px; display: block; color: #1e293b; }
         
-        .btn-perfil, .btn-comprar, .btn-logout {
+        .btn-perfil, .btn-comprar, .btn-logout, .btn-tema {
             padding: 8px 18px;
-            min-width: 120px;
-            font-size: 13px;
+            min-width: 100px;
+            font-size: 12px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
@@ -302,9 +325,21 @@
         .btn-perfil { background: linear-gradient(135deg, #8b5cf6, #06b6d4); color: white; }
         .btn-comprar { background: #10b981; color: white; }
         .btn-logout { background: #ff2800; color: white; }
-        .btn-perfil:hover, .btn-comprar:hover, .btn-logout:hover {
+        .btn-tema { background: #64748b; color: white; }
+        .btn-perfil:hover, .btn-comprar:hover, .btn-logout:hover, .btn-tema:hover {
             transform: scale(1.02);
             opacity: 0.9;
+        }
+        
+        .status-online {
+            background: #22c55e;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .login-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
@@ -313,10 +348,6 @@
         .admin-badge { background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; margin-left: 8px; }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .toolbar { background: var(--bg-card); border-radius: var(--radius); padding: 10px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border: 2px solid var(--border); }
-        .toolbar-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .toolbar-btn { padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); transition: all 0.2s; }
-        .toolbar-btn:hover { transform: translateY(-2px); border-color: var(--info); }
 
         .lottery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .lottery-card { background: var(--bg-secondary); padding: 20px; border-radius: var(--radius); border: 2px solid var(--border); cursor: pointer; transition: all 0.3s; text-align: center; position: relative; }
@@ -339,7 +370,14 @@
         .btn-treinar { background: #f59e0b; color: #1e293b; }
         .btn-backtest { background: #06b6d4; color: #1e293b; }
 
-        /* INPUT DE QUANTIDADE COM SLIDER */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 15px 0;
+            align-items: start;
+        }
+        
         .quantidade-container {
             display: flex;
             flex-direction: column;
@@ -347,7 +385,6 @@
         }
         .quantidade-input {
             width: 100%;
-            max-width: 120px;
             padding: 8px 12px;
             border: 2px solid var(--border);
             border-radius: var(--radius);
@@ -364,14 +401,29 @@
         }
         .quantidade-range {
             width: 100%;
-            max-width: 200px;
             cursor: pointer;
             background: var(--bg-card);
             height: 4px;
             border-radius: 5px;
         }
-        .quantidade-range:focus {
-            outline: none;
+        
+        .modo-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .config-label {
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--text-secondary);
         }
         
         select, input:not(.quantidade-input):not(.quantidade-range) { 
@@ -381,7 +433,6 @@
             background: var(--bg-card); 
             color: var(--text-primary); 
             width: 100%; 
-            max-width: 300px; 
             margin-top: 8px; 
             font-size: 13px;
         }
@@ -397,7 +448,6 @@
 
         .backtest-result { background: var(--bg-card); padding: 10px; border-radius: var(--radius); margin: 5px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
         
-        /* ÁREA DE TREINAMENTO - ESPAÇO REDUZIDO */
         .training-section {
             margin-bottom: 5px;
         }
@@ -436,7 +486,6 @@
 
         .filtros-aplicados { background: rgba(56, 189, 248, 0.1); border: 2px solid #38bdf8; padding: 12px; border-radius: var(--radius); margin: 15px 0; }
         .filtro-item { display: inline-block; background: var(--bg-card); padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 11px; }
-        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 15px 0; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 15px 0; }
         .stat-card { background: var(--bg-card); padding: 12px; border-radius: var(--radius); text-align: center; font-size: 13px; }
 
@@ -463,10 +512,8 @@
             border-color: #38bdf8;
         }
 
-        /* SLIDER DE DISPERSÃO COM ANIMAÇÃO QUANDO ATIVO */
         .dispersao-slider {
             width: 100%;
-            max-width: 280px;
         }
         .dispersao-slider input {
             width: 100%;
@@ -507,17 +554,18 @@
         @media (max-width: 768px) {
             .lottery-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
             .filtro-btn { padding: 5px 10px; font-size: 11px; }
-            .toolbar { flex-direction: column; align-items: stretch; }
             .bola { width: 30px; height: 30px; font-size: 12px; }
             .user-panel { flex-direction: column; text-align: center; margin: 10px; }
             .info-periodo { flex-direction: column; gap: 6px; }
             .header-logo img { width: 80px; }
             .login-buttons { justify-content: center; }
-            .btn-perfil, .btn-comprar, .btn-logout { min-width: 100px; padding: 6px 12px; font-size: 11px; }
+            .btn-perfil, .btn-comprar, .btn-logout, .btn-tema { min-width: 80px; padding: 6px 12px; font-size: 11px; }
             .credits-box { min-width: 100px; padding: 6px 12px; }
             .credits-box strong { font-size: 14px; }
-            .quantidade-input { max-width: 80px; padding: 6px; }
+            .quantidade-input { max-width: 100%; padding: 6px; }
             .header h1 { font-size: 16px; }
+            .version-badge { font-size: 10px; padding: 4px 10px; }
+            .config-grid { grid-template-columns: 1fr; gap: 15px; }
         }
     </style>
 </head>
@@ -538,14 +586,13 @@
         <div class="header-content">
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
             <div class="header-text">
-                <h1>Sistema Profissional de Loterias com IA Real <span class="version-badge">V.6.1</span></h1>
-                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
+                <h1>🧠 Sistema Profissional de Loterias com IA Real <span class="version-badge">V.6.1</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões 🎯• Login Social • Sistema de Créditos • PIX</p>
             </div>
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
         </div>
     </div>
 
-    <!-- PAINEL DO USUÁRIO - CENTRALIZADO ENTRE OS LOGOS -->
     <div id="userPanel" class="user-panel">
         <div id="loginArea">
             <div class="login-buttons">
@@ -558,25 +605,18 @@
     </div>
 
     <div class="container">
-        <div class="toolbar">
-            <div class="toolbar-group">
-                <button class="toolbar-btn" onclick="exportarResultadosPDF()">📄 Exportar PDF</button>
-                <button class="toolbar-btn" onclick="exportarResultadosCSV()">📊 Exportar CSV</button>
-                <button class="toolbar-btn" onclick="toggleTema()">🌓 Tema</button>
-                <button class="toolbar-btn" onclick="mostrarRelatorioPadroes()">📋 Relatório</button>
-                <button class="toolbar-btn" onclick="abrirHistorico()">📜 Meu Histórico</button>
-            </div>
-            <div class="toolbar-group">
-                <span id="statusConexao" class="status-badge status-ready">🟢 Online</span>
-                <span id="versaoBadge" class="status-badge status-ready">📌 V.6.1</span>
-            </div>
-        </div>
-
         <div class="lottery-grid" id="lotteryGrid"></div>
         <div id="conteudoLoteria"></div>
     </div>
 
     <script>
+        // ============================================
+        // ADMIN TESTE - DESATIVADO
+        // ============================================
+        let isAdminMode = false;
+        function isAdminUser() { return false; }
+        const isAdminConfigured = false;
+        
         // ============================================
         // CONFIGURAÇÕES GLOBAIS
         // ============================================
@@ -645,27 +685,6 @@
         }
         
         // ============================================
-        // ADMIN TESTE
-        // ============================================
-        const ADMIN_EMAIL = "admin@teste.com";
-        const ADMIN_PASSWORD = "admin123";
-        const ADMIN_CREDITS = 100;
-        let isAdminMode = false;
-        const isAdminConfigured = ADMIN_EMAIL && ADMIN_EMAIL !== "" && ADMIN_PASSWORD && ADMIN_PASSWORD !== "";
-        
-        async function loginAdmin() {
-            if (maintenanceMode) { alert('🔧 Sistema em manutenção.'); return; }
-            if (!isAdminConfigured) { mostrarToast('⚠️ Modo Admin não configurado!', 'error'); return; }
-            usuarioAtual = { uid: 'admin_' + Date.now(), nome: 'Administrador Teste', email: ADMIN_EMAIL, foto: null, isAdmin: true };
-            isAdminMode = true;
-            creditosUsuario = ADMIN_CREDITS;
-            atualizarInterfaceUsuario();
-            mostrarToast(`👑 Modo Administrador ativado! Você tem R$ ${creditosUsuario} créditos para testes.`, 'success');
-        }
-        
-        function isAdminUser() { return usuarioAtual && usuarioAtual.isAdmin === true; }
-        
-        // ============================================
         // PIX - MERCADO PAGO (MODO TESTE)
         // ============================================
         const MP_SANDBOX = true;
@@ -711,7 +730,7 @@
             mostrarToast('🔄 Processando pagamento simulado...', 'info');
             await new Promise(r => setTimeout(r, 1500));
             creditosUsuario += valor;
-            if (!isAdminUser()) await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+            await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
             await salvarTransacaoSupabase(usuarioAtual.uid, { tipo: 'pix_simulado', quantidade: valor, saldo: creditosUsuario, data: new Date() });
             document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = `R$ ${creditosUsuario}`);
             mostrarToast(`✅ Pagamento simulado aprovado! R$ ${valor} adicionados. Saldo: R$ ${creditosUsuario}`, 'success');
@@ -790,20 +809,26 @@
             }
         }
         
-        async function salvarHistoricoSupabase(uid, loteria, jogos, filtros, extras) {
-            console.log('🔍 Chamando salvarHistoricoSupabase:', {uid, loteria, jogos, filtros, extras});
+        async function salvarHistoricoSupabase(uid, loteria, jogos, filtros, extras, meses = null) {
+            console.log('🔍 Chamando salvarHistoricoSupabase:', {uid, loteria, jogos, filtros, extras, meses});
             if (!window.supabaseClient || isAdminUser()) return;
             try {
+                const insertData = { 
+                    usuario_uid: uid, 
+                    loteria: loteria, 
+                    jogos: jogos, 
+                    filtros: filtros, 
+                    extras: extras, 
+                    data: new Date()
+                };
+                
+                if (meses && Array.isArray(meses) && meses.length > 0) {
+                    insertData.meses = meses;
+                }
+                
                 const { data, error } = await window.supabaseClient
                     .from('historico_palpites')
-                    .insert({ 
-                        usuario_uid: uid, 
-                        loteria: loteria, 
-                        jogos: jogos, 
-                        filtros: filtros, 
-                        extras: extras, 
-                        data: new Date()
-                    });
+                    .insert(insertData);
                 if (error) throw error;
                 console.log('✅ Histórico salvo!', data);
             } catch (error) { 
@@ -864,9 +889,6 @@
         const cacheDados = {};
         const cacheDatas = {};
         
-        // ============================================
-        // LOTERIAS CONFIGURADAS
-        // ============================================
         const LOTERIAS = {
             megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25 },
             quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', temDispersao: false },
@@ -898,9 +920,6 @@
             cacheDatas[key] = { datas: [] }; 
         });
         
-        // ============================================
-        // FILTRO POR DATA REAL
-        // ============================================
         function getDataCortePorAnos(anos) {
             const dataAtual = new Date();
             return new Date(dataAtual.getFullYear() - anos, dataAtual.getMonth(), dataAtual.getDate());
@@ -969,9 +988,6 @@
             };
         }
         
-        // ============================================
-        // FUNÇÕES DE LOGIN E AUTENTICAÇÃO
-        // ============================================
         async function loginGoogle() {
             if (maintenanceMode) { alert('Manutenção'); return; }
             try { 
@@ -991,18 +1007,17 @@
         }
         
         async function logout() {
-            if (isAdminUser()) { 
-                usuarioAtual = null; isAdminMode = false; creditosUsuario = 0; 
-                atualizarInterfaceUsuario(); 
-                mostrarToast('Logout Admin', 'success'); 
-                return; 
-            }
             try { 
                 await auth.signOut(); 
                 usuarioAtual = null; creditosUsuario = 0; 
                 atualizarInterfaceUsuario(); 
                 mostrarToast('Logout realizado!', 'success'); 
             } catch(e) { console.error(e); }
+        }
+        
+        function toggleTema() { 
+            document.body.classList.toggle('light-mode'); 
+            localStorage.setItem('tema', document.body.classList.contains('light-mode') ? 'light' : 'dark');
         }
         
         function abrirPerfil() {
@@ -1029,7 +1044,6 @@
             
             creditosUsuario = await carregarCreditosSupabase(user.uid);
             
-            // Migração de localStorage (apenas uma vez)
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
             if (oldCredits && !isAdminUser()) { 
                 const old = parseInt(oldCredits); 
@@ -1065,7 +1079,7 @@
                 userInfoArea.innerHTML = `
                     <div class="user-info">
                         ${avatarHtml}
-                        <div class="user-details"><h4>${usuarioAtual.nome} ${usuarioAtual.isAdmin ? '<span class="admin-badge">👑 ADMIN TESTE</span>' : ''}</h4><p>${usuarioAtual.email}</p></div>
+                        <div class="user-details"><h4>${usuarioAtual.nome}</h4><p>${usuarioAtual.email}</p></div>
                     </div>
                     <div class="credits-box" onclick="abrirPerfil()">
                         <span>💰 MEUS CRÉDITOS</span>
@@ -1073,25 +1087,14 @@
                     </div>
                     <button class="btn-comprar" onclick="abrirModalComprar()">➕ Comprar Créditos</button>
                     <button class="btn-perfil" onclick="abrirPerfil()">👤 Meu Perfil</button>
+                    <button class="btn-tema" onclick="toggleTema()">🌓 Tema</button>
+                    <span class="status-online">🟢 Online</span>
                     <button class="btn-logout" onclick="logout()">🚪 Sair</button>
                 `;
             } else {
                 loginArea.style.display = 'block';
                 userInfoArea.style.display = 'none';
                 userInfoArea.innerHTML = '';
-                
-                const loginDiv = document.getElementById('loginArea');
-                if (loginDiv && !document.getElementById('btnAdminLogin') && isAdminConfigured) {
-                    const btn = document.createElement('button');
-                    btn.id = 'btnAdminLogin';
-                    btn.className = 'btn-google';
-                    btn.style.background = '#8b5cf6';
-                    btn.style.marginTop = '10px';
-                    btn.style.width = '100%';
-                    btn.innerHTML = '👑 Login Admin Teste';
-                    btn.onclick = () => loginAdmin();
-                    loginDiv.appendChild(btn);
-                }
             }
         }
         
@@ -1149,15 +1152,12 @@
         
         function fecharModalHistorico() { document.getElementById('modalHistorico')?.remove(); }
         
-        async function salvarHistoricoUsuario(jogos, filtros, extras) {
+        async function salvarHistoricoUsuario(jogos, filtros, extras, meses = null) {
             if (!usuarioAtual) return;
-            await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras);
+            await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras, meses);
         }
         
-        // ============================================
-        // FUNÇÕES DE ANIMAÇÃO DE TREINAMENTO
-        // ============================================
-        function atualizarAnimacaoTreinamento(status, texto = null) {
+        function atualizarAnimacaoTreinamento(status) {
             const container = document.getElementById('iaTrainingAnimation');
             if (!container) return;
             
@@ -1180,18 +1180,15 @@
             }
         }
         
-        // Função para atualizar o range slider com o input
         function atualizarQuantidadePorRange(valor) {
             document.getElementById('qtdJogos').value = valor;
+            document.getElementById('qtdRange').value = valor;
         }
         
         function atualizarQuantidadePorInput(valor) {
             document.getElementById('qtdRange').value = valor;
         }
         
-        // ============================================
-        // CLASSE IA
-        // ============================================
         class AdvancedLotteryAI {
             constructor(dados, maxNumero, loteriaNome) { 
                 this.dados = dados; 
@@ -1302,9 +1299,6 @@
             predizerTrevos(qtd) { const t = new Set(); while (t.size < qtd) t.add(Math.floor(Math.random() * 6) + 1); return Array.from(t).sort((a,b)=>a-b); }
         }
         
-        // ============================================
-        // FUNÇÕES DO SISTEMA
-        // ============================================
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -1438,6 +1432,8 @@
             html += `<div>✅ Créditos utilizados: R$ ${valorTotal}</div>`;
             
             const jogosGerados = [];
+            const extrasGerados = [];
+            const mesesGerados = [];
             const dispersaoBase = config.temDispersao ? Math.max(config.dispersaoMin, Math.min(config.dispersaoMax, dispersaoAtual)) : 10;
             
             for (let i = 0; i < qtd; i++) {
@@ -1496,6 +1492,8 @@
                 if (config.temTrevos) extras.trevos = aiModel.predizerTrevos(config.numTrevos || 2);
                 
                 jogosGerados.push(jogo);
+                extrasGerados.push(extras);
+                if (extras.mes) mesesGerados.push(extras.mes);
                 
                 const confianca = aiModel.calcularConfiancaJogo(jogo);
                 const confClass = confianca >= 70 ? 'confianca-alta' : (confianca >= 50 ? 'confianca-media' : 'confianca-baixa');
@@ -1521,11 +1519,9 @@
                 </div>`;
             }
             
-            if (!isAdminUser()) {
-                creditosUsuario -= valorTotal;
-                await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
-                await salvarTransacaoSupabase(usuarioAtual.uid, { tipo: 'uso', quantidade: valorTotal, saldo: creditosUsuario, data: new Date() });
-            }
+            creditosUsuario -= valorTotal;
+            await salvarCreditoSupabase(usuarioAtual.uid, creditosUsuario);
+            await salvarTransacaoSupabase(usuarioAtual.uid, { tipo: 'uso', quantidade: valorTotal, saldo: creditosUsuario, data: new Date() });
             document.getElementById('creditosDisplay') && (document.getElementById('creditosDisplay').textContent = `R$ ${creditosUsuario}`);
             
             let extrasStr = '';
@@ -1533,10 +1529,15 @@
             if (config.temTime) extrasStr += ' + Time';
             if (config.temTrevos) extrasStr += ` + ${config.numTrevos || 2} Trevos`;
             
-            await salvarHistoricoUsuario(jogosGerados, filtrosTreinamento ? filtrosTreinamento.map(f => `${f.label}:${f.valor}`).join(' | ') : '', extrasStr);
+            let mesesParaSalvar = null;
+            if (config.temMes && mesesGerados.length > 0) {
+                mesesParaSalvar = mesesGerados;
+            }
+            
+            await salvarHistoricoUsuario(jogosGerados, filtrosTreinamento ? filtrosTreinamento.map(f => `${f.label}:${f.valor}`).join(' | ') : '', extrasStr, mesesParaSalvar);
             salvarConfiguracoesUsuario();
             
-            html += `<div class="mensagem-sucesso">✅ ${jogosGerados.length} jogos gerados! ${isAdminUser() ? '(Admin - sem consumo)' : `Saldo: R$ ${creditosUsuario}`}</div>`;
+            html += `<div class="mensagem-sucesso">✅ ${jogosGerados.length} jogos gerados! Saldo: R$ ${creditosUsuario}</div>`;
             document.getElementById('resultados').innerHTML = html;
             mostrarToast(`${jogosGerados.length} jogos gerados!`, 'success');
         }
@@ -1580,8 +1581,6 @@
             URL.revokeObjectURL(url);
             mostrarToast('CSV exportado!', 'success');
         }
-        
-        function toggleTema() { document.body.classList.toggle('light-mode'); localStorage.setItem('tema', document.body.classList.contains('light-mode') ? 'light' : 'dark'); }
         
         function setPeriodo(p) { periodoSelecionado = p; iaTreinada = false; aiModel = null; renderizarConteudo(loteriaAtual); if (dadosAtuais.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); }
         
@@ -1653,14 +1652,17 @@
             const datasPeriodo = getDatasPeriodo();
             
             let controlesExtras = '';
-            if (config.temDispersao) controlesExtras += `<div class="dispersao-slider"><label>🎯 Dispersão</label><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)"><div class="dispersao-valor">Bloquear números recentes: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div></div>`;
+            if (config.temDispersao) controlesExtras += `<div class="dispersao-slider">
+                <label class="config-label">🎯 Dispersão</label>
+                <input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)">
+                <div class="dispersao-valor">Bloquear números recentes: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div>
+            </div>`;
             
             let html = `<div class="card"><h3 style="color:${config.cor};">${config.icone} ${config.nome} - IA V.6.1</h3>`;
             if (!cache.carregado) html += `<div class="mensagem-erro"><strong>⚠️ Nenhum dado!</strong><br>📁 Upload do CSV</div>`;
             html += `<div style="display:flex;gap:15px;flex-wrap:wrap;margin:15px 0;"><h4>📁 ${dadosCount} concursos</h4><span id="trainingStatus" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'✓ Treinada':'Pendente'}</span><button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()">📁 Upload CSV</button><input type="file" id="uploadManual" accept=".csv" onchange="importarArquivo(this,'${loteria}')" style="display:none;"></div>`;
             html += `<div class="stats-grid"><div class="stat-card">Concursos: ${dadosCount}</div><div class="stat-card">Período: ${dadosFiltradosCount}</div><div class="stat-card">Engine: 🧠 V.6.1</div></div></div>`;
             
-            // BOTÕES DE PERÍODO
             html += `<div class="card"><h4>📅 Período (Baseado em data real)</h4><div class="filtros">
                 <button class="filtro-btn ${periodoSelecionado === 'all' ? 'ativo' : ''}" onclick="setPeriodo('all')">Todos</button>
                 <button class="filtro-btn ${periodoSelecionado === 1 ? 'ativo' : ''}" onclick="setPeriodo(1)">1 Ano</button>
@@ -1676,7 +1678,6 @@
             </div>
             </div>`;
             
-            // ÁREA DE TREINAMENTO
             const animacaoStatus = iaTreinada ? 'trained' : (isTraining ? 'training' : 'none');
             let animacaoHtml = '';
             if (animacaoStatus === 'training') {
@@ -1697,12 +1698,13 @@
             
             html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid">
                 <div class="quantidade-container">
-                    <label>📊 Quantidade de Jogos</label>
+                    <label class="config-label">📊 Quantidade de Jogos</label>
                     <input type="range" id="qtdRange" class="quantidade-range" min="1" max="20" value="1" oninput="atualizarQuantidadePorRange(this.value)">
                     <input type="number" id="qtdJogos" class="quantidade-input" value="1" min="1" max="20" oninput="atualizarQuantidadePorInput(this.value)">
                 </div>
-                <div><label>🎓 Modo de IA</label><br>
-                    <select id="modoGeracao">
+                <div>
+                    <label class="config-label">🎓 Modo de IA</label>
+                    <select id="modoGeracao" class="modo-select">
                         <option value="ia_especialista">🎓 IA Especialista</option>
                         <option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option>
                         <option value="probabilistico">📊 Probabilístico</option>
@@ -1725,7 +1727,6 @@
             grid.innerHTML = Object.entries(LOTERIAS).map(([id, c]) => `<div class="lottery-card ${id==='megasena'?'active':''}" onclick="selecionarLoteria('${id}')" id="card-${id}"><div class="ia-status nao-treinado" id="status-${id}"></div><h3>${c.icone} ${c.nome}</h3><p class="rules">${c.numeros} números • 1 a ${c.maxNumero}${c.temMes ? ' + Mês' : ''}${c.temTime ? ' + Time' : ''}${c.temTrevos ? ' + Trevos' : ''}</p></div>`).join('');
         }
         
-        // Expor funções globais para o range slider
         window.atualizarQuantidadePorRange = atualizarQuantidadePorRange;
         window.atualizarQuantidadePorInput = atualizarQuantidadePorInput;
         
@@ -1735,10 +1736,9 @@
             if (tema === 'light') document.body.classList.add('light-mode');
             carregarGridLoterias();
             selecionarLoteria('megasena');
-            auth.onAuthStateChanged(async (user) => { if (user && !isAdminUser()) await processarLogin(user); else atualizarInterfaceUsuario(); });
-            console.log('%c✅ Loterias V.6.1 - Interface Melhorada!', 'color: #22c55e; font-size: 14px;');
-            console.log('✅ Botões igualados | Avatar com foto | Input quantidade corrigido | Modo Aleatório Puro');
-            mostrarToast(`Versão ${VERSAO} - Interface atualizada!`, 'info');
+            auth.onAuthStateChanged(async (user) => { if (user) await processarLogin(user); else atualizarInterfaceUsuario(); });
+            console.log('%c✅ Loterias V.6.1 - Versão Final!', 'color: #22c55e; font-size: 14px;');
+            mostrarToast(`Versão ${VERSAO} - Sistema pronto!`, 'info');
         });
     </script>
 </body>
