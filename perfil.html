@@ -323,68 +323,142 @@
         }
         
         async function exportarSelecionadosPDF() {
-            if (jogosSelecionados.size === 0) {
-                mostrarToast('Nenhum palpite selecionado!', 'warning');
-                return;
-            }
+    if (jogosSelecionados.size === 0) {
+        mostrarToast('Nenhum palpite selecionado!', 'warning');
+        return;
+    }
+    
+    const palpitesSelecionados = [];
+    const historicoItems = document.querySelectorAll('.historico-item');
+    
+    historicoItems.forEach((item) => {
+        const checkbox = item.querySelector('.selecionar-jogo');
+        if (checkbox && checkbox.checked) {
+            const loteriaElem = item.querySelector('.historico-loteria');
+            const numerosElem = item.querySelector('.historico-jogos');
+            const dataElem = item.querySelector('.historico-data');
             
-            const palpitesSelecionados = [];
-            const historicoItems = document.querySelectorAll('.historico-item');
+            let numerosTexto = numerosElem ? numerosElem.innerText : '';
+            numerosTexto = numerosTexto.replace('📊 Números: ', '').trim();
             
-            historicoItems.forEach((item, itemIdx) => {
-                const checkbox = item.querySelector('.selecionar-jogo');
-                if (checkbox && checkbox.checked) {
-                    const loteriaElem = item.querySelector('.historico-loteria');
-                    const numerosElem = item.querySelector('.historico-jogos');
-                    const dataElem = item.querySelector('.historico-data');
-                    
-                    palpitesSelecionados.push({
-                        loteria: loteriaElem ? loteriaElem.innerText : 'Loteria',
-                        numeros: numerosElem ? numerosElem.innerText : '',
-                        data: dataElem ? dataElem.innerText : ''
-                    });
-                }
+            palpitesSelecionados.push({
+                loteria: loteriaElem ? loteriaElem.innerText : 'Loteria',
+                numeros: numerosTexto,
+                data: dataElem ? dataElem.innerText : ''
             });
-            
-            if (palpitesSelecionados.length === 0) {
-                mostrarToast('Nenhum palpite selecionado para exportar', 'warning');
-                return;
-            }
-            
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 20;
-            
-            doc.setFontSize(18);
-            doc.text(`Palpites Selecionados - ${usuario.nome}`, 20, y);
-            y += 15;
-            
-            doc.setFontSize(10);
-            doc.text(`Data: ${new Date().toLocaleString()}`, 20, y);
-            y += 15;
-            doc.text(`Total de palpites: ${palpitesSelecionados.length}`, 20, y);
-            y += 20;
-            
-            for (let i = 0; i < palpitesSelecionados.length; i++) {
-                const p = palpitesSelecionados[i];
-                if (y > 270) {
-                    doc.addPage();
-                    y = 20;
-                }
-                doc.setFontSize(12);
-                doc.text(`${i+1}. ${p.loteria}`, 20, y);
-                y += 8;
-                doc.setFontSize(9);
-                const linhas = doc.splitTextToSize(p.numeros || '', 170);
-                doc.text(linhas, 20, y);
-                y += (linhas.length * 5) + 8;
-                doc.text(`📅 ${p.data}`, 20, y);
-                y += 12;
-            }
-            
-            doc.save(`palpites_selecionados_${Date.now()}.pdf`);
-            mostrarToast(`${palpitesSelecionados.length} palpites exportados!`, 'success');
         }
+    });
+    
+    if (palpitesSelecionados.length === 0) {
+        mostrarToast('Nenhum palpite selecionado para exportar', 'warning');
+        return;
+    }
+    
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // ============================================
+    // CABEÇALHO ESTILIZADO
+    // ============================================
+    
+    // Bordas decorativas
+    doc.setDrawColor(139, 92, 246);
+    doc.setLineWidth(0.5);
+    doc.rect(15, 10, 180, 25);
+    
+    doc.setFontSize(18);
+    doc.setTextColor(139, 92, 246);
+    doc.setFont('times', 'bold');
+    doc.text('LOTERIAS IA', 105, 22, { align: 'center' });
+    
+    doc.setFontSize(11);
+    doc.setTextColor(100, 100, 150);
+    doc.setFont('times', 'italic');
+    doc.text('Sistema Profissional com Inteligência Artificial', 105, 30, { align: 'center' });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Versão 6.1 • ${new Date().toLocaleDateString()}`, 105, 38, { align: 'center' });
+    
+    // ============================================
+    // INFORMAÇÕES DO USUÁRIO
+    // ============================================
+    doc.setFontSize(10);
+    doc.setTextColor(80, 80, 80);
+    doc.setFont('times', 'normal');
+    doc.text(`Usuário: ${usuario.nome}`, 20, 55);
+    doc.text(`Email: ${usuario.email}`, 20, 61);
+    doc.text(`Total selecionado: ${palpitesSelecionados.length} palpite(s)`, 20, 67);
+    
+    doc.line(20, 72, 190, 72);
+    
+    // ============================================
+    // PALPITES
+    // ============================================
+    let y = 85;
+    
+    for (let i = 0; i < palpitesSelecionados.length; i++) {
+        const p = palpitesSelecionados[i];
+        
+        if (y > 270) {
+            doc.addPage();
+            y = 25;
+            doc.setDrawColor(139, 92, 246);
+            doc.setLineWidth(0.5);
+            doc.rect(15, 10, 180, 20);
+            doc.setFontSize(14);
+            doc.setTextColor(139, 92, 246);
+            doc.setFont('times', 'bold');
+            doc.text('LOTERIAS IA', 105, 20, { align: 'center' });
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Página ${Math.floor(i / 10) + 2}`, 105, 28, { align: 'center' });
+            y = 40;
+        }
+        
+        // Fundo para cada palpite
+        doc.setFillColor(245, 245, 250);
+        doc.roundedRect(18, y - 5, 174, 22, 3, 3, 'F');
+        
+        // Loteria
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('times', 'bold');
+        doc.text(`${i+1}. ${p.loteria}`, 22, y);
+        
+        // Números em Times New Roman 13
+        doc.setFontSize(13);
+        doc.setTextColor(59, 130, 246);
+        doc.setFont('times', 'normal');
+        const numerosArray = p.numeros.split(',').map(n => n.trim());
+        const numerosFormatados = numerosArray.join('  •  ');
+        doc.text(`${numerosFormatados}`, 22, y + 8);
+        
+        // Data
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.setFont('times', 'italic');
+        doc.text(p.data, 22, y + 15);
+        
+        y += 28;
+    }
+    
+    // ============================================
+    // RODAPÉ
+    // ============================================
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(7);
+        doc.setTextColor(180, 180, 180);
+        doc.setFont('times', 'italic');
+        doc.text(`Gerado em ${new Date().toLocaleString()}`, 105, 290, { align: 'center' });
+        doc.text(`Loterias IA V.6.1 - ${pageCount} página(s)`, 105, 285, { align: 'center' });
+    }
+    
+    doc.save(`palpites_${usuario.nome.replace(/\s/g, '_')}_${Date.now()}.pdf`);
+    mostrarToast(`${palpitesSelecionados.length} palpites exportados!`, 'success');
+}
         
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
