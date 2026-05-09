@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loterias V.6.1 - Sistema Profissional com Login</title>
+    <title>Loterias V.6.1 - Sistema Profissional de Loterias com IA Real</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -71,12 +71,7 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* ANIMAÇÃO DE TREINAMENTO DA IA */
-        @keyframes trainingPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.85; transform: scale(1.01); }
-        }
-        
+        /* ANIMAÇÃO DE TREINAMENTO DA IA - MAIS LENTA (6 segundos) */
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -88,20 +83,26 @@
             50% { opacity: 0.6; letter-spacing: 2px; }
         }
         
-        /* ANIMAÇÃO DO BOTÃO DE PERÍODO ATIVO */
+        /* ANIMAÇÃO DO BOTÃO DE PERÍODO ATIVO E SLIDER */
         @keyframes pulseIA {
             0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
             50% { opacity: 0.9; transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+        
+        @keyframes pulseSlider {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
         }
 
         .ia-training-animation {
             background: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
             background-size: 400% 100%;
-            animation: gradientShift 4s ease infinite;
+            animation: gradientShift 6s ease infinite;  /* 6 segundos - mais lento */
             border-radius: 16px;
-            padding: 25px 20px;
+            padding: 20px 20px;
             text-align: center;
-            margin-top: 20px;
+            margin-top: 5px;
+            margin-bottom: 5px;
             border: 1px solid rgba(255,255,255,0.2);
             box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
         }
@@ -109,26 +110,26 @@
         .ia-training-animation.treinado {
             background: linear-gradient(90deg, #22c55e, #10b981, #059669, #22c55e);
             background-size: 300% 100%;
-            animation: gradientShift 3s ease infinite;
+            animation: gradientShift 6s ease infinite;
         }
         
         .ia-training-text {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: white;
             text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            animation: textFlicker 1.5s ease infinite;
+            animation: textFlicker 2s ease infinite;
         }
         
         .ia-training-text.treinado {
             animation: none;
-            font-size: 20px;
+            font-size: 18px;
         }
         
         .ia-training-subtext {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255,255,255,0.8);
-            margin-top: 10px;
+            margin-top: 6px;
         }
 
         .maintenance-overlay {
@@ -224,7 +225,7 @@
 
         .header {
             background: linear-gradient(135deg, var(--bg-secondary), #0f2744);
-            padding: 20px 20px;
+            padding: 15px 20px 10px 20px;
             text-align: center;
             border-bottom: 2px solid var(--border);
         }
@@ -235,30 +236,31 @@
             max-width: 1400px;
             margin: 0 auto;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
         }
-        .header-logo img { width: 200px; height: auto; border-radius: 8px; }
+        .header-logo img { width: 140px; height: auto; border-radius: 8px; }
         .header-text { flex: 1; text-align: center; }
-        .header h1 { font-size: 24px; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 10px; color: white; }
-        .header-subtitle { color: var(--text-secondary); font-size: 13px; }
+        .header h1 { font-size: 22px; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 8px; color: white; }
+        .header-subtitle { color: var(--text-secondary); font-size: 11px; margin-top: 5px; }
 
+        /* PAINEL DO USUÁRIO - CENTRALIZADO ABAIXO DO CABEÇALHO */
         .user-panel {
             background: var(--bg-card);
             border-radius: var(--radius);
-            padding: 15px 20px;
-            margin-bottom: 20px;
+            padding: 12px 20px;
+            margin: 15px 20px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
             border: 2px solid var(--border);
         }
-        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
         .user-avatar { 
-            width: 48px; 
-            height: 48px; 
+            width: 40px; 
+            height: 40px; 
             border-radius: 50%; 
             object-fit: cover; 
             border: 2px solid #38bdf8;
@@ -266,28 +268,27 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
         }
-        .user-details h4 { font-size: 16px; margin-bottom: 4px; }
-        .user-details p { font-size: 12px; color: var(--text-secondary); }
+        .user-details h4 { font-size: 14px; margin-bottom: 2px; }
+        .user-details p { font-size: 10px; color: var(--text-secondary); }
         .credits-box { 
             background: linear-gradient(135deg, #f59e0b, #eab308); 
-            padding: 12px 24px; 
+            padding: 8px 18px; 
             border-radius: 30px; 
             text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
-            min-width: 140px;
+            min-width: 120px;
         }
         .credits-box:hover { transform: scale(1.02); }
-        .credits-box span { font-size: 12px; opacity: 0.9; }
-        .credits-box strong { font-size: 20px; display: block; color: #1e293b; }
+        .credits-box span { font-size: 10px; opacity: 0.9; }
+        .credits-box strong { font-size: 16px; display: block; color: #1e293b; }
         
-        /* BOTÕES IGUALADOS */
         .btn-perfil, .btn-comprar, .btn-logout {
-            padding: 10px 20px;
-            min-width: 150px;
-            font-size: 14px;
+            padding: 8px 18px;
+            min-width: 120px;
+            font-size: 13px;
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
@@ -296,7 +297,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
         .btn-perfil { background: linear-gradient(135deg, #8b5cf6, #06b6d4); color: white; }
         .btn-comprar { background: #10b981; color: white; }
@@ -306,31 +307,31 @@
             opacity: 0.9;
         }
         
-        .login-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-google { background: #db4437; color: white; padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; }
-        .btn-facebook { background: #4267B2; color: white; padding: 10px 20px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; }
-        .admin-badge { background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 10px; }
+        .login-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .btn-google { background: #db4437; color: white; padding: 8px 18px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .btn-facebook { background: #4267B2; color: white; padding: 8px 18px; border-radius: 30px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; }
+        .admin-badge { background: linear-gradient(135deg, #8b5cf6, #ec4899); padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; margin-left: 8px; }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .toolbar { background: var(--bg-card); border-radius: var(--radius); padding: 12px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border: 2px solid var(--border); }
+        .toolbar { background: var(--bg-card); border-radius: var(--radius); padding: 10px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border: 2px solid var(--border); }
         .toolbar-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .toolbar-btn { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); transition: all 0.2s; }
+        .toolbar-btn { padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-primary); transition: all 0.2s; }
         .toolbar-btn:hover { transform: translateY(-2px); border-color: var(--info); }
 
-        .lottery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .lottery-card { background: var(--bg-secondary); padding: 25px; border-radius: var(--radius); border: 2px solid var(--border); cursor: pointer; transition: all 0.3s; text-align: center; position: relative; }
+        .lottery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .lottery-card { background: var(--bg-secondary); padding: 20px; border-radius: var(--radius); border: 2px solid var(--border); cursor: pointer; transition: all 0.3s; text-align: center; position: relative; }
         .lottery-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         .lottery-card.active { border-color: #38bdf8; background: var(--bg-card); }
-        .lottery-card h3 { font-size: 20px; margin: 10px 0; }
-        .lottery-card .rules { font-size: 12px; color: var(--text-secondary); }
+        .lottery-card h3 { font-size: 18px; margin: 8px 0; }
+        .lottery-card .rules { font-size: 11px; color: var(--text-secondary); }
 
-        .ia-status { position: absolute; top: 10px; right: 10px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); }
+        .ia-status { position: absolute; top: 10px; right: 10px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border); }
         .ia-status.treinado { background: #22c55e; }
         .ia-status.treinando { background: #f59e0b; animation: pulse 1s infinite; }
         .ia-status.nao-treinado { background: #ef4444; }
 
-        .card { background: var(--bg-secondary); padding: 25px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 20px; }
-        .btn { padding: 12px 24px; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; transition: all 0.3s; margin: 5px; }
+        .card { background: var(--bg-secondary); padding: 20px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: var(--radius); font-weight: 600; cursor: pointer; transition: all 0.3s; margin: 5px; font-size: 13px; }
         .btn:hover { transform: translateY(-2px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-primary { background: #22c55e; color: white; }
@@ -338,11 +339,16 @@
         .btn-treinar { background: #f59e0b; color: #1e293b; }
         .btn-backtest { background: #06b6d4; color: #1e293b; }
 
-        /* INPUT DE QUANTIDADE - CORRIGIDO (setas separadas) */
+        /* INPUT DE QUANTIDADE COM SLIDER */
+        .quantidade-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
         .quantidade-input {
             width: 100%;
             max-width: 120px;
-            padding: 10px 12px;
+            padding: 8px 12px;
             border: 2px solid var(--border);
             border-radius: var(--radius);
             background: var(--bg-card);
@@ -356,28 +362,40 @@
             opacity: 1;
             height: 24px;
         }
+        .quantidade-range {
+            width: 100%;
+            max-width: 200px;
+            cursor: pointer;
+            background: var(--bg-card);
+            height: 4px;
+            border-radius: 5px;
+        }
+        .quantidade-range:focus {
+            outline: none;
+        }
         
-        select, input:not(.quantidade-input) { 
-            padding: 12px; 
+        select, input:not(.quantidade-input):not(.quantidade-range) { 
+            padding: 10px; 
             border: 2px solid var(--border); 
             border-radius: var(--radius); 
             background: var(--bg-card); 
             color: var(--text-primary); 
             width: 100%; 
             max-width: 300px; 
-            margin-top: 10px; 
+            margin-top: 8px; 
+            font-size: 13px;
         }
         
         .bolas { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
-        .bola { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; animation: popIn 0.3s ease; }
-        .resultado-jogo { background: var(--bg-card); padding: 20px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 15px; transition: all 0.3s; }
+        .bola { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; animation: popIn 0.3s ease; }
+        .resultado-jogo { background: var(--bg-card); padding: 15px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 15px; transition: all 0.3s; }
         .resultado-jogo:hover { transform: translateX(5px); border-left-width: 6px; }
         .confianca-bar { height: 4px; border-radius: 2px; margin: 8px 0; transition: width 0.5s ease; }
         .confianca-alta { background: linear-gradient(90deg, #22c55e, #10b981); }
         .confianca-media { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
         .confianca-baixa { background: linear-gradient(90deg, #ef4444, #f97316); }
 
-        .backtest-result { background: var(--bg-card); padding: 12px; border-radius: var(--radius); margin: 5px 0; display: flex; justify-content: space-between; align-items: center; }
+        .backtest-result { background: var(--bg-card); padding: 10px; border-radius: var(--radius); margin: 5px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
         
         /* ÁREA DE TREINAMENTO - ESPAÇO REDUZIDO */
         .training-section {
@@ -399,15 +417,15 @@
         }
         .training-log {
             background: var(--bg-primary);
-            padding: 10px 12px;
+            padding: 8px 12px;
             border-radius: var(--radius);
             font-family: monospace;
-            font-size: 12px;
+            font-size: 11px;
             color: #86efac;
-            min-height: 100px;
-            max-height: 120px;
+            min-height: 80px;
+            max-height: 100px;
             overflow-y: auto;
-            margin-top: 6px;
+            margin-top: 5px;
             margin-bottom: 5px;
             line-height: 1.4;
         }
@@ -415,44 +433,21 @@
             margin-top: 5px;
             margin-bottom: 0;
         }
-        .ia-training-animation {
-            background: linear-gradient(90deg, #ef4444, #f59e0b, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);
-            background-size: 400% 100%;
-            animation: gradientShift 4s ease infinite;
-            border-radius: 10px;
-            padding: 10px 12px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .ia-training-text {
-            font-size: 13px;
-            font-weight: 600;
-            color: white;
-        }
-        .ia-training-text.treinado {
-            animation: none;
-            font-size: 14px;
-        }
-        .ia-training-subtext {
-            font-size: 10px;
-            color: rgba(255,255,255,0.7);
-            margin-top: 4px;
-        }
 
-        .filtros-aplicados { background: rgba(56, 189, 248, 0.1); border: 2px solid #38bdf8; padding: 15px; border-radius: var(--radius); margin: 15px 0; }
-        .filtro-item { display: inline-block; background: var(--bg-card); padding: 5px 12px; border-radius: 15px; margin: 3px; font-size: 12px; }
-        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0; }
-        .stat-card { background: var(--bg-card); padding: 15px; border-radius: var(--radius); text-align: center; }
+        .filtros-aplicados { background: rgba(56, 189, 248, 0.1); border: 2px solid #38bdf8; padding: 12px; border-radius: var(--radius); margin: 15px 0; }
+        .filtro-item { display: inline-block; background: var(--bg-card); padding: 4px 10px; border-radius: 15px; margin: 3px; font-size: 11px; }
+        .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 15px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 15px 0; }
+        .stat-card { background: var(--bg-card); padding: 12px; border-radius: var(--radius); text-align: center; font-size: 13px; }
 
-        .filtros { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+        .filtros { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
         .filtro-btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 2px solid var(--border);
             border-radius: 30px;
             background: var(--bg-card);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.2s;
             color: #38bdf8;
         }
@@ -468,41 +463,61 @@
             border-color: #38bdf8;
         }
 
-        .info-periodo { display: flex; gap: 15px; margin-top: 15px; padding: 12px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .info-periodo-item { flex: 1; text-align: center; padding: 8px; background: var(--bg-card); border-radius: 8px; }
-        .info-periodo-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
-        .info-periodo-valor { font-size: 13px; font-weight: 600; color: #38bdf8; }
+        /* SLIDER DE DISPERSÃO COM ANIMAÇÃO QUANDO ATIVO */
+        .dispersao-slider {
+            width: 100%;
+            max-width: 280px;
+        }
+        .dispersao-slider input {
+            width: 100%;
+            cursor: pointer;
+            background: var(--bg-card);
+            height: 4px;
+            border-radius: 5px;
+        }
+        .dispersao-slider input:active {
+            animation: pulseSlider 0.5s ease;
+        }
+        .dispersao-valor {
+            font-size: 12px;
+            margin-top: 5px;
+        }
 
-        .dispersao-slider { width: 100%; max-width: 300px; }
-        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .info-periodo { display: flex; gap: 12px; margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .info-periodo-item { flex: 1; text-align: center; padding: 6px; background: var(--bg-card); border-radius: 8px; }
+        .info-periodo-label { font-size: 10px; color: var(--text-secondary); margin-bottom: 3px; }
+        .info-periodo-valor { font-size: 12px; font-weight: 600; color: #38bdf8; }
+
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
         .status-ready { background: #22c55e; color: white; }
         .status-error { background: #ef4444; color: white; }
         .status-training { background: #f59e0b; color: #1e293b; animation: pulse 1.5s infinite; }
 
-        .mensagem-erro { background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; padding: 10px 15px; border-radius: var(--radius); margin: 10px 0; color: #fca5a5; }
-        .mensagem-sucesso { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; padding: 10px 15px; border-radius: var(--radius); margin: 10px 0; color: #86efac; }
+        .mensagem-erro { background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; padding: 8px 12px; border-radius: var(--radius); margin: 10px 0; color: #fca5a5; font-size: 13px; }
+        .mensagem-sucesso { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; padding: 8px 12px; border-radius: var(--radius); margin: 10px 0; color: #86efac; font-size: 13px; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .modal-container { background: var(--bg-secondary); border: 2px solid #38bdf8; border-radius: 20px; max-width: 500px; width: 90%; }
-        .modal-header { padding: 20px; border-bottom: 2px solid #38bdf8; }
-        .modal-body { padding: 25px; }
-        .modal-footer { padding: 20px; display: flex; gap: 15px; justify-content: flex-end; border-top: 1px solid var(--border); }
+        .modal-header { padding: 15px; border-bottom: 2px solid #38bdf8; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 15px; display: flex; gap: 15px; justify-content: flex-end; border-top: 1px solid var(--border); }
 
-        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-card); border-left: 4px solid var(--success); padding: 12px 20px; border-radius: 8px; z-index: 1100; animation: slideInRight 0.3s; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--bg-card); border-left: 4px solid var(--success); padding: 10px 18px; border-radius: 8px; z-index: 1100; animation: slideInRight 0.3s; font-size: 13px; }
 
         @media (max-width: 768px) {
             .lottery-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-            .filtro-btn { padding: 6px 12px; font-size: 12px; }
+            .filtro-btn { padding: 5px 10px; font-size: 11px; }
             .toolbar { flex-direction: column; align-items: stretch; }
-            .bola { width: 32px; height: 32px; font-size: 12px; }
-            .user-panel { flex-direction: column; text-align: center; }
-            .info-periodo { flex-direction: column; gap: 8px; }
-            .header-logo img { width: 120px; }
+            .bola { width: 30px; height: 30px; font-size: 12px; }
+            .user-panel { flex-direction: column; text-align: center; margin: 10px; }
+            .info-periodo { flex-direction: column; gap: 6px; }
+            .header-logo img { width: 80px; }
             .login-buttons { justify-content: center; }
-            .btn-perfil, .btn-comprar, .btn-logout { min-width: 120px; padding: 8px 12px; font-size: 12px; }
-            .credits-box { min-width: 120px; padding: 8px 12px; }
-            .credits-box strong { font-size: 18px; }
-            .quantidade-input { max-width: 100px; padding: 8px; }
+            .btn-perfil, .btn-comprar, .btn-logout { min-width: 100px; padding: 6px 12px; font-size: 11px; }
+            .credits-box { min-width: 100px; padding: 6px 12px; }
+            .credits-box strong { font-size: 14px; }
+            .quantidade-input { max-width: 80px; padding: 6px; }
+            .header h1 { font-size: 16px; }
         }
     </style>
 </head>
@@ -523,25 +538,26 @@
         <div class="header-content">
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
             <div class="header-text">
-                <h1>🧠  Sistema Profissional de Loterias com IA Real V.6.1 <span class="version-badge">COM LOGIN E CRÉDITOS</span></h1>
-                <p class="header-subtitle">10 loterias • IA que Aprende Padrões 🎯• Login Social • Sistema de Créditos • PIX</p>
+                <h1>Sistema Profissional de Loterias com IA Real <span class="version-badge">V.6.1</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
             </div>
             <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
         </div>
     </div>
 
-    <div class="container">
-        <div id="userPanel" class="user-panel">
-            <div id="loginArea">
-                <div class="login-buttons">
-                    <button class="btn-google" onclick="loginGoogle()">🔐 Entrar com Google</button>
-                    <button class="btn-facebook" onclick="loginFacebook()">🔐 Entrar com Facebook</button>
-                </div>
-                <p style="font-size: 12px; margin-top: 10px; color: var(--text-secondary);">Faça login para gerar jogos e salvar seu histórico</p>
+    <!-- PAINEL DO USUÁRIO - CENTRALIZADO ENTRE OS LOGOS -->
+    <div id="userPanel" class="user-panel">
+        <div id="loginArea">
+            <div class="login-buttons">
+                <button class="btn-google" onclick="loginGoogle()">🔐 Entrar com Google</button>
+                <button class="btn-facebook" onclick="loginFacebook()">🔐 Entrar com Facebook</button>
             </div>
-            <div id="userInfoArea" style="display: none;"></div>
+            <p style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">Faça login para gerar jogos e salvar seu histórico</p>
         </div>
+        <div id="userInfoArea" style="display: none;"></div>
+    </div>
 
+    <div class="container">
         <div class="toolbar">
             <div class="toolbar-group">
                 <button class="toolbar-btn" onclick="exportarResultadosPDF()">📄 Exportar PDF</button>
@@ -571,11 +587,13 @@
                 document.getElementById('maintenanceScreen').style.display = 'block';
                 document.querySelector('.container').style.display = 'none';
                 document.querySelector('.header').style.display = 'none';
+                document.getElementById('userPanel').style.display = 'none';
                 return true;
             } else {
                 document.getElementById('maintenanceScreen').style.display = 'none';
                 document.querySelector('.container').style.display = 'block';
                 document.querySelector('.header').style.display = 'block';
+                document.getElementById('userPanel').style.display = 'flex';
                 return false;
             }
         }
@@ -1035,6 +1053,7 @@
             if (usuarioAtual) {
                 loginArea.style.display = 'none';
                 userInfoArea.style.display = 'flex';
+                userInfoArea.style.justifyContent = 'center';
                 userInfoArea.style.alignItems = 'center';
                 userInfoArea.style.gap = '12px';
                 userInfoArea.style.flexWrap = 'wrap';
@@ -1159,6 +1178,15 @@
             } else {
                 container.style.display = 'none';
             }
+        }
+        
+        // Função para atualizar o range slider com o input
+        function atualizarQuantidadePorRange(valor) {
+            document.getElementById('qtdJogos').value = valor;
+        }
+        
+        function atualizarQuantidadePorInput(valor) {
+            document.getElementById('qtdRange').value = valor;
         }
         
         // ============================================
@@ -1432,7 +1460,6 @@
                         for (let k = cand.length-1; k > 0; k--) { const j = Math.floor(Math.random() * (k+1)); [cand[k], cand[j]] = [cand[j], cand[k]]; }
                         teste = cand.slice(0, config.numeros).sort((a,b)=>a-b);
                     } else if (modo === 'aleatorio_puro') {
-                        // Aleatório puro (RNG) - números completamente aleatórios
                         const numeros = [];
                         const maxValor = config.maxNumero + (config.incluirZero ? 1 : 0);
                         while (numeros.length < config.numeros) {
@@ -1558,7 +1585,12 @@
         
         function setPeriodo(p) { periodoSelecionado = p; iaTreinada = false; aiModel = null; renderizarConteudo(loteriaAtual); if (dadosAtuais.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); }
         
-        function atualizarDispersao(v) { dispersaoAtual = parseInt(v); document.getElementById('dispersaoValor') && (document.getElementById('dispersaoValor').textContent = `${v} concursos`); iaTreinada = false; aiModel = null; }
+        function atualizarDispersao(v) { 
+            dispersaoAtual = parseInt(v); 
+            document.getElementById('dispersaoValor') && (document.getElementById('dispersaoValor').textContent = `${v} concursos`); 
+            iaTreinada = false; 
+            aiModel = null; 
+        }
         
         function processarCSV(loteria, texto, nome) {
             const config = LOTERIAS[loteria];
@@ -1621,7 +1653,7 @@
             const datasPeriodo = getDatasPeriodo();
             
             let controlesExtras = '';
-            if (config.temDispersao) controlesExtras += `<div><label>🎯 Dispersão</label><div class="dispersao-slider"><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)"><div>Bloquear: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div></div></div>`;
+            if (config.temDispersao) controlesExtras += `<div class="dispersao-slider"><label>🎯 Dispersão</label><input type="range" id="dispersaoSlider" min="${config.dispersaoMin}" max="${config.dispersaoMax}" value="${dispersaoAtual}" oninput="atualizarDispersao(this.value)"><div class="dispersao-valor">Bloquear números recentes: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div></div>`;
             
             let html = `<div class="card"><h3 style="color:${config.cor};">${config.icone} ${config.nome} - IA V.6.1</h3>`;
             if (!cache.carregado) html += `<div class="mensagem-erro"><strong>⚠️ Nenhum dado!</strong><br>📁 Upload do CSV</div>`;
@@ -1661,11 +1693,15 @@
                 animacaoHtml = `<div id="iaTrainingAnimation" style="display: none;"></div>`;
             }
             
-            html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:100px; font-size:12px;">${iaTreinada?'✅ IA pronta!':'⏳ Clique em Treinar'}</div>${animacaoHtml}<div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
+            html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:80px; font-size:11px;">${iaTreinada?'✅ IA pronta!':'⏳ Clique em Treinar'}</div>${animacaoHtml}<div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
             
             html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid">
-                <div><label>Quantidade</label><br><input type="number" id="qtdJogos" class="quantidade-input" value="1" min="1" max="20"></div>
-                <div><label>Modo de IA</label><br>
+                <div class="quantidade-container">
+                    <label>📊 Quantidade de Jogos</label>
+                    <input type="range" id="qtdRange" class="quantidade-range" min="1" max="20" value="1" oninput="atualizarQuantidadePorRange(this.value)">
+                    <input type="number" id="qtdJogos" class="quantidade-input" value="1" min="1" max="20" oninput="atualizarQuantidadePorInput(this.value)">
+                </div>
+                <div><label>🎓 Modo de IA</label><br>
                     <select id="modoGeracao">
                         <option value="ia_especialista">🎓 IA Especialista</option>
                         <option value="aleatorio_inteligente">🎲 Aleatório Inteligente</option>
@@ -1688,6 +1724,10 @@
             const grid = document.getElementById('lotteryGrid');
             grid.innerHTML = Object.entries(LOTERIAS).map(([id, c]) => `<div class="lottery-card ${id==='megasena'?'active':''}" onclick="selecionarLoteria('${id}')" id="card-${id}"><div class="ia-status nao-treinado" id="status-${id}"></div><h3>${c.icone} ${c.nome}</h3><p class="rules">${c.numeros} números • 1 a ${c.maxNumero}${c.temMes ? ' + Mês' : ''}${c.temTime ? ' + Time' : ''}${c.temTrevos ? ' + Trevos' : ''}</p></div>`).join('');
         }
+        
+        // Expor funções globais para o range slider
+        window.atualizarQuantidadePorRange = atualizarQuantidadePorRange;
+        window.atualizarQuantidadePorInput = atualizarQuantidadePorInput;
         
         document.addEventListener('DOMContentLoaded', () => {
             checkMaintenance();
