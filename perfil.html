@@ -284,113 +284,194 @@
         // ============================================
         // FUNÇÃO PDF CORRIGIDA
         // ============================================
-        async function exportarSelecionadosPDF() {
-            console.log('🔍 Botão PDF clicado');
-            
-            if (!usuario) {
-                alert('Você precisa estar logado para exportar PDF!');
-                return;
-            }
-            
-            const palpitesSelecionados = [];
-            const checkboxes = document.querySelectorAll('.selecionar-jogo');
-            
-            console.log('Checkboxes encontrados:', checkboxes.length);
-            
-            if (checkboxes.length === 0) {
-                alert('Nenhum checkbox encontrado. Recarregue a página.');
-                return;
-            }
-            
-            checkboxes.forEach((checkbox) => {
-                if (checkbox.checked) {
-                    const item = checkbox.closest('.historico-item');
-                    if (item) {
-                        const loteriaElem = item.querySelector('.historico-loteria');
-                        const numerosElem = item.querySelector('.historico-jogos');
-                        const dataElem = item.querySelector('.historico-data');
-                        
-                        let numerosTexto = numerosElem ? numerosElem.innerText : '';
-                        numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').trim();
-                        
-                        let loteriaTexto = loteriaElem ? loteriaElem.innerText : 'Loteria';
-                        loteriaTexto = loteriaTexto.replace(/[🎲]/g, '').trim();
-                        
-                        palpitesSelecionados.push({
-                            loteria: loteriaTexto,
-                            numeros: numerosTexto,
-                            data: dataElem ? dataElem.innerText.replace(/[📅]/g, '').trim() : ''
-                        });
-                    }
-                }
-            });
-            
-            console.log('Palpites extraídos:', palpitesSelecionados.length);
-            
-            if (palpitesSelecionados.length === 0) {
-                alert('Nenhum palpite selecionado! Marque os checkboxes e clique novamente.');
-                return;
-            }
-            
-            try {
-                // CORREÇÃO AQUI - Usar window.jspdf
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                let y = 20;
-                
-                doc.setFontSize(18);
-                doc.text('LOTERIAS IA - Palpites Selecionados', 20, y);
-                y += 15;
-                
-                doc.setFontSize(10);
-                doc.text(`Usuario: ${usuario.nome || 'Nao informado'}`, 20, y);
-                y += 8;
-                doc.text(`Email: ${usuario.email || 'Nao informado'}`, 20, y);
-                y += 8;
-                doc.text(`Data: ${new Date().toLocaleString()}`, 20, y);
-                y += 8;
-                doc.text(`Total de palpites: ${palpitesSelecionados.length}`, 20, y);
-                y += 15;
-                
-                doc.line(20, y, 190, y);
-                y += 10;
-                
-                for (let i = 0; i < palpitesSelecionados.length; i++) {
-                    const p = palpitesSelecionados[i];
-                    
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 20;
-                    }
-                    
-                    doc.setFontSize(12);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text(`${i+1}. ${p.loteria}`, 20, y);
-                    y += 8;
-                    
-                    doc.setFontSize(11);
-                    doc.setFont('helvetica', 'normal');
-                    const numerosLinhas = doc.splitTextToSize(`Numeros: ${p.numeros}`, 170);
-                    doc.text(numerosLinhas, 25, y);
-                    y += (numerosLinhas.length * 6) + 5;
-                    
-                    doc.setFontSize(9);
-                    doc.setTextColor(100, 100, 100);
-                    doc.text(`Data: ${p.data}`, 25, y);
-                    y += 12;
-                    doc.setTextColor(0, 0, 0);
-                }
-                
-                const nomeArquivo = `palpites_${Date.now()}.pdf`;
-                doc.save(nomeArquivo);
-                console.log('PDF salvo como:', nomeArquivo);
-                alert(`${palpitesSelecionados.length} palpites exportados com sucesso!`);
-                
-            } catch (error) {
-                console.error('Erro detalhado:', error);
-                alert('Erro ao gerar PDF: ' + error.message);
-            }
+        // Variável para evitar múltiplos cliques
+let exportandoPDF = false;
+
+async function exportarSelecionadosPDF() {
+    // Evitar execução múltipla
+    if (exportandoPDF) {
+        console.log('Exportação já em andamento...');
+        return;
+    }
+    
+    exportandoPDF = true;
+    
+    try {
+        console.log('🔍 Iniciando exportação...');
+        
+        // Coletar dados dos checkboxes marcados
+        const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
+        
+        console.log('Checkboxes marcados:', checkboxes.length);
+        
+        if (checkboxes.length === 0) {
+            alert('Nenhum palpite selecionado!');
+            exportandoPDF = false;
+            return;
         }
+        
+        // Criar conteúdo HTML para impressão (formatado)
+        let htmlContent = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Palpites Loterias IA</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { 
+                    font-family: 'Times New Roman', 'Arial', sans-serif; 
+                    margin: 0;
+                    padding: 20px;
+                    background: white;
+                    color: #1e293b;
+                }
+                .pagina {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background: white;
+                    padding: 30px;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                }
+                .cabecalho {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #8b5cf6;
+                }
+                .cabecalho h1 {
+                    color: #8b5cf6;
+                    font-size: 24px;
+                    margin-bottom: 5px;
+                }
+                .cabecalho p {
+                    color: #64748b;
+                    font-size: 12px;
+                }
+                .info-usuario {
+                    background: #f1f5f9;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin-bottom: 25px;
+                    font-size: 13px;
+                }
+                .info-usuario p {
+                    margin: 5px 0;
+                }
+                .palpite {
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    border-left: 4px solid #38bdf8;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    page-break-inside: avoid;
+                }
+                .loteria {
+                    font-weight: bold;
+                    font-size: 15px;
+                    color: #1e293b;
+                    margin-bottom: 8px;
+                }
+                .numeros {
+                    font-size: 16px;
+                    color: #3b82f6;
+                    font-weight: 600;
+                    margin: 8px 0;
+                    letter-spacing: 2px;
+                }
+                .data {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    margin-top: 8px;
+                }
+                .rodape {
+                    text-align: center;
+                    margin-top: 40px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                    font-size: 10px;
+                    color: #94a3b8;
+                }
+                hr {
+                    margin: 15px 0;
+                    border-color: #e2e8f0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="pagina">
+                <div class="cabecalho">
+                    <h1>🎲 LOTERIAS IA</h1>
+                    <p>Sistema Profissional de Loterias com Inteligência Artificial</p>
+                    <p>Versão 6.1</p>
+                </div>
+                
+                <div class="info-usuario">
+                    <p><strong>👤 Usuário:</strong> ${usuario.nome || 'Não informado'}</p>
+                    <p><strong>📧 Email:</strong> ${usuario.email || 'Não informado'}</p>
+                    <p><strong>📅 Data de emissão:</strong> ${new Date().toLocaleString()}</p>
+                    <p><strong>🎯 Total de palpites selecionados:</strong> ${checkboxes.length}</p>
+                </div>
+        `;
+        
+        let contador = 0;
+        checkboxes.forEach((checkbox) => {
+            const item = checkbox.closest('.historico-item');
+            if (item) {
+                contador++;
+                const loteriaElem = item.querySelector('.historico-loteria');
+                const numerosElem = item.querySelector('.historico-jogos');
+                const dataElem = item.querySelector('.historico-data');
+                
+                let numerosTexto = numerosElem ? numerosElem.innerText : '';
+                numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
+                
+                let loteriaTexto = loteriaElem ? loteriaElem.innerText : 'Loteria';
+                loteriaTexto = loteriaTexto.replace(/[🎲]/g, '').replace('🎲', '').trim();
+                
+                let dataTexto = dataElem ? dataElem.innerText : '';
+                dataTexto = dataTexto.replace(/[📅]/g, '').trim();
+                
+                htmlContent += `
+                    <div class="palpite">
+                        <div class="loteria">${contador}. ${loteriaTexto}</div>
+                        <div class="numeros">📊 ${numerosTexto}</div>
+                        <div class="data">📅 ${dataTexto}</div>
+                    </div>
+                `;
+            }
+        });
+        
+        htmlContent += `
+                <div class="rodape">
+                    <hr>
+                    <p>Documento gerado por Loterias IA - Todos os direitos reservados</p>
+                    <p>Este documento contém ${checkboxes.length} palpite(s) selecionado(s).</p>
+                </div>
+            </div>
+        </body>
+        </html>`;
+        
+        // Criar blob e forçar download
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `palpites_loterias_ia_${Date.now()}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        console.log('✅ Exportação concluída:', checkboxes.length, 'palpites');
+        alert(`${checkboxes.length} palpites exportados com sucesso!\nO arquivo HTML foi baixado. Abra no navegador e use Ctrl+P para salvar como PDF.`);
+        
+    } catch (error) {
+        console.error('Erro na exportação:', error);
+        alert('Erro ao exportar: ' + error.message);
+    } finally {
+        exportandoPDF = false;
+    }
+}
         
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
