@@ -45,6 +45,9 @@
             min-height: 100vh;
         }
 
+        /* ============================================ */
+        /* CABEÇALHO */
+        /* ============================================ */
         .header {
             background: linear-gradient(135deg, var(--bg-secondary), #0f2744);
             padding: 15px 20px;
@@ -66,6 +69,9 @@
         .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 8px; color: white; }
         .header-subtitle { color: var(--text-secondary); font-size: 11px; }
 
+        /* ============================================ */
+        /* CONTAINER E BOTÃO VOLTAR */
+        /* ============================================ */
         .container { max-width: 1400px; margin: 0 auto; padding: 15px; }
         .btn-voltar { 
             background: #64748b; 
@@ -77,9 +83,13 @@
             font-weight: 600; 
             font-size: 13px;
             margin-bottom: 15px; 
+            transition: transform 0.2s; 
         }
         .btn-voltar:hover { transform: scale(1.02); background: #475569; }
 
+        /* ============================================ */
+        /* GRID DE 4 CARDES HOMOGÊNEOS */
+        /* ============================================ */
         .profile-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -87,6 +97,7 @@
             margin-bottom: 20px;
         }
         
+        /* CARD PADRÃO - TODOS COM MESMA ALTURA */
         .card {
             background: var(--bg-card);
             border-radius: 10px;
@@ -111,8 +122,14 @@
             flex-wrap: wrap;
         }
         
-        .card-full { grid-column: span 2; }
+        /* CARD QUE OCUPA 2 COLUNAS (PERFIL DO USUÁRIO) */
+        .card-full {
+            grid-column: span 2;
+        }
 
+        /* ============================================ */
+        /* PERFIL DO USUÁRIO */
+        /* ============================================ */
         .perfil-header {
             display: flex;
             align-items: center;
@@ -134,6 +151,9 @@
         .info h2 { font-size: 18px; margin-bottom: 3px; }
         .info p { font-size: 11px; color: var(--text-secondary); word-break: break-all; }
         
+        /* ============================================ */
+        /* SALDO CARD */
+        /* ============================================ */
         .saldo-card { 
             background: linear-gradient(135deg, #f59e0b, #eab308); 
             border-radius: 12px; 
@@ -147,6 +167,9 @@
         .saldo-card strong { font-size: 28px; display: block; color: #1e293b; }
         .saldo-card span { font-size: 11px; opacity: 0.9; }
         
+        /* ============================================ */
+        /* ESTATÍSTICAS */
+        /* ============================================ */
         .stats-container { 
             text-align: center; 
             padding: 10px;
@@ -159,6 +182,9 @@
         .stats-label { font-size: 11px; color: var(--text-secondary); }
         .stats-divider { margin: 10px 0; border-color: var(--border); }
         
+        /* ============================================ */
+        /* HISTÓRICO DE PALPITES */
+        /* ============================================ */
         .scroll-area { 
             max-height: 350px; 
             overflow-y: auto; 
@@ -178,15 +204,24 @@
         .historico-data { font-size: 10px; color: var(--text-secondary); }
         .historico-jogos { font-size: 12px; color: #cbd5e1; word-break: break-all; margin-top: 6px; line-height: 1.5; }
         
+        /* ============================================ */
+        /* TRANSAÇÕES */
+        /* ============================================ */
         .transacoes-table { width: 100%; border-collapse: collapse; font-size: 12px; }
         .transacoes-table th, .transacoes-table td { padding: 8px 4px; text-align: left; border-bottom: 1px solid var(--border); }
         .transacoes-table th { color: var(--text-secondary); font-weight: 500; }
         .credito { color: #22c55e; font-weight: 600; }
         .debito { color: #ef4444; font-weight: 600; }
         
+        /* ============================================ */
+        /* MENSAGENS */
+        /* ============================================ */
         .empty-message { text-align: center; padding: 30px; color: var(--text-secondary); font-size: 12px; }
         .loading { text-align: center; padding: 20px; color: #f59e0b; font-size: 14px; }
         
+        /* ============================================ */
+        /* BOTÕES */
+        /* ============================================ */
         .btn-selecionar-todos, .btn-exportar-pdf {
             transition: all 0.2s;
             font-size: 11px;
@@ -202,6 +237,9 @@
             opacity: 0.9;
         }
         
+        /* ============================================ */
+        /* CHECKBOX */
+        /* ============================================ */
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -211,6 +249,9 @@
             color: var(--text-secondary);
         }
         
+        /* ============================================ */
+        /* RESPONSIVIDADE */
+        /* ============================================ */
         @media (max-width: 768px) {
             .profile-grid { grid-template-columns: 1fr; }
             .card-full { grid-column: span 1; }
@@ -281,6 +322,70 @@
             }
         }
         
+        async function exportarSelecionadosPDF() {
+            if (jogosSelecionados.size === 0) {
+                mostrarToast('Nenhum palpite selecionado!', 'warning');
+                return;
+            }
+            
+            const palpitesSelecionados = [];
+            const historicoItems = document.querySelectorAll('.historico-item');
+            
+            historicoItems.forEach((item, itemIdx) => {
+                const checkbox = item.querySelector('.selecionar-jogo');
+                if (checkbox && checkbox.checked) {
+                    const loteriaElem = item.querySelector('.historico-loteria');
+                    const numerosElem = item.querySelector('.historico-jogos');
+                    const dataElem = item.querySelector('.historico-data');
+                    
+                    palpitesSelecionados.push({
+                        loteria: loteriaElem ? loteriaElem.innerText : 'Loteria',
+                        numeros: numerosElem ? numerosElem.innerText : '',
+                        data: dataElem ? dataElem.innerText : ''
+                    });
+                }
+            });
+            
+            if (palpitesSelecionados.length === 0) {
+                mostrarToast('Nenhum palpite selecionado para exportar', 'warning');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 20;
+            
+            doc.setFontSize(18);
+            doc.text(`Palpites Selecionados - ${usuario.nome}`, 20, y);
+            y += 15;
+            
+            doc.setFontSize(10);
+            doc.text(`Data: ${new Date().toLocaleString()}`, 20, y);
+            y += 15;
+            doc.text(`Total de palpites: ${palpitesSelecionados.length}`, 20, y);
+            y += 20;
+            
+            for (let i = 0; i < palpitesSelecionados.length; i++) {
+                const p = palpitesSelecionados[i];
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20;
+                }
+                doc.setFontSize(12);
+                doc.text(`${i+1}. ${p.loteria}`, 20, y);
+                y += 8;
+                doc.setFontSize(9);
+                const linhas = doc.splitTextToSize(p.numeros || '', 170);
+                doc.text(linhas, 20, y);
+                y += (linhas.length * 5) + 8;
+                doc.text(`📅 ${p.data}`, 20, y);
+                y += 12;
+            }
+            
+            doc.save(`palpites_selecionados_${Date.now()}.pdf`);
+            mostrarToast(`${palpitesSelecionados.length} palpites exportados!`, 'success');
+        }
+        
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
             toast.style.position = 'fixed';
@@ -295,169 +400,6 @@
             toast.innerHTML = mensagem;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
-        }
-        
-        // ============================================
-        // FUNÇÃO EXPORTAR PDF CORRIGIDA
-        // ============================================
-        async function exportarSelecionadosPDF() {
-            console.log('🔍 Iniciando exportação PDF...');
-            console.log('Palpites selecionados:', jogosSelecionados.size);
-            
-            if (jogosSelecionados.size === 0) {
-                mostrarToast('Nenhum palpite selecionado!', 'warning');
-                return;
-            }
-            
-            const palpitesSelecionados = [];
-            const historicoItems = document.querySelectorAll('.historico-item');
-            console.log('Total de itens no histórico:', historicoItems.length);
-            
-            historicoItems.forEach((item, idx) => {
-                const checkbox = item.querySelector('.selecionar-jogo');
-                if (checkbox && checkbox.checked) {
-                    console.log(`Item ${idx} selecionado`);
-                    const loteriaElem = item.querySelector('.historico-loteria');
-                    const numerosElem = item.querySelector('.historico-jogos');
-                    const dataElem = item.querySelector('.historico-data');
-                    
-                    let numerosTexto = numerosElem ? numerosElem.innerText : '';
-                    numerosTexto = numerosTexto.replace('Números:', '').replace('📊', '').trim();
-                    
-                    palpitesSelecionados.push({
-                        loteria: loteriaElem ? loteriaElem.innerText.replace('🎲', '').trim() : 'Loteria',
-                        numeros: numerosTexto,
-                        data: dataElem ? dataElem.innerText : ''
-                    });
-                }
-            });
-            
-            console.log('Palpites extraídos:', palpitesSelecionados.length);
-            
-            if (palpitesSelecionados.length === 0) {
-                mostrarToast('Nenhum palpite selecionado para exportar', 'warning');
-                return;
-            }
-            
-            try {
-                console.log('Inicializando jsPDF...');
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                console.log('jsPDF inicializado com sucesso');
-                
-                // CABEÇALHO
-                doc.setDrawColor(139, 92, 246);
-                doc.setLineWidth(0.8);
-                doc.rect(15, 8, 180, 28);
-                
-                doc.setFontSize(16);
-                doc.setTextColor(139, 92, 246);
-                doc.setFont('times', 'bold');
-                doc.text('LOTERIAS IA', 105, 20, { align: 'center' });
-                
-                doc.setFontSize(10);
-                doc.setTextColor(100, 100, 150);
-                doc.setFont('times', 'italic');
-                doc.text('Sistema Profissional de Loterias com IA Real', 105, 28, { align: 'center' });
-                
-                doc.setFontSize(8);
-                doc.setTextColor(150, 150, 150);
-                doc.text(`Versao 6.1 - ${new Date().toLocaleDateString()}`, 105, 36, { align: 'center' });
-                
-                doc.setDrawColor(200, 200, 200);
-                doc.line(15, 42, 195, 42);
-                
-                // INFORMAÇÕES DO USUÁRIO
-                doc.setFontSize(10);
-                doc.setTextColor(80, 80, 80);
-                doc.setFont('times', 'bold');
-                doc.text('DADOS DO USUARIO:', 20, 52);
-                
-                doc.setFont('times', 'normal');
-                doc.text(`Nome: ${usuario.nome}`, 20, 60);
-                doc.text(`Email: ${usuario.email}`, 20, 66);
-                doc.text(`Palpites selecionados: ${palpitesSelecionados.length}`, 20, 72);
-                
-                doc.line(20, 77, 190, 77);
-                
-                // PALPITES
-                doc.setFontSize(11);
-                doc.setTextColor(139, 92, 246);
-                doc.setFont('times', 'bold');
-                doc.text('PALPITES GERADOS:', 20, 85);
-                
-                let y = 95;
-                
-                for (let i = 0; i < palpitesSelecionados.length; i++) {
-                    const p = palpitesSelecionados[i];
-                    console.log(`Processando palpite ${i+1}:`, p.loteria);
-                    
-                    if (y > 260) {
-                        doc.addPage();
-                        y = 25;
-                        doc.setDrawColor(139, 92, 246);
-                        doc.setLineWidth(0.5);
-                        doc.rect(15, 8, 180, 20);
-                        doc.setFontSize(14);
-                        doc.setTextColor(139, 92, 246);
-                        doc.setFont('times', 'bold');
-                        doc.text('LOTERIAS IA', 105, 18, { align: 'center' });
-                        doc.setFontSize(8);
-                        doc.setTextColor(150, 150, 150);
-                        doc.text(`Pagina ${Math.floor(i / 15) + 2}`, 105, 28, { align: 'center' });
-                        y = 40;
-                    }
-                    
-                    doc.setFillColor(248, 248, 252);
-                    doc.roundedRect(18, y - 4, 174, 26, 3, 3, 'F');
-                    
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-                    doc.setFont('times', 'bold');
-                    doc.text(`${i+1}. ${p.loteria}`, 22, y);
-                    
-                    let numerosLimpos = p.numeros.replace(/[^\d,\s-]/g, '').trim();
-                    
-                    doc.setFontSize(13);
-                    doc.setTextColor(59, 130, 246);
-                    doc.setFont('times', 'normal');
-                    
-                    let numerosArray = numerosLimpos.split(',').map(n => n.trim());
-                    if (numerosArray.length === 1 && numerosLimpos.includes(' ')) {
-                        numerosArray = numerosLimpos.split(' ').map(n => n.trim());
-                    }
-                    const numerosFormatados = numerosArray.join('   ');
-                    doc.text(numerosFormatados, 22, y + 8);
-                    
-                    doc.setFontSize(8);
-                    doc.setTextColor(120, 120, 120);
-                    doc.setFont('times', 'italic');
-                    doc.text(`Data: ${p.data}`, 22, y + 18);
-                    
-                    y += 32;
-                }
-                
-                // RODAPÉ
-                const pageCount = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(7);
-                    doc.setTextColor(180, 180, 180);
-                    doc.setFont('times', 'italic');
-                    doc.text(`Documento gerado em ${new Date().toLocaleString()}`, 105, 290, { align: 'center' });
-                    doc.text(`Loterias IA Versao 6.1 - Pagina ${i} de ${pageCount}`, 105, 284, { align: 'center' });
-                }
-                
-                // Salvar PDF
-                const nomeArquivo = `palpites_${usuario.nome.replace(/\s/g, '_')}_${Date.now()}.pdf`;
-                doc.save(nomeArquivo);
-                console.log('PDF salvo como:', nomeArquivo);
-                mostrarToast(`${palpitesSelecionados.length} palpites exportados!`, 'success');
-                
-            } catch (error) {
-                console.error('Erro ao gerar PDF:', error);
-                mostrarToast('Erro ao gerar PDF. Tente novamente.', 'error');
-            }
         }
         
         function aguardarSupabase() {
@@ -586,9 +528,9 @@
                                     <span class="historico-data">${dataJogo}</span>
                                 </div>
                                 <div class="historico-jogos">
-                                    Números: ${numerosDisplay}
-                                    ${ehDiaDaSorte && mesNome ? `<br>Mes da Sorte: ${mesNome} (${formatarNumeroZero(mesNumero)})` : ''}
-                                    ${item.extras && !temMeses && !ehDiaDaSorte ? `<br>${item.extras}` : ''}
+                                    📊 Números: ${numerosDisplay}
+                                    ${ehDiaDaSorte && mesNome ? `<br>📅 Mês da Sorte: ${mesNome} (${formatarNumeroZero(mesNumero)})` : ''}
+                                    ${item.extras && !temMeses && !ehDiaDaSorte ? `<br>✨ ${item.extras}` : ''}
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <label class="checkbox-label">
@@ -606,19 +548,17 @@
             
             let transacoesHtml = '';
             if (transacoes.length === 0) {
-                transacoesHtml = '<div class="empty-message">Nenhuma transacao registrada</div>';
+                transacoesHtml = '<div class="empty-message">Nenhuma transação registrada</div>';
             } else {
                 transacoesHtml = `
                     <div class="scroll-area">
                         <table class="transacoes-table">
-                            <thead>
-                                <tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr>
-                            </thead>
+                            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
                             <tbody>
                                 ${transacoes.map(t => `
                                     <tr>
                                         <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
-                                        <td>${t.tipo === 'compra' ? 'Compra' : t.tipo === 'uso' ? 'Jogos' : t.tipo === 'pix_simulado' ? 'Teste' : t.tipo || '-'}</td>
+                                        <td>${t.tipo === 'compra' ? '💳 Compra' : t.tipo === 'uso' ? '🎲 Jogos' : t.tipo === 'pix_simulado' ? '🧪 Teste' : t.tipo || '-'}</td>
                                         <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
                                         <td>R$ ${t.saldo_apos || 0}</td>
                                     </tr>
@@ -633,25 +573,28 @@
             
             const html = `
                 <div class="profile-grid">
+                    <!-- CARD 1: PERFIL DO USUÁRIO (2 colunas) -->
                     <div class="card card-full">
                         <div class="perfil-header">
                             <div class="avatar">${avatarHtml}</div>
                             <div class="info">
-                                <h2>${usuario.nome || 'Usuario'}</h2>
-                                <p>${usuario.email || 'Email nao disponivel'}</p>
+                                <h2>${usuario.nome || 'Usuário'}</h2>
+                                <p>${usuario.email || 'Email não disponível'}</p>
                             </div>
                         </div>
                     </div>
                     
+                    <!-- CARD 2: SALDO -->
                     <div class="card">
-                        <div class="card-title">SALDO</div>
+                        <div class="card-title">💰 SALDO</div>
                         <div class="saldo-card">
                             <strong>R$ ${creditos}</strong>
                         </div>
                     </div>
                     
+                    <!-- CARD 3: ESTATÍSTICAS -->
                     <div class="card">
-                        <div class="card-title">ESTATISTICAS</div>
+                        <div class="card-title">📊 ESTATÍSTICAS</div>
                         <div class="stats-container">
                             <div class="stats-number">${totalJogosIndividuais}</div>
                             <div class="stats-label">Palpites gerados</div>
@@ -661,20 +604,22 @@
                         </div>
                     </div>
                     
+                    <!-- CARD 4: HISTÓRICO DE PALPITES -->
                     <div class="card">
                         <div class="card-title">
-                            <span>PALPITES</span>
+                            <span>📜 PALPITES</span>
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <span id="contadorSelecionados" style="font-size: 10px; color: var(--text-secondary);">0 selecionado(s)</span>
-                                <button class="btn-selecionar-todos" onclick="selecionarTodos()">Selecionar Todos</button>
-                                <button class="btn-exportar-pdf" onclick="exportarSelecionadosPDF()">Exportar PDF</button>
+                                <button class="btn-selecionar-todos" onclick="selecionarTodos()">✓ Todos</button>
+                                <button class="btn-exportar-pdf" onclick="exportarSelecionadosPDF()">📄 PDF</button>
                             </div>
                         </div>
                         ${historicoHtml}
                     </div>
                     
+                    <!-- CARD 5: HISTÓRICO DE TRANSAÇÕES -->
                     <div class="card">
-                        <div class="card-title">TRANSACOES</div>
+                        <div class="card-title">💰 TRANSAÇÕES</div>
                         ${transacoesHtml}
                     </div>
                 </div>
@@ -685,7 +630,6 @@
             atualizarContadorSelecionados();
         }
         
-        // EXPOR FUNÇÕES GLOBAIS
         window.toggleSelecao = toggleSelecao;
         window.selecionarTodos = selecionarTodos;
         window.exportarSelecionadosPDF = exportarSelecionadosPDF;
