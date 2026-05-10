@@ -23,6 +23,13 @@
         console.log('✅ Supabase perfil conectado');
     </script>
     
+    <!-- BRASAO OTIMIZADO (Base64 placeholder - substitua pelo seu) -->
+    <script>
+    // BRASAO - Substitua pela sua imagem em Base64 real
+    // Para converter: https://www.base64-image.de/
+    const BRASAO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJ3SURBVHgB7Z1BcsIwDEW5/4UjzLp0w8K0VGbTrtPxQvOYjCQ7QkUEhGT9EwtjzTBepTd6Uge+R5Zl6HuW74iI6B3w+aLI82+TNsC/xu+kyVrAb5Mm3wH/QAj4B0LAHwiBfyAE/IEQ+AdC4B8IgX8gBP6BEPgHQuAfCIF/IAT+gRD4B0LgHwiBfyAE/oEQ+AdC4B8IgX8gBP6BEPgHQuAfCIF/IAT+2UP81Edr26PRRfweyD+8YduDyCL+HfKDBAIhIARCQAgUCgEhhJD/l4kklBAChUJACCEEBYUAIRCEgBAIFAJCCAkEAoVCoRBCIASEQAgICoUQkBBRAMEBIAQKhUJACEFBISCgEIQQQEAQSAiBQqFQCCEkEAgIASEQKIQEEggIAUEgIQSFQqEQEFIIAQEBAUEhIYQQBJKEEBQUCgEhgRAQCIEQKASSQAiAIFAIFAolIQQCQkICQUGhEKIQEBIQDws4mSVBCAQgxKCgUKgUgjCQMSgr7aFQiEKhUIQQCggKCiEoFGohBAtIEAKIQ0EhAYQYFBQKpVIQiiAYFAoKAVEoRAiCgEDm/2sQjIGCQqFQKARhkeRyEAgUijRAUAgICkJQWChBWIAoCASFgoIQRBQBYVCox6BgLAKFYhFgAakoEAqFKoRQwUICKBRqIRYoBAsICiEoKISCKIQgJQAhECgUaVAIgQTELMCgEAhAiEFBIVCFEAoKCiEgKIQYFAqFQkIJgUIhIaQEAoVCISEYwQIhUAgICoVAEIJSKARjIBAYBMWiIAXg+YMgIYHAAQJBQaFQBLVAPK9u/BvnRzP+3/NPf0D4+X0rzS0rKQAAAABJRU5ErkJggg==';
+    </script>
+    
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -213,12 +220,6 @@
             color: var(--text-secondary);
         }
         
-        /* Estilos específicos para o PDF */
-        @media print {
-            body { background: white; }
-            .no-print { display: none; }
-        }
-        
         @media (max-width: 768px) {
             .profile-grid { grid-template-columns: 1fr; }
             .card-full { grid-column: span 1; }
@@ -291,247 +292,150 @@
         }
         
         // ============================================
-        // FUNÇÃO PDF PROFISSIONAL COM MARCA D'ÁGUA
+        // FUNÇÃO PDF PROFISSIONAL COM BRASÃO
         // ============================================
         async function exportarSelecionadosPDF() {
-    if (exportandoPDF) {
-        console.log('Exportação já em andamento...');
-        return;
-    }
-    
-    exportandoPDF = true;
-    
-    try {
-        const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
-        
-        if (checkboxes.length === 0) {
-            alert('Nenhum palpite selecionado!');
-            exportandoPDF = false;
-            return;
-        }
-        
-        // Criar uma janela popup para impressão (método mais confiável)
-        const janelaPDF = window.open('', '_blank');
-        
-        if (!janelaPDF) {
-            alert('Pop-up bloqueado! Permita pop-ups para este site.');
-            exportandoPDF = false;
-            return;
-        }
-        
-        // Obter data formatada
-        const dataAtual = new Date();
-        const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
-        
-        // Construir HTML dos palpites
-        let palpitesHTML = '';
-        let contador = 0;
-        
-        checkboxes.forEach((checkbox) => {
-            const item = checkbox.closest('.historico-item');
-            if (item) {
-                contador++;
-                const loteriaElem = item.querySelector('.historico-loteria');
-                const numerosElem = item.querySelector('.historico-jogos');
-                const dataElem = item.querySelector('.historico-data');
+            if (exportandoPDF) {
+                console.log('Exportação já em andamento...');
+                return;
+            }
+            
+            exportandoPDF = true;
+            
+            try {
+                const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
                 
-                let numerosTexto = numerosElem ? numerosElem.innerText : '';
-                numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
+                if (checkboxes.length === 0) {
+                    alert('Nenhum palpite selecionado!');
+                    exportandoPDF = false;
+                    return;
+                }
                 
-                let loteriaTexto = loteriaElem ? loteriaElem.innerText : 'Loteria';
-                loteriaTexto = loteriaTexto.replace(/[🎲]/g, '').replace('🎲', '').trim();
+                // Criar elemento para o PDF
+                const divPDF = document.createElement('div');
+                divPDF.style.padding = '30px';
+                divPDF.style.backgroundColor = 'white';
+                divPDF.style.fontFamily = "'Times New Roman', Arial, sans-serif";
+                divPDF.style.maxWidth = '100%';
                 
-                let dataTexto = dataElem ? dataElem.innerText : '';
-                dataTexto = dataTexto.replace(/[📅]/g, '').trim();
+                // Obter data atual formatada
+                const dataAtual = new Date();
+                const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
                 
-                // Formatar números com estilo Arial 12 itálico
-                const numerosArray = numerosTexto.split(',').map(n => n.trim());
+                // Construir HTML dos palpites
+                let palpitesHTML = '';
+                let contador = 0;
                 
-                palpitesHTML += `
-                    <div style="margin-bottom: 25px; padding: 15px; border-left: 4px solid #8b5cf6; background: #f8fafc; border-radius: 8px; page-break-inside: avoid;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
-                            <span style="font-weight: bold; font-size: 14px; color: #1e293b;">${contador}. ${loteriaTexto}</span>
-                            <span style="font-size: 10px; color: #94a3b8;">${dataTexto || 'Data não informada'}</span>
+                checkboxes.forEach((checkbox) => {
+                    const item = checkbox.closest('.historico-item');
+                    if (item) {
+                        contador++;
+                        const loteriaElem = item.querySelector('.historico-loteria');
+                        const numerosElem = item.querySelector('.historico-jogos');
+                        const dataElem = item.querySelector('.historico-data');
+                        
+                        let numerosTexto = numerosElem ? numerosElem.innerText : '';
+                        numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
+                        
+                        let loteriaTexto = loteriaElem ? loteriaElem.innerText : 'Loteria';
+                        loteriaTexto = loteriaTexto.replace(/[🎲]/g, '').replace('🎲', '').trim();
+                        
+                        let dataTexto = dataElem ? dataElem.innerText : '';
+                        dataTexto = dataTexto.replace(/[📅]/g, '').trim();
+                        
+                        // Separar números
+                        const numerosArray = numerosTexto.split(',').map(n => n.trim());
+                        
+                        palpitesHTML += `
+                            <div style="margin-bottom: 20px; padding: 12px; border-left: 4px solid #8b5cf6; background: #f8fafc; border-radius: 8px; page-break-inside: avoid;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+                                    <span style="font-weight: bold; font-size: 13px; color: #1e293b;">${contador}. ${loteriaTexto}</span>
+                                    <span style="font-size: 9px; color: #94a3b8;">${dataTexto || 'Data não informada'}</span>
+                                </div>
+                                <div style="font-family: 'Arial', monospace; font-size: 12px; font-style: italic; color: #3b82f6; margin-top: 6px;">
+                                    Números: ${numerosArray.map(n => `<strong style="font-size: 13px;">${n}</strong>`).join(' • ')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                // HTML completo do PDF
+                divPDF.innerHTML = `
+                    <div style="max-width: 100%; position: relative;">
+                        <!-- MARCA D'ÁGUA -->
+                        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.04; z-index: 0; text-align: center; pointer-events: none;">
+                            <img src="${BRASAO}" style="width: 350px; height: auto;">
+                            <div style="font-size: 24px; font-weight: bold; color: #000; margin-top: 10px;">LOTERIAS IA</div>
                         </div>
-                        <div style="font-family: 'Arial', 'Times New Roman', monospace; font-size: 12px; font-style: italic; color: #3b82f6; margin-top: 8px; letter-spacing: 1px;">
-                            <strong>Números:</strong> ${numerosArray.map(n => `<span style="font-size: 13px; font-weight: bold;">${n}</span>`).join(' • ')}
+                        
+                        <div style="position: relative; z-index: 1;">
+                            <!-- CABEÇALHO COM BRASÃO DOS DOIS LADOS -->
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 25px; flex-wrap: wrap;">
+                                <img src="${BRASAO}" style="width: 70px; height: 70px; object-fit: contain;">
+                                <div style="text-align: center;">
+                                    <h1 style="font-size: 28px; color: #8b5cf6; margin: 0; letter-spacing: 2px;">LOTERIAS IA</h1>
+                                    <p style="font-size: 11px; color: #64748b; margin: 5px 0;">Sistema Profissional de Loterias com Inteligência Artificial</p>
+                                    <p style="font-size: 10px; color: #94a3b8; margin: 0;">Versão 6.1</p>
+                                </div>
+                                <img src="${BRASAO}" style="width: 70px; height: 70px; object-fit: contain;">
+                            </div>
+                            
+                            <!-- INFORMAÇÕES DO USUÁRIO -->
+                            <div style="background: #f1f5f9; padding: 15px; border-radius: 10px; margin-bottom: 25px;">
+                                <table style="width: 100%; font-size: 11px;">
+                                    <tr><td style="padding: 4px;"><strong>👤 Usuário:</strong></td><td>${usuario.nome || 'Não informado'}</td>
+                                    <td style="padding: 4px;"><strong>📧 Email:</strong></td><td>${usuario.email || 'Não informado'}</td></tr>
+                                    <tr><td style="padding: 4px;"><strong>📅 Data de emissão:</strong></td><td>${dataFormatada}</td>
+                                    <td style="padding: 4px;"><strong>🎯 Total de palpites:</strong></td><td>${checkboxes.length}</td></tr>
+                                </table>
+                            </div>
+                            
+                            <!-- TÍTULO -->
+                            <h3 style="color: #8b5cf6; font-size: 16px; margin-bottom: 15px;">📜 PALPITES SELECIONADOS</h3>
+                            
+                            <!-- LISTA DE PALPITES -->
+                            ${palpitesHTML}
+                            
+                            <!-- RODAPÉ -->
+                            <div style="text-align: center; margin-top: 40px; padding-top: 15px; border-top: 1px solid #e2e8f0; font-size: 8px; color: #94a3b8;">
+                                <p>Documento gerado por Loterias IA - Todos os direitos reservados</p>
+                                <p>Gerado em ${dataFormatada}</p>
+                            </div>
                         </div>
                     </div>
                 `;
-            }
-        });
-        
-        // HTML completo para impressão
-        const htmlConteudo = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Palpites Loterias IA</title>
-                <style>
-                    * {
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }
-                    body {
-                        font-family: 'Times New Roman', Arial, sans-serif;
-                        margin: 0;
-                        padding: 30px;
-                        background: white;
-                        color: #1e293b;
-                    }
-                    .container {
-                        max-width: 900px;
-                        margin: 0 auto;
-                        background: white;
-                        position: relative;
-                    }
-                    /* Marca d'água */
-                    .marca-dagua {
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        opacity: 0.06;
-                        z-index: 0;
-                        text-align: center;
-                        width: 100%;
-                        pointer-events: none;
-                    }
-                    .marca-dagua div {
-                        font-size: 60px;
-                        font-weight: bold;
-                        color: #000;
-                        letter-spacing: 5px;
-                    }
-                    .conteudo {
-                        position: relative;
-                        z-index: 1;
-                    }
-                    .cabecalho {
-                        text-align: center;
-                        margin-bottom: 30px;
-                        padding-bottom: 20px;
-                        border-bottom: 3px solid #8b5cf6;
-                    }
-                    .cabecalho h1 {
-                        font-size: 28px;
-                        color: #8b5cf6;
-                        margin-bottom: 5px;
-                    }
-                    .cabecalho p {
-                        font-size: 12px;
-                        color: #64748b;
-                    }
-                    .info-usuario {
-                        background: #f1f5f9;
-                        padding: 15px;
-                        border-radius: 10px;
-                        margin-bottom: 25px;
-                        font-size: 12px;
-                    }
-                    .info-usuario table {
-                        width: 100%;
-                    }
-                    .info-usuario td {
-                        padding: 5px;
-                    }
-                    .titulo {
-                        margin-bottom: 20px;
-                    }
-                    .titulo h3 {
-                        color: #8b5cf6;
-                        font-size: 18px;
-                    }
-                    .rodape {
-                        text-align: center;
-                        margin-top: 40px;
-                        padding-top: 20px;
-                        border-top: 1px solid #e2e8f0;
-                        font-size: 9px;
-                        color: #94a3b8;
-                    }
-                    @media print {
-                        body {
-                            margin: 0;
-                            padding: 20px;
-                        }
-                        .no-print {
-                            display: none;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <!-- MARCA D'ÁGUA -->
-                    <div class="marca-dagua">
-                        <div>🎲 LOTERIAS IA 🎲</div>
-                    </div>
-                    
-                    <div class="conteudo">
-                        <!-- CABEÇALHO -->
-                        <div class="cabecalho">
-                            <h1>🎲 LOTERIAS IA 🎲</h1>
-                            <p>Sistema Profissional de Loterias com Inteligência Artificial</p>
-                            <p>Versão 6.1</p>
-                        </div>
-                        
-                        <!-- INFORMAÇÕES DO USUÁRIO -->
-                        <div class="info-usuario">
-                            <table>
-                                <tr><td><strong>👤 Usuário:</strong></td><td>${usuario.nome || 'Não informado'}</td></tr>
-                                <tr><td><strong>📧 Email:</strong></td><td>${usuario.email || 'Não informado'}</td></tr>
-                                <tr><td><strong>📅 Data de emissão:</strong></td><td>${dataFormatada}</td></tr>
-                                <tr><td><strong>🎯 Total de palpites:</strong></td><td>${checkboxes.length}</td></tr>
-                            </table>
-                        </div>
-                        
-                        <!-- LISTA DE PALPITES -->
-                        <div class="titulo">
-                            <h3>📜 PALPITES SELECIONADOS</h3>
-                        </div>
-                        
-                        ${palpitesHTML}
-                        
-                        <!-- RODAPÉ -->
-                        <div class="rodape">
-                            <p>Documento gerado por Loterias IA - Todos os direitos reservados</p>
-                            <p>Este documento contém ${checkboxes.length} palpite(s) selecionado(s).</p>
-                            <p>Gerado em ${dataFormatada}</p>
-                        </div>
-                    </div>
-                </div>
                 
-                <script>
-                    // Imprimir automaticamente ao carregar
-                    window.onload = function() {
-                        setTimeout(function() {
-                            window.print();
-                            setTimeout(function() {
-                                window.close();
-                            }, 500);
-                        }, 500);
-                    };
-                <\/script>
-            </body>
-            </html>
-        `;
-        
-        // Escrever na nova janela
-        janelaPDF.document.write(htmlConteudo);
-        janelaPDF.document.close();
-        
-        mostrarToast(`${checkboxes.length} palpites exportados! O PDF será aberto para salvar.`, 'success');
-        
-    } catch (error) {
-        console.error('Erro na exportação:', error);
-        alert('Erro ao gerar PDF: ' + error.message);
-    } finally {
-        exportandoPDF = false;
-    }
-}
+                // Adicionar ao corpo temporariamente
+                document.body.appendChild(divPDF);
+                divPDF.style.position = 'absolute';
+                divPDF.style.left = '-9999px';
+                divPDF.style.top = '-9999px';
+                
+                // Configurar opções do PDF
+                const opt = {
+                    margin: [0.3, 0.3, 0.3, 0.3],
+                    filename: `palpites_loterias_ia_${Date.now()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { scale: 2, useCORS: false, logging: false, letterRendering: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+                
+                // Gerar PDF automaticamente
+                await html2pdf().set(opt).from(divPDF).save();
+                
+                // Remover elemento temporário
+                document.body.removeChild(divPDF);
+                
+                mostrarToast(`${checkboxes.length} palpites exportados com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro na exportação:', error);
+                alert('Erro ao gerar PDF: ' + error.message);
+            } finally {
+                exportandoPDF = false;
+            }
+        }
         
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
@@ -707,7 +611,7 @@
                                 ${transacoes.map(t => `
                                     <tr>
                                         <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
-                                        <tr>${t.tipo === 'compra' ? 'Compra' : t.tipo === 'uso' ? 'Jogos' : t.tipo === 'pix_simulado' ? 'Teste' : t.tipo || '-'}</td>
+                                        <td>${t.tipo === 'compra' ? 'Compra' : t.tipo === 'uso' ? 'Jogos' : t.tipo === 'pix_simulado' ? 'Teste' : t.tipo || '-'}</td>
                                         <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
                                         <td>R$ ${t.saldo_apos || 0}</td>
                                     </tr>
