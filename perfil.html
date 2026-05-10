@@ -323,68 +323,114 @@
         }
         
         async function exportarSelecionadosPDF() {
-            if (jogosSelecionados.size === 0) {
-                mostrarToast('Nenhum palpite selecionado!', 'warning');
-                return;
+    console.log('🔍 Botão PDF clicado');
+    
+    // Coletar palpites selecionados DIRETAMENTE dos checkboxes
+    const palpitesSelecionados = [];
+    const checkboxes = document.querySelectorAll('.selecionar-jogo');
+    
+    console.log('Checkboxes encontrados:', checkboxes.length);
+    
+    if (checkboxes.length === 0) {
+        alert('Nenhum checkbox encontrado na página. Recarregue e tente novamente.');
+        return;
+    }
+    
+    checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+            console.log('Checkbox está marcado');
+            
+            // Encontrar o item pai (historico-item)
+            const item = checkbox.closest('.historico-item');
+            if (item) {
+                const loteriaElem = item.querySelector('.historico-loteria');
+                const numerosElem = item.querySelector('.historico-jogos');
+                const dataElem = item.querySelector('.historico-data');
+                
+                let numerosTexto = numerosElem ? numerosElem.innerText : '';
+                numerosTexto = numerosTexto.replace('Números:', '').replace('📊', '').trim();
+                
+                palpitesSelecionados.push({
+                    loteria: loteriaElem ? loteriaElem.innerText.replace('🎲', '').trim() : 'Loteria',
+                    numeros: numerosTexto,
+                    data: dataElem ? dataElem.innerText : ''
+                });
             }
-            
-            const palpitesSelecionados = [];
-            const historicoItems = document.querySelectorAll('.historico-item');
-            
-            historicoItems.forEach((item, itemIdx) => {
-                const checkbox = item.querySelector('.selecionar-jogo');
-                if (checkbox && checkbox.checked) {
-                    const loteriaElem = item.querySelector('.historico-loteria');
-                    const numerosElem = item.querySelector('.historico-jogos');
-                    const dataElem = item.querySelector('.historico-data');
-                    
-                    palpitesSelecionados.push({
-                        loteria: loteriaElem ? loteriaElem.innerText : 'Loteria',
-                        numeros: numerosElem ? numerosElem.innerText : '',
-                        data: dataElem ? dataElem.innerText : ''
-                    });
-                }
-            });
-            
-            if (palpitesSelecionados.length === 0) {
-                mostrarToast('Nenhum palpite selecionado para exportar', 'warning');
-                return;
-            }
-            
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            let y = 20;
-            
-            doc.setFontSize(18);
-            doc.text(`Palpites Selecionados - ${usuario.nome}`, 20, y);
-            y += 15;
-            
-            doc.setFontSize(10);
-            doc.text(`Data: ${new Date().toLocaleString()}`, 20, y);
-            y += 15;
-            doc.text(`Total de palpites: ${palpitesSelecionados.length}`, 20, y);
-            y += 20;
-            
-            for (let i = 0; i < palpitesSelecionados.length; i++) {
-                const p = palpitesSelecionados[i];
-                if (y > 270) {
-                    doc.addPage();
-                    y = 20;
-                }
-                doc.setFontSize(12);
-                doc.text(`${i+1}. ${p.loteria}`, 20, y);
-                y += 8;
-                doc.setFontSize(9);
-                const linhas = doc.splitTextToSize(p.numeros || '', 170);
-                doc.text(linhas, 20, y);
-                y += (linhas.length * 5) + 8;
-                doc.text(`📅 ${p.data}`, 20, y);
-                y += 12;
-            }
-            
-            doc.save(`palpites_selecionados_${Date.now()}.pdf`);
-            mostrarToast(`${palpitesSelecionados.length} palpites exportados!`, 'success');
         }
+    });
+    
+    console.log('Palpites selecionados:', palpitesSelecionados.length);
+    
+    if (palpitesSelecionados.length === 0) {
+        alert('Nenhum palpite selecionado! Marque os checkboxes e clique novamente.');
+        return;
+    }
+    
+    // Gerar PDF usando o jsPDF
+    try {
+        const doc = new jspdf.jsPDF();
+        let y = 20;
+        
+        // Título
+        doc.setFontSize(18);
+        doc.text('LOTERIAS IA - Palpites Selecionados', 20, y);
+        y += 15;
+        
+        // Dados do usuário
+        doc.setFontSize(10);
+        doc.text(`Usuario: ${usuario.nome}`, 20, y);
+        y += 8;
+        doc.text(`Email: ${usuario.email}`, 20, y);
+        y += 8;
+        doc.text(`Data: ${new Date().toLocaleString()}`, 20, y);
+        y += 8;
+        doc.text(`Total de palpites: ${palpitesSelecionados.length}`, 20, y);
+        y += 15;
+        
+        // Linha separadora
+        doc.line(20, y, 190, y);
+        y += 10;
+        
+        // Listar palpites
+        for (let i = 0; i < palpitesSelecionados.length; i++) {
+            const p = palpitesSelecionados[i];
+            
+            if (y > 270) {
+                doc.addPage();
+                y = 20;
+            }
+            
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${i+1}. ${p.loteria}`, 20, y);
+            y += 8;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            
+            // Quebrar números em múltiplas linhas se necessário
+            const numerosLinhas = doc.splitTextToSize(`Numeros: ${p.numeros}`, 170);
+            doc.text(numerosLinhas, 25, y);
+            y += (numerosLinhas.length * 6) + 5;
+            
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Data: ${p.data}`, 25, y);
+            y += 12;
+            doc.setTextColor(0, 0, 0);
+        }
+        
+        // Salvar PDF
+        const nomeArquivo = `palpites_${Date.now()}.pdf`;
+        doc.save(nomeArquivo);
+        console.log('PDF salvo como:', nomeArquivo);
+        alert(`${palpitesSelecionados.length} palpites exportados com sucesso!`);
+        
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        alert('Erro ao gerar PDF: ' + error.message);
+    }
+}
         
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
