@@ -9,8 +9,9 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Biblioteca html2pdf (mais estável que html2canvas) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <script type="module">
         import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -31,10 +32,6 @@
             --text-secondary: #94a3b8;
             --border: #334155;
             --radius: 10px;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --info: #3b82f6;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -284,178 +281,125 @@
         }
         
         // ============================================
-        // FUNÇÃO PDF COM html2canvas + jsPDF
+        // FUNÇÃO PDF SIMPLES E FUNCIONAL
         // ============================================
-       async function exportarSelecionadosPDF() {
-    if (exportandoPDF) {
-        console.log('Exportação já em andamento...');
-        return;
-    }
-    
-    exportandoPDF = true;
-    
-    try {
-        const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
-        
-        if (checkboxes.length === 0) {
-            alert('Nenhum palpite selecionado!');
-            exportandoPDF = false;
-            return;
-        }
-        
-        // Coletar dados dos palpites
-        const palpites = [];
-        checkboxes.forEach((checkbox) => {
-            const item = checkbox.closest('.historico-item');
-            if (item) {
-                const loteriaElem = item.querySelector('.historico-loteria');
-                const numerosElem = item.querySelector('.historico-jogos');
-                const dataElem = item.querySelector('.historico-data');
-                
-                let numerosTexto = numerosElem ? numerosElem.innerText : '';
-                numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
-                
-                let loteriaTexto = loteriaElem ? loteriaElem.innerText : 'Loteria';
-                loteriaTexto = loteriaTexto.replace(/[🎲]/g, '').trim();
-                
-                let dataTexto = dataElem ? dataElem.innerText : '';
-                dataTexto = dataTexto.replace(/[📅]/g, '').trim();
-                
-                palpites.push({
-                    loteria: loteriaTexto,
-                    numeros: numerosTexto,
-                    data: dataTexto
-                });
+        async function exportarSelecionadosPDF() {
+            if (exportandoPDF) {
+                console.log('Exportação já em andamento...');
+                return;
             }
-        });
-        
-        // Criar elemento HTML para o PDF
-        const divPDF = document.createElement('div');
-        divPDF.style.width = '750px';
-        divPDF.style.padding = '25px';
-        divPDF.style.backgroundColor = 'white';
-        divPDF.style.fontFamily = 'Arial, sans-serif';
-        divPDF.style.position = 'absolute';
-        divPDF.style.left = '-9999px';
-        divPDF.style.top = '-9999px';
-        divPDF.style.zIndex = '1';
-        
-        const dataAtual = new Date();
-        const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
-        
-        // Brasão - usar emoji por enquanto (mais confiável)
-        // Depois você pode substituir por: <img src="Brasao400.png" style="width: 50px; height: 50px;">
-        //const brasaoHtml = `<div style="font-size: 38px;">🎲</div>`;
-        const brasaoHtml = `<img src="Brasao400.png" style="width: 45px; height: 45px; object-fit: contain;">`;
-        // Gerar HTML dos palpites
-        let palpitesHTML = '';
-        palpites.forEach((p, idx) => {
-            const numerosArray = p.numeros.split(',').map(n => n.trim());
-            palpitesHTML += `
-                <div style="margin-bottom: 15px; padding: 10px; border-left: 3px solid #8b5cf6; background: #f8fafc; border-radius: 6px; page-break-inside: avoid;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                        <span style="font-weight: bold; font-size: 12px;">${idx+1}. ${p.loteria}</span>
-                        <span style="font-size: 9px; color: #666;">${p.data || 'Data não informada'}</span>
+            
+            exportandoPDF = true;
+            
+            try {
+                const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
+                
+                if (checkboxes.length === 0) {
+                    alert('Nenhum palpite selecionado!');
+                    exportandoPDF = false;
+                    return;
+                }
+                
+                // Coletar dados
+                const palpites = [];
+                checkboxes.forEach((checkbox) => {
+                    const item = checkbox.closest('.historico-item');
+                    if (item) {
+                        const loteriaElem = item.querySelector('.historico-loteria');
+                        const numerosElem = item.querySelector('.historico-jogos');
+                        const dataElem = item.querySelector('.historico-data');
+                        
+                        let numerosTexto = numerosElem ? numerosElem.innerText : '';
+                        numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
+                        
+                        let loteriaTexto = loteriaElem ? loteriaElem.innerText : 'Loteria';
+                        loteriaTexto = loteriaTexto.replace(/[🎲]/g, '').trim();
+                        
+                        palpites.push({
+                            loteria: loteriaTexto,
+                            numeros: numerosTexto,
+                            data: dataElem ? dataElem.innerText.replace(/[📅]/g, '').trim() : ''
+                        });
+                    }
+                });
+                
+                // Criar elemento para o PDF
+                const element = document.createElement('div');
+                element.style.width = '700px';
+                element.style.padding = '20px';
+                element.style.backgroundColor = 'white';
+                element.style.fontFamily = 'Arial, sans-serif';
+                element.style.margin = '0 auto';
+                
+                const dataAtual = new Date();
+                const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
+                
+                // Gerar HTML
+                let palpitesHTML = '';
+                palpites.forEach((p, idx) => {
+                    const numerosArray = p.numeros.split(',').map(n => n.trim());
+                    palpitesHTML += `
+                        <div style="margin-bottom: 15px; padding: 10px; border-left: 3px solid #8b5cf6; background: #f8fafc; border-radius: 5px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span style="font-weight: bold; font-size: 12px;">${idx+1}. ${p.loteria}</span>
+                                <span style="font-size: 9px; color: #666;">${p.data || 'Data não informada'}</span>
+                            </div>
+                            <div style="font-family: Arial; font-size: 11px; color: #3b82f6;">
+                                Números: ${numerosArray.join(' • ')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                element.innerHTML = `
+                    <div style="text-align: center; border-bottom: 2px solid #8b5cf6; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h1 style="font-size: 22px; color: #8b5cf6;">🎲 LOTERIAS IA 🎲</h1>
+                        <p style="font-size: 10px; color: #666;">Sistema Profissional de Loterias com IA Real - Versão 6.1</p>
                     </div>
-                    <div style="font-family: Arial; font-size: 11px; font-style: italic; color: #3b82f6; margin-top: 4px;">
-                        Números: ${numerosArray.map(n => `<strong style="font-size: 11px;">${n}</strong>`).join(' • ')}
+                    
+                    <div style="background: #f1f5f9; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                            <span><strong>Usuário:</strong> ${usuario.nome || 'Não informado'}</span>
+                            <span><strong>Email:</strong> ${usuario.email || 'Não informado'}</span>
+                            <span><strong>Data:</strong> ${dataFormatada}</span>
+                            <span><strong>Total:</strong> ${palpites.length} palpites</span>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
-        
-        // HTML COMPLETO (sem marca d'água atrapalhando)
-        divPDF.innerHTML = `
-            <div style="position: relative;">
-                <!-- CABEÇALHO -->
-                <div style="text-align: center; border-bottom: 2px solid #8b5cf6; padding-bottom: 15px; margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px;">
-                        ${brasaoHtml}
-                        <h1 style="font-size: 24px; color: #8b5cf6; margin: 0;">LOTERIAS IA</h1>
-                        ${brasaoHtml}
+                    
+                    <h3 style="color: #8b5cf6; font-size: 14px; margin-bottom: 15px;">📜 PALPITES SELECIONADOS</h3>
+                    
+                    ${palpitesHTML}
+                    
+                    <div style="text-align: center; margin-top: 30px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 8px; color: #999;">
+                        Documento gerado por Loterias IA - ${dataFormatada}
                     </div>
-                    <p style="font-size: 10px; color: #666;">Sistema Profissional de Loterias com IA Real</p>
-                    <p style="font-size: 9px; color: #999;">Versão 6.1</p>
-                </div>
+                `;
                 
-                <!-- INFORMAÇÕES USUÁRIO (NORMAL, NÃO É MARCA D'ÁGUA) -->
-                <div style="background: #f1f5f9; padding: 10px; border-radius: 6px; margin-bottom: 20px;">
-                    <table style="width: 100%; font-size: 10px;">
-                        <tr><td style="padding: 3px;"><strong>Usuário:</strong> ${usuario.nome || 'Não informado'}</td>
-                            <td style="padding: 3px;"><strong>Email:</strong> ${usuario.email || 'Não informado'}</td>
-                        </tr>
-                        <tr><td style="padding: 3px;"><strong>Data:</strong> ${dataFormatada}</td>
-                            <td style="padding: 3px;"><strong>Total:</strong> ${palpites.length} palpites</td>
-                        </tr>
-                    </table>
-                </div>
+                document.body.appendChild(element);
                 
-                <!-- TÍTULO -->
-                <h3 style="color: #8b5cf6; font-size: 14px; margin-bottom: 12px;">📜 PALPITES SELECIONADOS</h3>
+                // Configurar opções do PDF
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: `palpites_loterias_ia_${Date.now()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
                 
-                <!-- PALPITES -->
-                ${palpitesHTML}
+                // Gerar PDF
+                await html2pdf().set(opt).from(element).save();
                 
-                <!-- RODAPÉ -->
-                <div style="text-align: center; margin-top: 25px; padding-top: 10px; border-top: 1px solid #ddd; font-size: 7px; color: #999;">
-                    Documento gerado por Loterias IA - ${dataFormatada}
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(divPDF);
-        await new Promise(r => setTimeout(r, 150));
-        
-        // Verificar se html2canvas está disponível
-        if (typeof html2canvas === 'undefined') {
-            throw new Error('Biblioteca html2canvas não carregada');
+                document.body.removeChild(element);
+                
+                mostrarToast(`${palpites.length} palpites exportados com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao gerar PDF: ' + error.message);
+            } finally {
+                exportandoPDF = false;
+            }
         }
-        
-        // Converter para imagem
-        const canvas = await html2canvas(divPDF, {
-            scale: 2,
-            backgroundColor: '#ffffff',
-            logging: false,
-            useCORS: true,
-            allowTaint: false
-        });
-        
-        document.body.removeChild(divPDF);
-        
-        // Criar PDF
-        const { jsPDF } = window.jspdf;
-        const imgData = canvas.toDataURL('image/png');
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        const doc = new jsPDF({
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        });
-        
-        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        
-        let heightLeft = imgHeight;
-        let position = 0;
-        while (heightLeft > pageHeight) {
-            position = heightLeft - pageHeight;
-            doc.addPage();
-            doc.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
-        
-        doc.save(`palpites_loterias_ia_${Date.now()}.pdf`);
-        mostrarToast(`${palpites.length} palpites exportados com sucesso!`, 'success');
-        
-    } catch (error) {
-        console.error('Erro detalhado:', error);
-        alert('Erro ao gerar PDF: ' + error.message + '\nTente novamente.');
-    } finally {
-        exportandoPDF = false;
-    }
-}
         
         function mostrarToast(mensagem, tipo = 'success') {
             const toast = document.createElement('div');
@@ -581,15 +525,11 @@
                 historicoHtml = `<div class="scroll-area">`;
                 
                 historico.forEach((item, itemIdx) => {
-                    const ehDiaDaSorte = item.loteria === 'diadesorte';
-                    const temMeses = item.meses && Array.isArray(item.meses) && item.meses.length > 0;
                     const jogosArray = item.jogos || [];
                     const dataJogo = item.data ? new Date(item.data).toLocaleString() : 'Data desconhecida';
                     
                     jogosArray.forEach((jogo, jogoIdx) => {
                         totalJogosIndividuais++;
-                        const mesNumero = temMeses ? item.meses[jogoIdx] : null;
-                        const mesNome = mesNumero ? getNomeMes(mesNumero) : null;
                         const numerosDisplay = Array.isArray(jogo) ? jogo.join(', ') : jogo;
                         
                         historicoHtml += `
@@ -600,8 +540,6 @@
                                 </div>
                                 <div class="historico-jogos">
                                     Números: ${numerosDisplay}
-                                    ${ehDiaDaSorte && mesNome ? `<br>Mês da Sorte: ${mesNome} (${formatarNumeroZero(mesNumero)})` : ''}
-                                    ${item.extras && !temMeses && !ehDiaDaSorte ? `<br>${item.extras}` : ''}
                                 </div>
                                 <div style="margin-top: 8px;">
                                     <label class="checkbox-label">
@@ -624,10 +562,10 @@
                 transacoesHtml = `
                     <div class="scroll-area">
                         <table class="transacoes-table">
-                            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
+                            <thead></tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
                             <tbody>
                                 ${transacoes.map(t => `
-                                    </tr>
+                                    <tr>
                                         <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
                                         <td>${t.tipo === 'compra' ? 'Compra' : t.tipo === 'uso' ? 'Jogos' : t.tipo === 'pix_simulado' ? 'Teste' : t.tipo || '-'}</td>
                                         <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
