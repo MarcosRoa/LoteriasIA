@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loterias V.6.1 - Sistema Profissional de Loterias com IA Real</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
+    
+    <!-- Supabase SDK -->
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        window.supabaseClient = createClient(
+            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
+        );
+        console.log('✅ Supabase inicializado');
+    </script>
+    
+    <!-- Mercado Pago SDK -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    
+    <!-- Bibliotecas -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div id="maintenanceScreen" style="display: none;">
+        <div class="maintenance-overlay">
+            <div class="maintenance-content">
+                <div class="maintenance-icon">🔧⚙️</div>
+                <h1 class="maintenance-title">Sistema em Manutenção</h1>
+                <p class="maintenance-text">Estamos realizando melhorias no sistema para melhor atendê-lo.</p>
+                <p class="maintenance-text">Em breve estaremos de volta com novidades!</p>
+                <div class="maintenance-time">⏱️ Previsão: algumas horas<br>📧 Dúvidas: suporte@loteriasia.com</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-content">
+            <div class="header-logo"><img src="img/brasao.png" onerror="this.style.display='none'" alt="Logo"></div>
+            <div class="header-text">
+                <h1>🧠 Sistema Profissional de Loterias com IA Real <span class="version-badge">V.6.1</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões 🎯• Login Social • Sistema de Créditos • PIX</p>
+            </div>
+            <div class="header-logo"><img src="img/brasao.png" onerror="this.style.display='none'" alt="Logo"></div>
+        </div>
+    </div>
+
+    <div id="userPanel" class="user-panel">
+        <div id="loginArea">
+            <div class="login-buttons">
+                <button class="btn-google" onclick="loginGoogle()">🔐 Entrar com Google</button>
+                <button class="btn-facebook" onclick="loginFacebook()">🔐 Entrar com Facebook</button>
+            </div>
+            <p style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">Faça login para gerar jogos e salvar seu histórico</p>
+        </div>
+        <div id="userInfoArea" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <div class="lottery-grid" id="lotteryGrid"></div>
+        <div id="conteudoLoteria"></div>
+    </div>
+
+    <!-- Scripts modulares -->
+    <script type="module">
+        import { loginGoogle, loginFacebook, logout, onAuthStateChanged, processarLogin } from './js/auth.js';
+        import { carregarGridLoterias, atualizarInterfaceUsuario } from './js/ui.js';
+        import { checkMaintenance } from './js/utils.js';
+        
+        // Expor funções globalmente para onclick
+        window.loginGoogle = loginGoogle;
+        window.loginFacebook = loginFacebook;
+        window.logout = logout;
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async () => {
+            checkMaintenance();
+            
+            const tema = localStorage.getItem('tema');
+            if (tema === 'light') document.body.classList.add('light-mode');
+            
+            carregarGridLoterias();
+            
+            onAuthStateChanged(async (user) => { 
+                if (user) await processarLogin(user); 
+                else atualizarInterfaceUsuario(); 
+            });
+        });
+    </script>
+</body>
+</html>
