@@ -1,0 +1,80 @@
+/* ============================================ */
+/* ESTILOS DO SISTEMA PRO */
+/* ============================================ */
+
+/* Badge PRO */
+.pro-badge {
+    background: linear-gradient(135deg, #f59e0b, #eab308);
+    color: #1e293b;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-left: 8px;
+    display: inline-block;
+    animation: pulse 1.5s ease infinite;
+}
+
+/* Texto de expiração do PRO */
+.pro-expires {
+    font-size: 10px;
+    color: #f59e0b;
+    margin-top: 2px;
+}
+
+/* Botão de ativação PRO */
+.btn-pro {
+    background: linear-gradient(135deg, #f59e0b, #eab308);
+    color: #1e293b;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-pro:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+/* Configurações ocultas para não PRO */
+.configuracoes-ocultas {
+    filter: blur(4px);
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 4px 8px;
+    display: inline-block;
+    cursor: not-allowed;
+    user-select: none;
+}
+
+.configuracoes-ocultas:hover {
+    filter: blur(0);
+    transition: filter 0.3s;
+}
+
+/* Tooltip para funcionalidades PRO */
+.pro-tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.pro-tooltip:hover::after {
+    content: "⭐ Funcionalidade exclusiva PRO";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #f59e0b;
+    color: #1e293b;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+}
