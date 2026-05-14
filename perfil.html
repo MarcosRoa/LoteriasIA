@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Loterias IA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        window.supabaseClient = createClient(
+            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
+        );
+        window.supabaseReady = true;
+        console.log('✅ Supabase perfil conectado');
+    </script>
+    
+    <style>
+        .config-oculto { filter: blur(5px); background: rgba(0,0,0,0.2); border-radius: 4px; padding: 2px 6px; display: inline-block; }
+        .pro-badge-pequeno { background: linear-gradient(135deg, #f59e0b, #eab308); color: #1e293b; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-left: 6px; display: inline-block; }
+        .btn-pdf-bloqueado { background: #64748b; color: white; cursor: not-allowed; opacity: 0.6; }
+        .btn-pdf-bloqueado:hover { transform: none; opacity: 0.6; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-logo"><img src="img/brasao.png" onerror="this.style.display='none'" alt="Logo"></div>
+            <div class="header-text">
+                <h1>🧠 Loterias V.6.1 <span class="version-badge">MEU PERFIL</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
+            </div>
+            <div class="header-logo"><img src="img/brasao.png" onerror="this.style.display='none'" alt="Logo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <button class="btn-voltar" onclick="window.location.href='index.html'">← Voltar ao Sistema</button>
+        <div id="perfilContent"><div class="loading">🔍 Carregando seus dados...</div></div>
+    </div>
+
+    <script>
+        let usuario = null;
+        let creditos = 0;
+        let isPro = false;
+        let jogosSelecionados = new Set();
+        let exportandoPDF = false;
+        
+        function formatarNumeroZero(numero) { return numero.toString().padStart(2, '0'); }
+        
+        function getNomeMes(numero) {
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            return meses[numero - 1] || 'Desconhecido';
+        }
+        
+        function mascararConfiguracoes(texto) {
+            if (!texto) return '••••••';
+            return '•'.repeat(Math.min(texto.length, 40));
+        }
+        
+        function toggleSelecao(itemIdx, jogoIdx) {
+            const id = `${itemIdx}_${jogoIdx}`;
+            if (jogosSelecionados.has(id)) jogosSelecionados.delete(id);
+            else jogosSelecionados.add(id);
+            atualizarContadorSelecionados();
+        }
+        
+        function selecionarTodos() {
+            document.querySelectorAll('.selecionar-jogo').forEach(cb => cb.checked = true);
+            atualizarContadorSelecionados();
+            mostrarToast(`${document.querySelectorAll('.selecionar-jogo').length} palpites selecionados!`, 'success');
+        }
+        
+        function atualizarContadorSelecionados() {
+            const contador = document.getElementById('contadorSelecionados');
+            if (contador) contador.textContent = `${jogosSelecionados.size} selecionado(s)`;
+        }
+        
+        async function podeExportarPDF() {
+            if (!isPro) {
+                mostrarToast('⭐ Esta funcionalidade é exclusiva para usuários PRO!', 'warning');
+                return false;
+            }
+            return true;
+        }
+        
+        async function exportarSelecionadosPDF() {
+            if (!await podeExportarPDF()) return;
+            if (exportandoPDF) return;
+            exportandoPDF = true;
+            
+            try {
+                const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
+                if (checkboxes.length === 0) { alert('Nenhum palpite selecionado!'); exportandoPDF = false; return; }
+                
+                const palpites = [];
+                checkboxes.forEach((checkbox) => {
+                    const item = checkbox.closest('.historico-item');
+                    if (item) {
+                        const loteriaElem = item.querySelector('.historico-loteria');
+                        const numerosElem = item.querySelector('.historico-jogos');
+                        const dataElem = item.querySelector('.historico-data');
+                        const configElem = item.querySelector('.config-texto');
+                        
+                        let numerosTexto = numerosElem ? numerosElem.innerText : '';
+                        numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
+                        let loteriaTexto = loteriaElem ? loteriaElem.innerText.replace(/[🎲]/g, '').trim() : 'Loteria';
+                        let dataTexto = dataElem ? dataElem.innerText.replace(/[📅]/g, '').trim() : '';
+                        let configTexto = configElem ? configElem.innerText : '';
+                        
+                        palpites.push({ loteria: loteriaTexto, numeros: numerosTexto, data: dataTexto, config: configTexto });
+                    }
+                });
+                
+                const divPDF = document.createElement('div');
+                divPDF.style.width = '750px';
+                divPDF.style.padding = '25px';
+                divPDF.style.backgroundColor = 'white';
+                divPDF.style.fontFamily = 'Arial, sans-serif';
+                divPDF.style.position = 'absolute';
+                divPDF.style.left = '-9999px';
+                divPDF.style.top = '-9999px';
+                
+                const dataAtual = new Date();
+                const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
+                const brasaoUrl = 'img/brasao.png';
+                
+                let palpitesHTML = '';
+                palpites.forEach((p, idx) => {
+                    const numerosArray = p.numeros.split(',').map(n => n.trim());
+                    palpitesHTML += `
+                        <div style="margin-bottom: 15px; padding: 12px; border-left: 4px solid #8b5cf6; background: #f8fafc; border-radius: 8px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-weight: bold; font-size: 13px;">${idx+1}. ${p.loteria}</span>
+                                <span style="font-size: 9px; color: #666;">${p.data || 'Data não informada'}</span>
+                            </div>
+                            <div style="font-family: Arial; font-size: 12px; color: #3b82f6; margin-top: 5px;">
+                                Números: ${numerosArray.map(n => `<strong>${n}</strong>`).join(' • ')}
+                            </div>
+                            ${p.config ? `<div style="font-size: 9px; color: #888; margin-top: 8px; border-top: 1px solid #eee; padding-top: 5px;">⚙️ ${p.config}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                divPDF.innerHTML = `
+                    <div>
+                        <div style="text-align: center; border-bottom: 3px solid #8b5cf6; padding-bottom: 15px; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px;">
+                                <img src="${brasaoUrl}" style="width: 50px; height: 50px;" onerror="this.style.display='none'">
+                                <h1 style="font-size: 24px; color: #8b5cf6;">LOTERIAS IA</h1>
+                                <img src="${brasaoUrl}" style="width: 50px; height: 50px;" onerror="this.style.display='none'">
+                            </div>
+                            <p style="font-size: 11px; color: #666;">Sistema Profissional de Loterias com IA Real</p>
+                            <p style="font-size: 10px; color: #999;">Versão 6.1</p>
+                        </div>
+                        <div style="background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                <span><strong>Usuário:</strong> ${usuario.nome || 'Não informado'}</span>
+                                <span><strong>Email:</strong> ${usuario.email || 'Não informado'}</span>
+                                <span><strong>Data:</strong> ${dataFormatada}</span>
+                                <span><strong>Total:</strong> ${palpites.length} palpites</span>
+                            </div>
+                        </div>
+                        <h3 style="color: #8b5cf6; font-size: 14px; margin-bottom: 12px;">📜 PALPITES SELECIONADOS</h3>
+                        ${palpitesHTML}
+                        <div style="text-align: center; margin-top: 25px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 8px; color: #999;">
+                            Documento gerado por Loterias IA - ${dataFormatada}
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(divPDF);
+                await new Promise(r => setTimeout(r, 100));
+                
+                const canvas = await html2canvas(divPDF, { scale: 2.5, backgroundColor: '#ffffff', logging: false, useCORS: true });
+                document.body.removeChild(divPDF);
+                
+                const { jsPDF } = window.jspdf;
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+                while (heightLeft > pageHeight) {
+                    position = heightLeft - pageHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                doc.save(`palpites_loterias_ia_${Date.now()}.pdf`);
+                mostrarToast(`${palpites.length} palpites exportados!`, 'success');
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao gerar PDF: ' + error.message);
+            } finally { exportandoPDF = false; }
+        }
+        
+        function mostrarToast(mensagem, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.background = tipo === 'success' ? '#22c55e' : tipo === 'warning' ? '#f59e0b' : '#ef4444';
+            toast.style.color = 'white';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.zIndex = '9999';
+            toast.style.fontSize = '13px';
+            toast.innerHTML = mensagem;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+        
+        function aguardarSupabase() {
+            return new Promise((resolve) => {
+                if (window.supabaseClient) { resolve(); return; }
+                const checkInterval = setInterval(() => {
+                    if (window.supabaseClient) { clearInterval(checkInterval); resolve(); }
+                }, 100);
+                setTimeout(() => { clearInterval(checkInterval); resolve(); }, 5000);
+            });
+        }
+        
+        async function carregarStatusPro(uid) {
+            try {
+                const { data, error } = await window.supabaseClient.rpc('get_pro_status', { user_uid: uid });
+                if (error) throw error;
+                if (data && data.length > 0) return { isPro: data[0].is_pro, expiresAt: data[0].expira_em, diasRestantes: data[0].dias_restantes };
+                return { isPro: false, expiresAt: null, diasRestantes: 0 };
+            } catch (error) { return { isPro: false, expiresAt: null, diasRestantes: 0 }; }
+        }
+        
+        async function carregarPerfil() {
+            await aguardarSupabase();
+            const storedUser = sessionStorage.getItem('perfil_usuario');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    usuario = userData;
+                    creditos = userData.creditos || 0;
+                    isPro = userData.isPro || false;
+                    usuario.isPro = isPro;
+                    sessionStorage.removeItem('perfil_usuario');
+                    await carregarDadosCompletos();
+                    return;
+                } catch(e) { console.error('Erro:', e); }
+            }
+            
+            const auth = firebase.auth();
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    usuario = { uid: user.uid, nome: user.displayName || user.email?.split('@')[0] || 'Usuário', email: user.email, foto: user.photoURL };
+                    const proStatus = await carregarStatusPro(usuario.uid);
+                    isPro = proStatus.isPro;
+                    usuario.isPro = isPro;
+                    usuario.proExpiresAt = proStatus.expiresAt;
+                    await carregarCreditosDoBanco();
+                    await carregarDadosCompletos();
+                } else {
+                    document.getElementById('perfilContent').innerHTML = `<div class="empty-message"><h3>🔐 Você não está logado!</h3><button class="btn-voltar" onclick="window.location.href='index.html'">Ir para o sistema</button></div>`;
+                }
+            });
+        }
+        
+        async function carregarCreditosDoBanco() {
+            if (!window.supabaseClient || !usuario) return;
+            try {
+                const { data, error } = await window.supabaseClient.from('usuarios').select('creditos').eq('uid', usuario.uid).maybeSingle();
+                if (error) throw error;
+                if (data) creditos = data.creditos;
+            } catch(e) { console.error('Erro créditos:', e); }
+        }
+        
+        async function carregarDadosCompletos() {
+            if (!window.supabaseClient || !usuario) return;
+            const { data: historico } = await window.supabaseClient.from('historico_palpites').select('*').eq('usuario_uid', usuario.uid).order('data', { ascending: false }).limit(50);
+            const { data: transacoes } = await window.supabaseClient.from('transacoes').select('*').eq('usuario_uid', usuario.uid).order('data', { ascending: false }).limit(30);
+            renderizarPerfil(historico || [], transacoes || []);
+        }
+        
+        function renderizarPerfil(historico, transacoes) {
+            const avatarHtml = usuario.foto ? `<img src="${usuario.foto}" alt="Avatar" onerror="this.parentElement.innerHTML='👤'">` : '👤';
+            let historicoHtml = '';
+            let totalJogosIndividuais = 0;
+            
+            if (historico.length === 0) {
+                historicoHtml = '<div class="empty-message">Nenhum palpite gerado ainda!</div>';
+            } else {
+                historicoHtml = `<div class="scroll-area">`;
+                historico.forEach((item, itemIdx) => {
+                    const jogosArray = item.jogos || [];
+                    const dataJogo = item.data ? new Date(item.data).toLocaleString() : 'Data desconhecida';
+                    jogosArray.forEach((jogo, jogoIdx) => {
+                        totalJogosIndividuais++;
+                        const numerosDisplay = Array.isArray(jogo) ? jogo.join(', ') : jogo;
+                        let configDisplay = '';
+                        if (item.filtros) {
+                            if (isPro) {
+                                configDisplay = `<div class="config-texto" style="font-size: 10px; color: #666; margin-top: 6px; padding-top: 4px; border-top: 1px solid #eee;">⚙️ ${item.filtros}</div>`;
+                            } else {
+                                configDisplay = `<div class="config-texto" style="font-size: 10px; color: #999; margin-top: 6px; padding-top: 4px; border-top: 1px solid #eee;">⚙️ ${mascararConfiguracoes(item.filtros)}</div>`;
+                            }
+                        }
+                        let mesDisplay = '';
+                        if (item.loteria === 'diadesorte' && item.meses && item.meses[jogoIdx]) {
+                            const mesNome = getNomeMes(item.meses[jogoIdx]);
+                            mesDisplay = `<br>📅 Mês da Sorte: ${mesNome} (${formatarNumeroZero(item.meses[jogoIdx])})`;
+                        }
+                        historicoHtml += `
+                            <div class="historico-item">
+                                <div class="historico-header">
+                                    <span class="historico-loteria">${item.loteria || 'Loteria'} - Jogo ${jogoIdx + 1}</span>
+                                    <span class="historico-data">${dataJogo}</span>
+                                </div>
+                                <div class="historico-jogos">Números: ${numerosDisplay}${mesDisplay}</div>
+                                ${configDisplay}
+                                <div style="margin-top: 8px;">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="selecionar-jogo" data-idx="${itemIdx}" data-jogo="${jogoIdx}" onchange="toggleSelecao(${itemIdx}, ${jogoIdx})">
+                                        Selecionar para PDF
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+                historicoHtml += `</div>`;
+            }
+            
+            let transacoesHtml = '';
+            if (transacoes.length === 0) {
+                transacoesHtml = '<div class="empty-message">Nenhuma transação registrada</div>';
+            } else {
+                transacoesHtml = `
+                    <div class="scroll-area">
+                        <table class="transacoes-table">
+                            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
+                            <tbody>
+                                ${transacoes.map(t => `
+                                    <tr><td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
+                                    <td>${t.tipo === 'compra' ? 'Compra' : t.tipo === 'uso' ? 'Jogos' : t.tipo === 'pix_simulado' ? 'Teste' : t.tipo || '-'}</td>
+                                    <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
+                                    <td>R$ ${t.saldo_apos || 0}</td>
+                                    </table>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            const totalCompras = transacoes.filter(t => t.tipo === 'compra' || t.tipo === 'pix_simulado').length;
+            const proBadgeHtml = isPro ? `<span class="pro-badge-pequeno">⭐ PRO</span>` : `<span class="pro-badge-pequeno" style="background: #64748b;">🔓 Grátis</span>`;
+            const btnPdfHtml = isPro ? `<button class="btn-exportar-pdf" onclick="exportarSelecionadosPDF()" style="background: #22c55e;">📄 Exportar PDF</button>` : `<button class="btn-exportar-pdf btn-pdf-bloqueado" onclick="mostrarToast('⭐ Funcionalidade exclusiva PRO!', 'warning')" style="background: #64748b; cursor: not-allowed;">🔒 Exportar PDF (PRO)</button>`;
+            
+            const html = `
+                <div class="profile-grid">
+                    <div class="card card-full">
+                        <div class="perfil-header">
+                            <div class="avatar">${avatarHtml}</div>
+                            <div class="info">
+                                <h2>${usuario.nome || 'Usuário'} ${proBadgeHtml}</h2>
+                                ${isPro && usuario.proExpiresAt ? `<p style="font-size: 11px; color: #f59e0b;">✨ Válido até ${new Date(usuario.proExpiresAt).toLocaleDateString()}</p>` : ''}
+                                <p>${usuario.email || 'Email não disponível'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card"><div class="card-title">SALDO</div><div class="saldo-card"><strong>R$ ${creditos}</strong></div></div>
+                    <div class="card"><div class="card-title">ESTATÍSTICAS</div><div class="stats-container"><div class="stats-number">${totalJogosIndividuais}</div><div class="stats-label">Palpites gerados</div><hr class="stats-divider"><div class="stats-number" style="color: #f59e0b;">${totalCompras}</div><div class="stats-label">Compras realizadas</div></div></div>
+                    <div class="card"><div class="card-title"><span>PALPITES</span><div style="display: flex; gap: 8px; align-items: center;"><span id="contadorSelecionados">0 selecionado(s)</span><button class="btn-selecionar-todos" onclick="selecionarTodos()">Selecionar Todos</button>${btnPdfHtml}</div></div>${historicoHtml}</div>
+                    <div class="card"><div class="card-title">TRANSAÇÕES</div>${transacoesHtml}</div>
+                </div>
+            `;
+            document.getElementById('perfilContent').innerHTML = html;
+            jogosSelecionados.clear();
+            atualizarContadorSelecionados();
+        }
+        
+        window.toggleSelecao = toggleSelecao;
+        window.selecionarTodos = selecionarTodos;
+        window.exportarSelecionadosPDF = exportarSelecionadosPDF;
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCA_FoID7Ch8LkcwK5TbQSK23lU7BxQMuE",
+            authDomain: "loteriasia.firebaseapp.com",
+            projectId: "loteriasia",
+            storageBucket: "loteriasia.firebasestorage.app",
+            messagingSenderId: "124650527048",
+            appId: "1:124650527048:web:bc335922cb9e1586c3fb7d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        carregarPerfil();
+    </script>
+</body>
+</html>
