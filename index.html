@@ -43,7 +43,6 @@
             --warning: #f59e0b;
             --error: #ef4444;
             --info: #3b82f6;
-            --ferrari: #ff2800;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -748,7 +747,6 @@
             
             if (!confirmacao) return false;
             
-            // Mostrar modal PIX para PRO
             mostrarModalPixSimuladoPro(valor, dias);
             return true;
         }
@@ -795,7 +793,6 @@
                 
                 if (error) throw error;
                 
-                // Recarregar status PRO
                 const proStatus = await carregarStatusPro(usuarioAtual.uid);
                 isUserPro = proStatus.isPro;
                 proExpiresAt = proStatus.expira_em;
@@ -1169,7 +1166,6 @@
         
         function abrirPerfil() {
             if (!usuarioAtual) { mostrarModalLogin(); return; }
-            // Salvar dados no sessionStorage para o perfil.html
             sessionStorage.setItem('perfil_usuario', JSON.stringify({ 
                 uid: usuarioAtual.uid, 
                 nome: usuarioAtual.nome, 
@@ -1195,7 +1191,6 @@
             
             creditosUsuario = await carregarCreditosSupabase(user.uid);
             
-            // CARREGAR STATUS PRO
             const proStatus = await carregarStatusPro(user.uid);
             isUserPro = proStatus.isPro;
             proExpiresAt = proStatus.expira_em;
@@ -1204,7 +1199,6 @@
             usuarioAtual.proExpiresAt = proExpiresAt;
             usuarioAtual.proDiasRestantes = proDiasRestantes;
             
-            // Migração de localStorage
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
             if (oldCredits && !isAdminUser()) { 
                 const old = parseInt(oldCredits); 
@@ -1216,7 +1210,6 @@
                 localStorage.removeItem(`historico_${user.uid}`);
             }
             
-            // Limpar dados antigos baseado no status PRO
             await limparDadosAntigos(user.uid);
             
             carregarConfiguracoesUsuario();
@@ -1317,7 +1310,6 @@
             if (historico.length === 0) { mostrarToast('Nenhum histórico', 'info'); return; }
             let html = `<div class="modal-overlay" id="modalHistorico"><div class="modal-container" style="max-width:700px;"><div class="modal-header"><h3>📜 Meu Histórico</h3></div><div class="modal-body" style="max-height:500px;overflow-y:auto;">`;
             historico.forEach(item => {
-                // Mascarar configurações se não for PRO
                 let configDisplay = item.filtros || '';
                 if (!isUserPro && configDisplay) {
                     configDisplay = mascararConfiguracoes(configDisplay);
@@ -1526,7 +1518,6 @@
         function exportarResultadosPDF() {
             if (!verificarLoginEAcao(null)) return;
             
-            // Verificar se é PRO para exportar
             if (!isUserPro) {
                 mostrarToast('⭐ Esta funcionalidade é exclusiva para usuários PRO!', 'warning');
                 return;
@@ -1646,7 +1637,6 @@
             const backtest = await executarBacktesting();
             let html = '';
             if (filtrosTreinamento) {
-                // Mostrar configurações completas se for PRO, ou mascaradas se não for
                 if (isUserPro) {
                     html += `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>`;
                 } else {
@@ -1737,7 +1727,6 @@
                 if (extras.time) extrasDisplay += `<div class="extra-item"><span class="extra-label">⚽ Time:</span><span class="extra-value">${formatarNumeroZero(extras.time)}</span></div>`;
                 if (extras.trevos) extrasDisplay += `<div class="extra-item"><span class="extra-label">💎 Trevos:</span><span class="extra-value">${extras.trevos.map(t => formatarNumeroZero(t)).join(' - ')}</span></div>`;
                 
-                // Informações de configuração do jogo (apenas para PRO)
                 let configJogoHtml = '';
                 if (isUserPro && filtrosTreinamento) {
                     configJogoHtml = `<div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px; padding-top: 5px; border-top: 1px solid var(--border);">
@@ -1929,7 +1918,6 @@
             grid.innerHTML = Object.entries(LOTERIAS).map(([id, c]) => `<div class="lottery-card ${id==='megasena'?'active':''}" onclick="selecionarLoteria('${id}')" id="card-${id}"><div class="ia-status nao-treinado" id="status-${id}"></div><h3>${c.icone} ${c.nome}</h3><p class="rules">${c.numeros} números • 1 a ${c.maxNumero}${c.temMes ? ' + Mês' : ''}${c.temTime ? ' + Time' : ''}${c.temTrevos ? ' + Trevos' : ''}</p></div>`).join('');
         }
         
-        // Expor funções globalmente
         window.atualizarQuantidadePorRange = atualizarQuantidadePorRange;
         window.atualizarQuantidadePorInput = atualizarQuantidadePorInput;
         window.exportarResultadosPDF = exportarResultadosPDF;
