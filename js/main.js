@@ -7,20 +7,25 @@ import { mostrarToast } from './utils.js';
 import { LOTERIAS, cacheDados, cacheDatas } from './loterias.js';
 import { atualizarInterfaceUsuario } from './ui.js';
 
-// Estado global
+// Estado global (APENAS UMA VEZ)
 export let usuarioAtual = null;
 export let creditosUsuario = 0;
 export let isUserPro = false;
 
-// Setters para atualizar estado
+// REMOVA as declarações duplicadas de setUsuarioAtual, setCreditosUsuario, setIsUserPro
+// Elas estão sendo declaradas como variáveis, mas também exportadas como funções
+
+// Funções para atualizar estado (APENAS UMA VEZ)
 export function setUsuarioAtual(valor) { 
     usuarioAtual = valor; 
     window.usuarioAtual = valor; 
 }
+
 export function setCreditosUsuario(valor) { 
     creditosUsuario = valor; 
     window.creditosUsuario = valor; 
 }
+
 export function setIsUserPro(valor) { 
     isUserPro = valor; 
     window.usuarioIsPro = valor; 
@@ -41,9 +46,15 @@ window.periodoSelecionado = 'all';
 window.dispersaoAtual = 15;
 window.loteriaAtual = 'megasena';
 
+// ============================================
+// PROCESSAR LOGIN
+// ============================================
+
 export async function processarLogin(user) {
     const { isAdminUser } = await import('./auth.js');
     if (isAdminUser()) return;
+    
+    console.log('🔄 Processando login para:', user.email);
     
     // Carregar créditos
     let creditos = await carregarCreditosSupabase(user.uid, usuarioAtual);
@@ -86,12 +97,17 @@ export async function processarLogin(user) {
     // Atualizar interface
     atualizarInterfaceUsuario();
     
-    // Limpar dados antigos (10 ou 30 dias baseado no status PRO)
+    // Limpar dados antigos
     await limparDadosAntigos(user.uid);
     
     const proMsg = proStatus?.is_pro ? ` ⭐ PRO (válido até ${new Date(proStatus.expira_em).toLocaleDateString()})` : '';
     mostrarToast(`Bem-vindo ${usuario.nome}! Saldo: R$ ${creditos}${proMsg}`, 'success');
+    console.log('✅ Login processado com sucesso');
 }
+
+// ============================================
+// CONFIGURAÇÕES DO USUÁRIO
+// ============================================
 
 function carregarConfiguracoesUsuario() {
     if (!window.usuarioAtual) return;
