@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Loterias IA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        window.supabaseClient = createClient(
+            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
+        );
+        window.supabaseReady = true;
+        console.log('✅ Supabase perfil conectado');
+    </script>
+    
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #020617;
+            --bg-card: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --radius: 10px;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ============================================ */
+        /* CABEÇALHO */
+        /* ============================================ */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary), #0f2744);
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--border);
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-logo img { width: 120px; height: auto; border-radius: 8px; }
+        .header-text { flex: 1; text-align: center; }
+        .header h1 { font-size: 20px; background: linear-gradient(135deg, #8b5cf6, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .version-badge { display: inline-block; background: linear-gradient(135deg, #ef4444, #f59e0b); padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-left: 8px; color: white; }
+        .header-subtitle { color: var(--text-secondary); font-size: 11px; }
+
+        /* ============================================ */
+        /* CONTAINER E BOTÃO VOLTAR */
+        /* ============================================ */
+        .container { max-width: 1400px; margin: 0 auto; padding: 15px; }
+        .btn-voltar { 
+            background: #64748b; 
+            color: white; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px;
+            margin-bottom: 15px; 
+            transition: transform 0.2s; 
+        }
+        .btn-voltar:hover { transform: scale(1.02); background: #475569; }
+
+        /* ============================================ */
+        /* GRID DE CARDS - REDUZIDO */
+        /* ============================================ */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); }
+        
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .card-full {
+            grid-column: span 2;
+        }
+
+        /* ============================================ */
+        /* PERFIL DO USUÁRIO - REDUZIDO */
+        /* ============================================ */
+        .perfil-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .avatar { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 28px; 
+            overflow: hidden; 
+        }
+        .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .info h2 { font-size: 18px; margin-bottom: 3px; }
+        .info p { font-size: 11px; color: var(--text-secondary); word-break: break-all; }
+        
+        /* ============================================ */
+        /* SALDO - REDUZIDO */
+        /* ============================================ */
+        .saldo-card { 
+            background: linear-gradient(135deg, #f59e0b, #eab308); 
+            border-radius: 12px; 
+            padding: 10px; 
+            text-align: center; 
+        }
+        .saldo-card strong { font-size: 28px; display: block; color: #1e293b; }
+        .saldo-card span { font-size: 11px; opacity: 0.9; }
+        
+        /* ============================================ */
+        /* HISTÓRICO DE PALPITES - REDUZIDO */
+        /* ============================================ */
+        .scroll-area { max-height: 300px; overflow-y: auto; }
+        .historico-item { 
+            background: var(--bg-primary); 
+            border-radius: 8px; 
+            padding: 8px 10px; 
+            margin-bottom: 6px; 
+            border-left: 3px solid #38bdf8; 
+        }
+        .historico-header { display: flex; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; }
+        .historico-loteria { font-size: 12px; font-weight: 600; color: #38bdf8; }
+        .historico-data { font-size: 10px; color: var(--text-secondary); }
+        .historico-jogos { font-size: 10px; color: #cbd5e1; word-break: break-all; margin-top: 4px; line-height: 1.4; }
+        
+        /* ============================================ */
+        /* TRANSAÇÕES - REDUZIDO */
+        /* ============================================ */
+        .transacoes-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .transacoes-table th, .transacoes-table td { padding: 6px 4px; text-align: left; border-bottom: 1px solid var(--border); }
+        .transacoes-table th { color: var(--text-secondary); font-weight: 500; }
+        .credito { color: #22c55e; font-weight: 600; }
+        .debito { color: #ef4444; font-weight: 600; }
+        
+        /* ============================================ */
+        /* ESTATÍSTICAS - REDUZIDO */
+        /* ============================================ */
+        .stats-container { text-align: center; padding: 8px; }
+        .stats-number { font-size: 24px; color: #38bdf8; font-weight: 700; }
+        .stats-label { font-size: 10px; color: var(--text-secondary); }
+        .stats-divider { margin: 8px 0; border-color: var(--border); }
+        
+        /* ============================================ */
+        /* MENSAGENS */
+        /* ============================================ */
+        .empty-message { text-align: center; padding: 20px; color: var(--text-secondary); font-size: 12px; }
+        .loading { text-align: center; padding: 20px; color: #f59e0b; font-size: 14px; }
+        
+        /* ============================================ */
+        /* RESPONSIVIDADE */
+        /* ============================================ */
+        @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .card-full { grid-column: span 1; }
+            .perfil-header { flex-direction: column; text-align: center; }
+            .header-logo img { width: 80px; }
+            .header h1 { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- CABEÇALHO -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
+            <div class="header-text">
+                <h1>🧠 Loterias V.6.1 <span class="version-badge">MEU PERFIL</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
+            </div>
+            <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <button class="btn-voltar" onclick="window.location.href='index.html'">← Voltar ao Sistema</button>
+        <div id="perfilContent"><div class="loading">🔍 Carregando seus dados...</div></div>
+    </div>
+
+    <script>
+        let usuario = null;
+        let creditos = 0;
+        
+        function aguardarSupabase() {
+            return new Promise((resolve) => {
+                if (window.supabaseClient) { resolve(); return; }
+                const checkInterval = setInterval(() => {
+                    if (window.supabaseClient) { clearInterval(checkInterval); resolve(); }
+                }, 100);
+                setTimeout(() => { clearInterval(checkInterval); resolve(); }, 5000);
+            });
+        }
+        
+        async function carregarPerfil() {
+            await aguardarSupabase();
+            
+            const storedUser = sessionStorage.getItem('perfil_usuario');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    usuario = userData;
+                    creditos = userData.creditos || 0;
+                    console.log('✅ Dados carregados do sessionStorage:', usuario.email);
+                    sessionStorage.removeItem('perfil_usuario');
+                    await carregarDadosCompletos();
+                    return;
+                } catch(e) { console.error('Erro:', e); }
+            }
+            
+            const auth = firebase.auth();
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log('✅ Usuário autenticado:', user.email);
+                    usuario = { 
+                        uid: user.uid, 
+                        nome: user.displayName || user.email?.split('@')[0] || 'Usuário', 
+                        email: user.email, 
+                        foto: user.photoURL 
+                    };
+                    await carregarCreditosDoBanco();
+                    await carregarDadosCompletos();
+                } else {
+                    document.getElementById('perfilContent').innerHTML = `
+                        <div class="empty-message">
+                            <h3>🔐 Você não está logado!</h3>
+                            <p>Faça login no sistema para acessar seu perfil.</p>
+                            <button class="btn-voltar" style="margin-top:15px;" onclick="window.location.href='index.html'">Ir para o sistema</button>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        async function carregarCreditosDoBanco() {
+            if (!window.supabaseClient || !usuario) return;
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('usuarios')
+                    .select('creditos')
+                    .eq('uid', usuario.uid)
+                    .maybeSingle();
+                if (error) throw error;
+                if (data) creditos = data.creditos;
+            } catch(e) { console.error('Erro créditos:', e); }
+        }
+        
+        async function carregarDadosCompletos() {
+            if (!window.supabaseClient || !usuario) {
+                document.getElementById('perfilContent').innerHTML = `<div class="empty-message"><h3>⚠️ Erro de conexão</h3><button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button></div>`;
+                return;
+            }
+            
+            console.log('📡 Buscando dados para:', usuario.uid);
+            
+            const { data: historico, error: histError } = await window.supabaseClient
+                .from('historico_palpites')
+                .select('*')
+                .eq('usuario_uid', usuario.uid)
+                .order('data', { ascending: false })
+                .limit(50);
+            
+            if (histError) console.error('Erro histórico:', histError);
+            console.log(`📜 Histórico: ${historico?.length || 0} registros`);
+            
+            const { data: transacoes, error: transError } = await window.supabaseClient
+                .from('transacoes')
+                .select('*')
+                .eq('usuario_uid', usuario.uid)
+                .order('data', { ascending: false })
+                .limit(30);
+            
+            if (transError) console.error('Erro transações:', transError);
+            console.log(`💰 Transações: ${transacoes?.length || 0} registros`);
+            
+            renderizarPerfil(historico || [], transacoes || []);
+        }
+        
+        function renderizarPerfil(historico, transacoes) {
+            const avatarHtml = usuario.foto 
+                ? `<img src="${usuario.foto}" alt="Avatar" onerror="this.parentElement.innerHTML='👤'">`
+                : '👤';
+            
+            // Histórico de palpites
+            let historicoHtml = '';
+            if (historico.length === 0) {
+                historicoHtml = '<div class="empty-message">Nenhum palpite gerado ainda</div>';
+            } else {
+                historicoHtml = `<div class="scroll-area">${historico.map(item => `
+                    <div class="historico-item">
+                        <div class="historico-header">
+                            <span class="historico-loteria">🎲 ${item.loteria || 'Loteria'}</span>
+                            <span class="historico-data">${item.data ? new Date(item.data).toLocaleString() : '-'}</span>
+                        </div>
+                        <div class="historico-jogos">
+                            ${item.jogos?.map(j => Array.isArray(j) ? `[${j.join(', ')}]` : j).join(', ') || '-'}
+                            ${item.extras ? `<br>✨ ${item.extras}` : ''}
+                        </div>
+                    </div>
+                `).join('')}</div>`;
+            }
+            
+            // Transações
+            let transacoesHtml = '';
+            if (transacoes.length === 0) {
+                transacoesHtml = '<div class="empty-message">Nenhuma transação registrada</div>';
+            } else {
+                transacoesHtml = `
+                    <div class="scroll-area">
+                        <table class="transacoes-table">
+                            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
+                            <tbody>
+                                ${transacoes.map(t => `
+                                    <tr>
+                                        <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
+                                        <td>${t.tipo === 'compra' ? '💳 Compra' : t.tipo === 'uso' ? '🎲 Jogos' : t.tipo === 'pix_simulado' ? '🧪 Teste' : t.tipo || '-'}</td>
+                                        <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
+                                        <td>R$ ${t.saldo_apos || 0}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            const totalCompras = transacoes.filter(t => t.tipo === 'compra' || t.tipo === 'pix_simulado').length;
+            
+            const html = `
+                <div class="profile-grid">
+                    <div class="card card-full">
+                        <div class="perfil-header">
+                            <div class="avatar">${avatarHtml}</div>
+                            <div class="info">
+                                <h2>${usuario.nome || 'Usuário'}</h2>
+                                <p>${usuario.email || 'Email não disponível'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">💰 SALDO</div>
+                        <div class="saldo-card"><strong>R$ ${creditos}</strong></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">📊 ESTATÍSTICAS</div>
+                        <div class="stats-container">
+                            <div class="stats-number">${historico.length}</div>
+                            <div class="stats-label">Palpites gerados</div>
+                            <hr class="stats-divider">
+                            <div class="stats-number" style="color: #f59e0b;">${totalCompras}</div>
+                            <div class="stats-label">Compras realizadas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">📜 PALPITES</div>
+                        ${historicoHtml}
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">💰 TRANSAÇÕES</div>
+                        ${transacoesHtml}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('perfilContent').innerHTML = html;
+        }
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCA_FoID7Ch8LkcwK5TbQSK23lU7BxQMuE",
+            authDomain: "loteriasia.firebaseapp.com",
+            projectId: "loteriasia",
+            storageBucket: "loteriasia.firebasestorage.app",
+            messagingSenderId: "124650527048",
+            appId: "1:124650527048:web:bc335922cb9e1586c3fb7d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        carregarPerfil();
+    </script>
+</body>
+</html>
