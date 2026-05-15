@@ -4,32 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loterias V.6.1 - Sistema Profissional de Loterias com IA Real</title>
+    <title>Loterias V.6.1 - Sistema Profissional de Loterias com IA Real + PRO</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
-    
-    <!-- Supabase SDK -->
-    <script type="module">
-        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-        window.supabaseClient = createClient(
-            'https://fuiaikymhsjdgdhojjhq.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
-        );
-        console.log('✅ Supabase inicializado');
-    </script>
-    
-    <!-- Mercado Pago SDK -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    
-    <!-- Bibliotecas existentes -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     
     <style>
         :root {
@@ -44,7 +21,6 @@
             --warning: #f59e0b;
             --error: #ef4444;
             --info: #3b82f6;
-            --ferrari: #ff2800;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,7 +47,6 @@
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* ANIMAÇÃO DE TREINAMENTO DA IA */
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -86,11 +61,6 @@
         @keyframes pulseIA {
             0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
             50% { opacity: 0.9; transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
-        }
-        
-        @keyframes pulseSlider {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
         }
         
         @keyframes badgeGradient {
@@ -156,6 +126,39 @@
             text-shadow: 0 0 5px rgba(0,0,0,0.3);
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
         }
+        
+        .pro-badge {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: #1e293b;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 8px;
+            display: inline-block;
+            animation: pulse 1.5s ease infinite;
+        }
+        
+        .pro-expires {
+            font-size: 10px;
+            color: #f59e0b;
+            margin-top: 2px;
+        }
+        
+        .btn-pro {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: #1e293b;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-pro:hover { transform: scale(1.02); opacity: 0.9; }
 
         .maintenance-overlay {
             position: fixed;
@@ -426,17 +429,6 @@
             color: var(--text-secondary);
         }
         
-        select, input:not(.quantidade-input):not(.quantidade-range) { 
-            padding: 10px; 
-            border: 2px solid var(--border); 
-            border-radius: var(--radius); 
-            background: var(--bg-card); 
-            color: var(--text-primary); 
-            width: 100%; 
-            margin-top: 8px; 
-            font-size: 13px;
-        }
-        
         .bolas { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
         .bola { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; animation: popIn 0.3s ease; }
         .resultado-jogo { background: var(--bg-card); padding: 15px; border-radius: var(--radius); border: 2px solid var(--border); margin-bottom: 15px; transition: all 0.3s; }
@@ -522,9 +514,6 @@
             height: 4px;
             border-radius: 5px;
         }
-        .dispersao-slider input:active {
-            animation: pulseSlider 0.5s ease;
-        }
         .dispersao-valor {
             font-size: 12px;
             margin-top: 5px;
@@ -566,6 +555,7 @@
             .header h1 { font-size: 16px; }
             .version-badge { font-size: 10px; padding: 4px 10px; }
             .config-grid { grid-template-columns: 1fr; gap: 15px; }
+            .btn-pro { padding: 6px 12px; font-size: 11px; }
         }
     </style>
 </head>
@@ -584,12 +574,12 @@
 
     <div class="header">
         <div class="header-content">
-            <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
+            <div class="header-logo"><img src="img/brasao.png" onerror="this.style.display='none'" alt="Logo"></div>
             <div class="header-text">
-                <h1>🧠 Sistema Profissional de Loterias com IA Real <span class="version-badge">V.6.1</span></h1>
-                <p class="header-subtitle">10 loterias • IA que Aprende Padrões 🎯• Login Social • Sistema de Créditos • PIX</p>
+                <h1>🧠 Sistema Profissional de Loterias com IA Real <span class="version-badge">V.6.1 PRO</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões 🎯• Login Social • Sistema de Créditos • PIX • PLANO PRO</p>
             </div>
-            <div class="header-logo"><img src="BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
+            <div class="header-logo"><img src="img/brasao.png" onerror="this.style.display='none'" alt="Logo"></div>
         </div>
     </div>
 
@@ -622,6 +612,13 @@
         // ============================================
         let maintenanceMode = false;
         
+        // ============================================
+        // VARIÁVEIS GLOBAIS PRO
+        // ============================================
+        let isUserPro = false;
+        let proExpiresAt = null;
+        let proDiasRestantes = 0;
+        
         function checkMaintenance() {
             if (maintenanceMode === true) {
                 document.getElementById('maintenanceScreen').style.display = 'block';
@@ -650,6 +647,11 @@
             return numero.toString().padStart(2, '0');
         }
         
+        function mascararConfiguracoes(texto) {
+            if (!texto) return '••••••';
+            return '•'.repeat(Math.min(texto.length, 40));
+        }
+        
         function mostrarModalLogin() {
             const existing = document.querySelector('.modal-login-overlay');
             if (existing) existing.remove();
@@ -659,7 +661,7 @@
             overlay.innerHTML = `
                 <div class="modal-login-container">
                     <div class="modal-login-logo">🎲</div>
-                    <div class="modal-login-title">Loterias V.6.1</div>
+                    <div class="modal-login-title">Loterias V.6.1 PRO</div>
                     <div class="modal-login-message">
                         🔐 Para gerar seus palpites e salvar seu histórico,<br>
                         <strong>faça login utilizando Google ou Facebook</strong>.
@@ -682,6 +684,126 @@
             }
             if (typeof acao === 'function') acao();
             return true;
+        }
+        
+        // ============================================
+        // FUNÇÕES DO SISTEMA PRO
+        // ============================================
+        
+        async function carregarStatusPro(uid) {
+            if (!window.supabaseClient) return { isPro: false, expira_em: null, dias_restantes: 0 };
+            try {
+                const { data, error } = await window.supabaseClient
+                    .rpc('get_pro_status', { user_uid: uid });
+                if (error) throw error;
+                if (data && data.length > 0) {
+                    return {
+                        isPro: data[0].is_pro || false,
+                        expira_em: data[0].expira_em,
+                        dias_restantes: data[0].dias_restantes || 0
+                    };
+                }
+                return { isPro: false, expira_em: null, dias_restantes: 0 };
+            } catch (error) {
+                console.error('Erro ao carregar status PRO:', error);
+                return { isPro: false, expira_em: null, dias_restantes: 0 };
+            }
+        }
+        
+        async function ativarPro(valor = 19.90, dias = 15) {
+            if (!usuarioAtual) {
+                mostrarModalLogin();
+                return false;
+            }
+            
+            if (isUserPro) {
+                mostrarToast(`⭐ Você já é PRO! Válido por mais ${proDiasRestantes} dias.`, 'info');
+                return false;
+            }
+            
+            const confirmacao = confirm(`⭐ ATIVAR PLANO PRO\n\nValor: R$ ${valor}\nDuração: ${dias} dias\n\nBenefícios:\n• Exportar PDF de palpites selecionados\n• Ver configurações detalhadas de cada palpite\n• Suporte prioritário\n\nDeseja continuar?`);
+            
+            if (!confirmacao) return false;
+            
+            mostrarModalPixSimuladoPro(valor, dias);
+            return true;
+        }
+        
+        function mostrarModalPixSimuladoPro(valor, dias) {
+            const existing = document.querySelector('.modal-pix-overlay');
+            if (existing) existing.remove();
+            
+            const qrCodeSimulado = `https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=PRO_${Date.now()}`;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-pix-overlay';
+            overlay.innerHTML = `
+                <div class="modal-pix-container">
+                    <div style="font-size: 48px;">⭐🧪</div>
+                    <h3 style="color: #f59e0b;">MODO TESTE - ATIVAÇÃO PRO</h3>
+                    <p style="color: var(--text-secondary);">Valor: <strong style="color: #fbbf24;">R$ ${valor.toFixed(2)}</strong></p>
+                    <p style="font-size: 12px; color: #f59e0b;">⚠️ Modo teste - Nenhum pagamento real</p>
+                    <div class="qr-code-area"><img src="${qrCodeSimulado}" style="width: 200px;"></div>
+                    <div class="pix-copy-area"><code>PRO_${Date.now()}</code></div>
+                    <button class="btn-copiar" onclick="copiarPixSimulado('PRO_${Date.now()}')">📋 Copiar</button>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="simularAtivacaoPro(${valor}, ${dias})" style="background: #f59e0b;">⭐ Simular Ativação PRO</button>
+                        <button class="btn" onclick="fecharModalPix()" style="background: #64748b;">Fechar</button>
+                    </div>
+                    <p style="font-size: 11px;">💡 Clique em "Simular Ativação PRO" para testar</p>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        async function simularAtivacaoPro(valor, dias) {
+            fecharModalPix();
+            mostrarToast('🔄 Ativando plano PRO...', 'info');
+            await new Promise(r => setTimeout(r, 1500));
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .rpc('ativar_pro', { 
+                        user_uid: usuarioAtual.uid, 
+                        valor_pagamento: valor, 
+                        dias_validade: dias 
+                    });
+                
+                if (error) throw error;
+                
+                const proStatus = await carregarStatusPro(usuarioAtual.uid);
+                isUserPro = proStatus.isPro;
+                proExpiresAt = proStatus.expira_em;
+                proDiasRestantes = proStatus.dias_restantes;
+                usuarioAtual.isPro = isUserPro;
+                usuarioAtual.proExpiresAt = proExpiresAt;
+                usuarioAtual.proDiasRestantes = proDiasRestantes;
+                
+                atualizarInterfaceUsuario();
+                mostrarToast(`⭐ PARABÉNS! Agora você é PRO! Válido por ${dias} dias.`, 'success');
+                
+            } catch (error) {
+                console.error('Erro ao ativar PRO:', error);
+                mostrarToast('❌ Erro ao ativar PRO. Tente novamente.', 'error');
+            }
+        }
+        
+        async function limparDadosAntigos(uid) {
+            if (!window.supabaseClient) return;
+            try {
+                const { data, error } = await window.supabaseClient
+                    .rpc('limpar_historico_usuario', { user_uid: uid });
+                if (error) throw error;
+                console.log(`🗑️ Limpeza concluída: ${data || 0} registros removidos`);
+                return data;
+            } catch (error) {
+                console.error('Erro ao limpar dados antigos:', error);
+                return 0;
+            }
+        }
+        
+        function isProUser() {
+            return isUserPro && (!proExpiresAt || new Date(proExpiresAt) > new Date());
         }
         
         // ============================================
@@ -873,7 +995,7 @@
         // VERSÃO E CONFIGURAÇÕES INICIAIS
         // ============================================
         const VERSAO = "6.1.0";
-        console.log(`🚀 Loterias V.${VERSAO} - Atualizado`);
+        console.log(`🚀 Loterias V.${VERSAO} - Atualizado com PRO`);
         
         let loteriaAtual = 'megasena';
         let dadosAtuais = [];
@@ -889,17 +1011,20 @@
         const cacheDados = {};
         const cacheDatas = {};
         
+        // ============================================
+        // CONFIGURAÇÕES DAS LOTERIAS (COM DISPERSÃO PARA TODAS)
+        // ============================================
         const LOTERIAS = {
             megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25 },
-            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', temDispersao: false },
-            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', temDispersao: false },
-            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', incluirZero: true },
-            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', temDispersao: true, dispersaoPadrao: 10 },
-            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', temTime: true },
-            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, cor: '#a855f7', temDispersao: true, dispersaoPadrao: 12, temTrevos: true, numTrevos: 2, maxTrevo: 6 },
-            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16' },
-            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, cor: '#f97316', temDispersao: true, dispersaoPadrao: 8, temMes: true, maxMes: 12 },
-            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', incluirZero: true }
+            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 20 },
+            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 15 },
+            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', incluirZero: true, temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 30 },
+            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 15 },
+            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', temTime: true, temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 20 },
+            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, cor: '#a855f7', temDispersao: true, dispersaoPadrao: 12, dispersaoMin: 5, dispersaoMax: 20, temTrevos: true, numTrevos: 2, maxTrevo: 6 },
+            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 15 },
+            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, cor: '#f97316', temDispersao: true, dispersaoPadrao: 8, dispersaoMin: 3, dispersaoMax: 15, temMes: true, maxMes: 12 },
+            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', incluirZero: true, temDispersao: true, dispersaoPadrao: 7, dispersaoMin: 3, dispersaoMax: 10 }
         };
         
         const REGRAS_OFICIAIS = {
@@ -1009,7 +1134,7 @@
         async function logout() {
             try { 
                 await auth.signOut(); 
-                usuarioAtual = null; creditosUsuario = 0; 
+                usuarioAtual = null; creditosUsuario = 0; isUserPro = false; proExpiresAt = null; proDiasRestantes = 0;
                 atualizarInterfaceUsuario(); 
                 mostrarToast('Logout realizado!', 'success'); 
             } catch(e) { console.error(e); }
@@ -1027,13 +1152,16 @@
                 nome: usuarioAtual.nome, 
                 email: usuarioAtual.email, 
                 foto: usuarioAtual.foto, 
-                creditos: creditosUsuario 
+                creditos: creditosUsuario,
+                isPro: isUserPro,
+                proExpiresAt: proExpiresAt
             }));
             window.location.href = 'perfil.html';
         }
         
         async function processarLogin(user) {
             if (isAdminUser()) return;
+            
             usuarioAtual = { 
                 uid: user.uid, 
                 nome: user.displayName || user.email?.split('@')[0] || 'Usuário', 
@@ -1043,6 +1171,14 @@
             };
             
             creditosUsuario = await carregarCreditosSupabase(user.uid);
+            
+            const proStatus = await carregarStatusPro(user.uid);
+            isUserPro = proStatus.isPro;
+            proExpiresAt = proStatus.expira_em;
+            proDiasRestantes = proStatus.dias_restantes;
+            usuarioAtual.isPro = isUserPro;
+            usuarioAtual.proExpiresAt = proExpiresAt;
+            usuarioAtual.proDiasRestantes = proDiasRestantes;
             
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
             if (oldCredits && !isAdminUser()) { 
@@ -1055,9 +1191,13 @@
                 localStorage.removeItem(`historico_${user.uid}`);
             }
             
+            await limparDadosAntigos(user.uid);
+            
             carregarConfiguracoesUsuario();
             atualizarInterfaceUsuario();
-            mostrarToast(`Bem-vindo ${usuarioAtual.nome}! Saldo: R$ ${creditosUsuario}`, 'success');
+            
+            const proMsg = isUserPro ? ` ⭐ PRO (válido até ${new Date(proExpiresAt).toLocaleDateString()})` : '';
+            mostrarToast(`Bem-vindo ${usuarioAtual.nome}! Saldo: R$ ${creditosUsuario}${proMsg}`, 'success');
         }
         
         function atualizarInterfaceUsuario() {
@@ -1076,16 +1216,24 @@
                     ? `<img src="${usuarioAtual.foto}" class="user-avatar" alt="Avatar" style="object-fit: cover;">`
                     : `<div class="user-avatar" style="background: linear-gradient(135deg, #8b5cf6, #06b6d4); display: flex; align-items: center; justify-content: center;">👤</div>`;
                 
+                const proBadgeHtml = isUserPro ? '<span class="pro-badge">⭐ PRO</span>' : '';
+                const proExpiresHtml = isUserPro && proExpiresAt ? `<p class="pro-expires">✨ Válido até ${new Date(proExpiresAt).toLocaleDateString()}</p>` : '';
+                
                 userInfoArea.innerHTML = `
                     <div class="user-info">
                         ${avatarHtml}
-                        <div class="user-details"><h4>${usuarioAtual.nome}</h4><p>${usuarioAtual.email}</p></div>
+                        <div class="user-details">
+                            <h4>${usuarioAtual.nome} ${proBadgeHtml}</h4>
+                            ${proExpiresHtml}
+                            <p>${usuarioAtual.email}</p>
+                        </div>
                     </div>
                     <div class="credits-box" onclick="abrirPerfil()">
                         <span>💰 MEUS CRÉDITOS</span>
                         <strong id="creditosDisplay">R$ ${creditosUsuario}</strong>
                     </div>
                     <button class="btn-comprar" onclick="abrirModalComprar()">➕ Comprar Créditos</button>
+                    ${!isUserPro ? '<button class="btn-pro" onclick="ativarPro()">⭐ ATIVAR PRO</button>' : ''}
                     <button class="btn-perfil" onclick="abrirPerfil()">👤 Meu Perfil</button>
                     <button class="btn-tema" onclick="toggleTema()">🌓 Tema</button>
                     <span class="status-online">🟢 Online</span>
@@ -1106,7 +1254,10 @@
                 const q = v/3; 
                 html += `<button onclick="iniciarPagamentoPix(${v})" style="background: linear-gradient(135deg,#10b981,#059669);border:none;border-radius:12px;padding:15px;color:white;cursor:pointer;"><strong>R$ ${v}</strong><br><small>${q} jogos</small></button>`; 
             });
-            html += `</div><p style="font-size:11px;margin-top:20px;">💳 Pagamento via PIX (Modo Teste)</p></div><div class="modal-footer"><button onclick="fecharModalComprar()">Fechar</button></div></div></div>`;
+            html += `</div><hr style="margin: 15px 0;"><div style="text-align: center;">`;
+            html += `<button onclick="fecharModalComprar(); ativarPro();" style="background: linear-gradient(135deg,#f59e0b,#eab308);border:none;border-radius:12px;padding:15px;color:#1e293b;cursor:pointer;font-weight:bold;width:100%;">⭐ ATIVAR PLANO PRO (R$ 19,90)</button>`;
+            html += `<p style="font-size: 10px; margin-top: 8px;">⚡ Benefícios: Exportar PDF selecionado, configurações detalhadas, suporte prioritário</p>`;
+            html += `</div><div class="modal-footer"><button onclick="fecharModalComprar()">Fechar</button></div></div></div>`;
             document.body.insertAdjacentHTML('beforeend', html);
         }
         
@@ -1140,9 +1291,14 @@
             if (historico.length === 0) { mostrarToast('Nenhum histórico', 'info'); return; }
             let html = `<div class="modal-overlay" id="modalHistorico"><div class="modal-container" style="max-width:700px;"><div class="modal-header"><h3>📜 Meu Histórico</h3></div><div class="modal-body" style="max-height:500px;overflow-y:auto;">`;
             historico.forEach(item => {
+                let configDisplay = item.filtros || '';
+                if (!isUserPro && configDisplay) {
+                    configDisplay = mascararConfiguracoes(configDisplay);
+                }
                 html += `<div style="padding:12px;margin:8px 0;background:var(--bg-card);border-radius:12px;">
                             <div><span>🎲 ${item.loteria}</span> - ${new Date(item.data).toLocaleString()}</div>
                             <div><strong>Jogos:</strong> ${item.jogos?.map(j => Array.isArray(j) ? `[${j.join(',')}]` : j).join(', ') || ''}</div>
+                            ${configDisplay ? `<div><strong>Configurações:</strong> ${configDisplay}</div>` : ''}
                             ${item.extras ? `<div><strong>Extras:</strong> ${item.extras}</div>` : ''}
                          </div>`;
             });
@@ -1154,7 +1310,7 @@
         
         async function salvarHistoricoUsuario(jogos, filtros, extras, meses = null) {
             if (!usuarioAtual) return;
-            await salvarHistoricoSupabase(usuarioAtual.uid, loteriaAtual, jogos, filtros, extras, meses);
+            await salvarHistoricoSupabase(usuarioAtual.uid, LOTERIAS[loteriaAtual].nome, jogos, filtros, extras, meses);
         }
         
         function atualizarAnimacaoTreinamento(status) {
@@ -1321,14 +1477,50 @@
         function getFiltrosAtivos() {
             const config = LOTERIAS[loteriaAtual];
             const modo = document.getElementById('modoGeracao')?.value || 'ia_especialista';
-            return [
+            const periodoTexto = getPeriodoTexto();
+            const qtdJogos = document.getElementById('qtdJogos')?.value || 1;
+            const dadosFiltrados = filtrarDados();
+            
+            let filtros = [
                 { label: 'Loteria', valor: `${config.icone} ${config.nome}` },
-                { label: 'Período', valor: getPeriodoTexto() },
+                { label: 'Período', valor: periodoTexto },
                 { label: 'Modo IA', valor: getModoTexto(modo) },
-                { label: 'Quantidade', valor: `${document.getElementById('qtdJogos')?.value || 1} jogos` },
-                ...(config.temDispersao ? [{ label: 'Dispersão', valor: `${dispersaoAtual} concursos` }] : []),
-                { label: 'Base dados', valor: `${filtrarDados().length} concursos` }
+                { label: 'Quantidade', valor: `${qtdJogos} jogos` },
+                { label: 'Base dados', valor: `${dadosFiltrados.length} concursos` }
             ];
+            
+            if (config.temDispersao) {
+                filtros.push({ label: 'Dispersão', valor: `${dispersaoAtual} concursos` });
+            }
+            
+            return filtros;
+        }
+        
+        function exportarResultadosPDF() {
+            if (!verificarLoginEAcao(null)) return;
+            
+            if (!isUserPro) {
+                mostrarToast('⭐ Esta funcionalidade é exclusiva para usuários PRO!', 'warning');
+                return;
+            }
+            
+            const palpites = document.querySelectorAll('.resultado-jogo');
+            if (palpites.length === 0) { mostrarToast('Nenhum resultado para exportar', 'warning'); return; }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(`Palpites - ${LOTERIAS[loteriaAtual].nome}`, 20, 20);
+            doc.text(`Usuário: ${usuarioAtual?.nome}`, 20, 30);
+            doc.text(new Date().toLocaleString(), 20, 40);
+            let y = 60;
+            palpites.forEach((p, i) => {
+                const nums = Array.from(p.querySelectorAll('.bola')).map(b => b.textContent).join(', ');
+                doc.text(`Jogo ${i+1}: ${nums}`, 20, y);
+                y += 10;
+                if (y > 270) { doc.addPage(); y = 20; }
+            });
+            doc.save(`palpites_${loteriaAtual}.pdf`);
+            mostrarToast('PDF exportado!', 'success');
         }
         
         function mostrarRelatorioPadroes() {
@@ -1425,11 +1617,18 @@
             
             const backtest = await executarBacktesting();
             let html = '';
-            if (filtrosTreinamento) html += `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>`;
-            if (backtest) html += `<div style="margin:15px 0;padding:15px;background:rgba(34,197,94,0.1);border-left:4px solid #22c55e;"><h4>📈 Performance IA</h4><div>Acerto: <strong>${backtest.percentualIA}%</strong></div></div>`;
+            if (filtrosTreinamento) {
+                if (isUserPro) {
+                    html += `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>`;
+                } else {
+                    html += `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${mascararConfiguracoes(f.valor)}</strong></span>`).join('')}</div></div>`;
+                }
+            }
+            if (backtest && isUserPro) html += `<div style="margin:15px 0;padding:15px;background:rgba(34,197,94,0.1);border-left:4px solid #22c55e;"><h4>📈 Performance IA</h4><div>Acerto: <strong>${backtest.percentualIA}%</strong></div></div>`;
             
             html += `<h3>🎯 ${qtd} JOGOS - ${getModoTexto(modo)}</h3>`;
             html += `<div>✅ Créditos utilizados: R$ ${valorTotal}</div>`;
+            html += `<div><button class="btn btn-primary" onclick="exportarResultadosPDF()" style="background:#8b5cf6; margin-top:10px;">📄 Exportar PDF</button></div>`;
             
             const jogosGerados = [];
             const extrasGerados = [];
@@ -1509,6 +1708,17 @@
                 if (extras.time) extrasDisplay += `<div class="extra-item"><span class="extra-label">⚽ Time:</span><span class="extra-value">${formatarNumeroZero(extras.time)}</span></div>`;
                 if (extras.trevos) extrasDisplay += `<div class="extra-item"><span class="extra-label">💎 Trevos:</span><span class="extra-value">${extras.trevos.map(t => formatarNumeroZero(t)).join(' - ')}</span></div>`;
                 
+                let configJogoHtml = '';
+                if (isUserPro && filtrosTreinamento) {
+                    configJogoHtml = `<div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px; padding-top: 5px; border-top: 1px solid var(--border);">
+                        ⚙️ ${filtrosTreinamento.map(f => `${f.label}: ${f.valor}`).join(' | ')}
+                    </div>`;
+                } else if (!isUserPro && filtrosTreinamento) {
+                    configJogoHtml = `<div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px; padding-top: 5px; border-top: 1px solid var(--border);">
+                        ⚙️ Configurações: ${mascararConfiguracoes(filtrosTreinamento.map(f => `${f.label}: ${f.valor}`).join(' | '))}
+                    </div>`;
+                }
+                
                 html += `<div class="resultado-jogo" style="border-left: 4px solid ${config.cor};">
                     <h4 style="color:${config.cor};">${config.icone} Jogo ${i+1}</h4>
                     <div class="bolas">${numsDisplay}</div>
@@ -1516,6 +1726,7 @@
                     <div class="confianca-bar ${confClass}" style="width:${confianca}%;"></div>
                     <div>Confiança: ${confText} (${confianca}%)</div>
                     <div style="font-size:11px;">🧠 Baseado em ${dados.length} concursos | ${getPeriodoTexto()}</div>
+                    ${configJogoHtml}
                 </div>`;
             }
             
@@ -1534,52 +1745,13 @@
                 mesesParaSalvar = mesesGerados;
             }
             
-            await salvarHistoricoUsuario(jogosGerados, filtrosTreinamento ? filtrosTreinamento.map(f => `${f.label}:${f.valor}`).join(' | ') : '', extrasStr, mesesParaSalvar);
+            const filtrosStr = filtrosTreinamento ? filtrosTreinamento.map(f => `${f.label}: ${f.valor}`).join(' | ') : '';
+            await salvarHistoricoUsuario(jogosGerados, filtrosStr, extrasStr, mesesParaSalvar);
             salvarConfiguracoesUsuario();
             
             html += `<div class="mensagem-sucesso">✅ ${jogosGerados.length} jogos gerados! Saldo: R$ ${creditosUsuario}</div>`;
             document.getElementById('resultados').innerHTML = html;
             mostrarToast(`${jogosGerados.length} jogos gerados!`, 'success');
-        }
-        
-        function exportarResultadosPDF() {
-            if (!verificarLoginEAcao(null)) return;
-            const palpites = document.querySelectorAll('.resultado-jogo');
-            if (palpites.length === 0) { mostrarToast('Nenhum resultado', 'warning'); return; }
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text(`Palpites - ${LOTERIAS[loteriaAtual].nome}`, 20, 20);
-            doc.text(`Usuário: ${usuarioAtual?.nome}`, 20, 30);
-            doc.text(new Date().toLocaleString(), 20, 40);
-            let y = 60;
-            palpites.forEach((p, i) => {
-                const nums = Array.from(p.querySelectorAll('.bola')).map(b => b.textContent).join(', ');
-                doc.text(`Jogo ${i+1}: ${nums}`, 20, y);
-                y += 10;
-                if (y > 270) { doc.addPage(); y = 20; }
-            });
-            doc.save(`palpites_${loteriaAtual}.pdf`);
-            mostrarToast('PDF exportado!', 'success');
-        }
-        
-        function exportarResultadosCSV() {
-            if (!verificarLoginEAcao(null)) return;
-            const palpites = document.querySelectorAll('.resultado-jogo');
-            if (palpites.length === 0) { mostrarToast('Nenhum resultado', 'warning'); return; }
-            let csv = `versao,usuario,jogo,numeros,confianca,data\n`;
-            palpites.forEach((p, i) => {
-                const nums = Array.from(p.querySelectorAll('.bola')).map(b => b.textContent).join(';');
-                const conf = p.querySelector('.confianca-label')?.textContent.match(/\d+/)?.[0] || 'N/A';
-                csv += `V.${VERSAO},${usuarioAtual?.email},${i+1},"${nums}",${conf},${new Date().toLocaleString()}\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `palpites_${loteriaAtual}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarToast('CSV exportado!', 'success');
         }
         
         function setPeriodo(p) { periodoSelecionado = p; iaTreinada = false; aiModel = null; renderizarConteudo(loteriaAtual); if (dadosAtuais.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); }
@@ -1658,10 +1830,10 @@
                 <div class="dispersao-valor">Bloquear números recentes: <strong id="dispersaoValor">${dispersaoAtual} concursos</strong></div>
             </div>`;
             
-            let html = `<div class="card"><h3 style="color:${config.cor};">${config.icone} ${config.nome} - IA V.6.1</h3>`;
+            let html = `<div class="card"><h3 style="color:${config.cor};">${config.icone} ${config.nome} - IA V.6.1 PRO</h3>`;
             if (!cache.carregado) html += `<div class="mensagem-erro"><strong>⚠️ Nenhum dado!</strong><br>📁 Upload do CSV</div>`;
             html += `<div style="display:flex;gap:15px;flex-wrap:wrap;margin:15px 0;"><h4>📁 ${dadosCount} concursos</h4><span id="trainingStatus" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'✓ Treinada':'Pendente'}</span><button class="btn btn-upload" onclick="document.getElementById('uploadManual').click()">📁 Upload CSV</button><input type="file" id="uploadManual" accept=".csv" onchange="importarArquivo(this,'${loteria}')" style="display:none;"></div>`;
-            html += `<div class="stats-grid"><div class="stat-card">Concursos: ${dadosCount}</div><div class="stat-card">Período: ${dadosFiltradosCount}</div><div class="stat-card">Engine: 🧠 V.6.1</div></div></div>`;
+            html += `<div class="stats-grid"><div class="stat-card">Concursos: ${dadosCount}</div><div class="stat-card">Período: ${dadosFiltradosCount}</div><div class="stat-card">Engine: 🧠 V.6.1 PRO</div></div></div>`;
             
             html += `<div class="card"><h4>📅 Período (Baseado em data real)</h4><div class="filtros">
                 <button class="filtro-btn ${periodoSelecionado === 'all' ? 'ativo' : ''}" onclick="setPeriodo('all')">Todos</button>
@@ -1694,7 +1866,7 @@
                 animacaoHtml = `<div id="iaTrainingAnimation" style="display: none;"></div>`;
             }
             
-            html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:80px; font-size:11px;">${iaTreinada?'✅ IA pronta!':'⏳ Clique em Treinar'}</div>${animacaoHtml}<div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
+            html += `<div class="training-section"><h4>🧠 Treinamento da IA</h4><div style="display:flex;gap:15px;flex-wrap:wrap;"><span id="trainingStatus2" class="status-badge ${iaTreinada?'status-ready':'status-error'}">${iaTreinada?'Treinado ✓':'Não Treinado'}</span><button class="btn btn-treinar" onclick="treinarIAComFiltrosAtuais()">🚀 Treinar IA</button><button class="btn btn-backtest" onclick="executarBacktesting()">🔬 Backtest</button><button class="btn btn-relatorio" onclick="mostrarRelatorioPadroes()">📋 Relatório</button></div><div class="training-progress"><div class="training-progress-bar" id="trainingProgressBar" style="width:${iaTreinada?'100%':'0%'};"></div></div><div class="training-log" id="trainingLog" style="min-height:80px; font-size:11px;">${iaTreinada?'✅ IA pronta!':'⏳ Clique em Treinar'}</div>${animacaoHtml}<div id="filtrosAplicadosContainer">${iaTreinada && filtrosTreinamento ? `<div class="filtros-aplicados"><h4>📋 Configuração ${isUserPro ? '' : '(MASCARADO)'}</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${isUserPro ? f.valor : mascararConfiguracoes(f.valor)}</strong></span>`).join('')}</div></div>` : ''}</div></div>`;
             
             html += `<div class="card"><h4>🎲 Configurar e Gerar Jogos</h4><div class="config-grid">
                 <div class="quantidade-container">
@@ -1729,6 +1901,23 @@
         
         window.atualizarQuantidadePorRange = atualizarQuantidadePorRange;
         window.atualizarQuantidadePorInput = atualizarQuantidadePorInput;
+        window.exportarResultadosPDF = exportarResultadosPDF;
+        window.ativarPro = ativarPro;
+        window.loginGoogle = loginGoogle;
+        window.loginFacebook = loginFacebook;
+        window.logout = logout;
+        window.toggleTema = toggleTema;
+        window.abrirPerfil = abrirPerfil;
+        window.abrirModalComprar = abrirModalComprar;
+        window.fecharModalComprar = fecharModalComprar;
+        window.setPeriodo = setPeriodo;
+        window.atualizarDispersao = atualizarDispersao;
+        window.selecionarLoteria = selecionarLoteria;
+        window.gerarJogos = gerarJogos;
+        window.treinarIAComFiltrosAtuais = treinarIAComFiltrosAtuais;
+        window.executarBacktesting = executarBacktesting;
+        window.mostrarRelatorioPadroes = mostrarRelatorioPadroes;
+        window.iniciarPagamentoPix = iniciarPagamentoPix;
         
         document.addEventListener('DOMContentLoaded', () => {
             checkMaintenance();
@@ -1737,8 +1926,8 @@
             carregarGridLoterias();
             selecionarLoteria('megasena');
             auth.onAuthStateChanged(async (user) => { if (user) await processarLogin(user); else atualizarInterfaceUsuario(); });
-            console.log('%c✅ Loterias V.6.1 - Versão Final!', 'color: #22c55e; font-size: 14px;');
-            mostrarToast(`Versão ${VERSAO} - Sistema pronto!`, 'info');
+            console.log('%c✅ Loterias V.6.1 PRO - Versão Final!', 'color: #22c55e; font-size: 14px;');
+            mostrarToast(`Versão ${VERSAO} PRO - Sistema pronto!`, 'info');
         });
     </script>
 </body>
