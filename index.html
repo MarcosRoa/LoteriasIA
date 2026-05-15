@@ -748,7 +748,6 @@
             
             if (!confirmacao) return false;
             
-            // Mostrar modal PIX para PRO
             mostrarModalPixSimuladoPro(valor, dias);
             return true;
         }
@@ -795,7 +794,6 @@
                 
                 if (error) throw error;
                 
-                // Recarregar status PRO
                 const proStatus = await carregarStatusPro(usuarioAtual.uid);
                 isUserPro = proStatus.isPro;
                 proExpiresAt = proStatus.expira_em;
@@ -1036,17 +1034,20 @@
         const cacheDados = {};
         const cacheDatas = {};
         
+        // ============================================
+        // CONFIGURAÇÕES DAS LOTERIAS (COM DISPERSÃO PARA TODAS)
+        // ============================================
         const LOTERIAS = {
             megasena: { nome: 'Mega-Sena', icone: '💰', numeros: 6, maxNumero: 60, cor: '#8b5cf6', temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 25 },
-            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', temDispersao: false },
-            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', temDispersao: false },
-            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', incluirZero: true },
-            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', temDispersao: true, dispersaoPadrao: 10 },
-            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', temTime: true },
-            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, cor: '#a855f7', temDispersao: true, dispersaoPadrao: 12, temTrevos: true, numTrevos: 2, maxTrevo: 6 },
-            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16' },
-            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, cor: '#f97316', temDispersao: true, dispersaoPadrao: 8, temMes: true, maxMes: 12 },
-            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', incluirZero: true }
+            quina: { nome: 'Quina', icone: '🎯', numeros: 5, maxNumero: 80, cor: '#f59e0b', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 20 },
+            lotofacil: { nome: 'Lotofácil', icone: '🍀', numeros: 15, maxNumero: 25, cor: '#10b981', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 15 },
+            lotomania: { nome: 'Lotomania', icone: '🎪', numeros: 50, maxNumero: 99, cor: '#ef4444', incluirZero: true, temDispersao: true, dispersaoPadrao: 15, dispersaoMin: 5, dispersaoMax: 30 },
+            duplasena: { nome: 'Dupla Sena', icone: '🎲', numeros: 6, maxNumero: 50, cor: '#06b6d4', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 15 },
+            timemania: { nome: 'Timemania', icone: '⚽', numeros: 10, maxNumero: 80, cor: '#ec4899', temTime: true, temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 20 },
+            milionaria: { nome: '+Milionária', icone: '💎', numeros: 6, maxNumero: 50, cor: '#a855f7', temDispersao: true, dispersaoPadrao: 12, dispersaoMin: 5, dispersaoMax: 20, temTrevos: true, numTrevos: 2, maxTrevo: 6 },
+            loteca: { nome: 'Loteca', icone: '⚽', numeros: 14, maxNumero: 3, cor: '#84cc16', temDispersao: true, dispersaoPadrao: 10, dispersaoMin: 3, dispersaoMax: 15 },
+            diadesorte: { nome: 'Dia de Sorte', icone: '📅', numeros: 7, maxNumero: 31, cor: '#f97316', temDispersao: true, dispersaoPadrao: 8, dispersaoMin: 3, dispersaoMax: 15, temMes: true, maxMes: 12 },
+            supersete: { nome: 'Super Sete', icone: '🌟', numeros: 7, maxNumero: 9, cor: '#fbbf24', incluirZero: true, temDispersao: true, dispersaoPadrao: 7, dispersaoMin: 3, dispersaoMax: 10 }
         };
         
         const REGRAS_OFICIAIS = {
@@ -1169,7 +1170,6 @@
         
         function abrirPerfil() {
             if (!usuarioAtual) { mostrarModalLogin(); return; }
-            // Salvar dados no sessionStorage para o perfil.html
             sessionStorage.setItem('perfil_usuario', JSON.stringify({ 
                 uid: usuarioAtual.uid, 
                 nome: usuarioAtual.nome, 
@@ -1195,7 +1195,6 @@
             
             creditosUsuario = await carregarCreditosSupabase(user.uid);
             
-            // CARREGAR STATUS PRO
             const proStatus = await carregarStatusPro(user.uid);
             isUserPro = proStatus.isPro;
             proExpiresAt = proStatus.expira_em;
@@ -1204,7 +1203,6 @@
             usuarioAtual.proExpiresAt = proExpiresAt;
             usuarioAtual.proDiasRestantes = proDiasRestantes;
             
-            // Migração de localStorage
             const oldCredits = localStorage.getItem(`creditos_${user.uid}`);
             if (oldCredits && !isAdminUser()) { 
                 const old = parseInt(oldCredits); 
@@ -1216,7 +1214,6 @@
                 localStorage.removeItem(`historico_${user.uid}`);
             }
             
-            // Limpar dados antigos baseado no status PRO
             await limparDadosAntigos(user.uid);
             
             carregarConfiguracoesUsuario();
@@ -1317,7 +1314,6 @@
             if (historico.length === 0) { mostrarToast('Nenhum histórico', 'info'); return; }
             let html = `<div class="modal-overlay" id="modalHistorico"><div class="modal-container" style="max-width:700px;"><div class="modal-header"><h3>📜 Meu Histórico</h3></div><div class="modal-body" style="max-height:500px;overflow-y:auto;">`;
             historico.forEach(item => {
-                // Mascarar configurações se não for PRO
                 let configDisplay = item.filtros || '';
                 if (!isUserPro && configDisplay) {
                     configDisplay = mascararConfiguracoes(configDisplay);
@@ -1526,7 +1522,6 @@
         function exportarResultadosPDF() {
             if (!verificarLoginEAcao(null)) return;
             
-            // Verificar se é PRO para exportar
             if (!isUserPro) {
                 mostrarToast('⭐ Esta funcionalidade é exclusiva para usuários PRO!', 'warning');
                 return;
@@ -1646,7 +1641,6 @@
             const backtest = await executarBacktesting();
             let html = '';
             if (filtrosTreinamento) {
-                // Mostrar configurações completas se for PRO, ou mascaradas se não for
                 if (isUserPro) {
                     html += `<div class="filtros-aplicados"><h4>📋 Configuração</h4><div>${filtrosTreinamento.map(f => `<span class="filtro-item">${f.label}: <strong>${f.valor}</strong></span>`).join('')}</div></div>`;
                 } else {
@@ -1737,7 +1731,6 @@
                 if (extras.time) extrasDisplay += `<div class="extra-item"><span class="extra-label">⚽ Time:</span><span class="extra-value">${formatarNumeroZero(extras.time)}</span></div>`;
                 if (extras.trevos) extrasDisplay += `<div class="extra-item"><span class="extra-label">💎 Trevos:</span><span class="extra-value">${extras.trevos.map(t => formatarNumeroZero(t)).join(' - ')}</span></div>`;
                 
-                // Informações de configuração do jogo (apenas para PRO)
                 let configJogoHtml = '';
                 if (isUserPro && filtrosTreinamento) {
                     configJogoHtml = `<div style="font-size: 9px; color: var(--text-secondary); margin-top: 8px; padding-top: 5px; border-top: 1px solid var(--border);">
@@ -1793,30 +1786,77 @@
             aiModel = null; 
         }
         
+        // ============================================
+        // FUNÇÃO PROCESSAR CSV COM CONVERSÃO PARA LOTECA
+        // ============================================
         function processarCSV(loteria, texto, nome) {
             const config = LOTERIAS[loteria];
             const linhas = texto.split('\n').filter(l => l.trim());
             if (linhas.length < 2) return;
+            
             const sep = linhas[0].includes(';') ? ';' : ',';
             const dados = [];
             const datas = [];
+            
+            // Função específica para converter valores especiais (como os da Loteca)
+            function converterValorEspecial(valor, loteriaNome) {
+                if (loteriaNome === 'loteca') {
+                    if (valor === 'Coluna 1') return 1;
+                    if (valor === 'Coluna 2') return 2;
+                    if (valor === 'Coluna do meio') return 0;
+                }
+                const num = parseInt(valor);
+                return isNaN(num) ? null : num;
+            }
+            
             for (let i = 1; i < linhas.length; i++) {
                 const cols = linhas[i].split(sep);
                 let data = null;
+                
+                // Procurar data na linha
                 for (let j = 0; j < cols.length; j++) {
                     const v = cols[j].trim();
-                    if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) { data = v; break; }
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) { const [a,m,d] = v.split('-'); data = `${d}/${m}/${a}`; break; }
+                    if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) { 
+                        data = v; 
+                        break; 
+                    }
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) { 
+                        const [a,m,d] = v.split('-'); 
+                        data = `${d}/${m}/${a}`; 
+                        break; 
+                    }
                 }
                 datas.push(data);
-                const numeros = cols.map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-                if (numeros.length >= config.numeros) dados.push(numeros.slice(0, config.numeros).sort((a,b)=>a-b));
+                
+                // Extrair números com conversão especial quando necessário
+                const numeros = [];
+                for (let j = 0; j < cols.length; j++) {
+                    const valor = cols[j].trim();
+                    // Pular a data se já foi identificada
+                    if (valor === data) continue;
+                    
+                    const num = converterValorEspecial(valor, loteria);
+                    if (num !== null && !isNaN(num)) {
+                        numeros.push(num);
+                    }
+                }
+                
+                if (numeros.length >= config.numeros) {
+                    dados.push(numeros.slice(0, config.numeros).sort((a,b) => a - b));
+                }
             }
+            
             if (dados.length > 0) {
                 cacheDados[loteria] = { dados, carregado: true, nomeArquivo: nome };
                 cacheDatas[loteria] = { datas };
-                if (loteriaAtual === loteria) { dadosAtuais = [...dados]; renderizarConteudo(loteria); if (dados.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); }
+                if (loteriaAtual === loteria) { 
+                    dadosAtuais = [...dados]; 
+                    renderizarConteudo(loteria); 
+                    if (dados.length >= 10) setTimeout(() => treinarIAComFiltrosAtuais(), 500); 
+                }
                 mostrarToast(`${config.nome}: ${dados.length} concursos carregados!`, 'success');
+            } else {
+                console.warn(`Nenhum dado válido encontrado para ${loteria}`);
             }
         }
         
@@ -1839,7 +1879,10 @@
             if (cacheDados[loteria].carregado) dadosAtuais = [...cacheDados[loteria].dados];
             else {
                 dadosAtuais = [];
-                try { const r = await fetch(`${loteria}.csv`); if (r.ok) processarCSV(loteria, await r.text(), `${loteria}.csv`); } catch(e) { console.log(`Arquivo ${loteria}.csv não encontrado`); }
+                try { 
+                    const r = await fetch(`${loteria}.csv`); 
+                    if (r.ok) processarCSV(loteria, await r.text(), `${loteria}.csv`); 
+                } catch(e) { console.log(`Arquivo ${loteria}.csv não encontrado`); }
             }
             renderizarConteudo(loteria);
             if (dadosAtuais.length >= 10 && !iaTreinada && !isTraining) setTimeout(() => treinarIAComFiltrosAtuais(), 500);
@@ -1929,7 +1972,9 @@
             grid.innerHTML = Object.entries(LOTERIAS).map(([id, c]) => `<div class="lottery-card ${id==='megasena'?'active':''}" onclick="selecionarLoteria('${id}')" id="card-${id}"><div class="ia-status nao-treinado" id="status-${id}"></div><h3>${c.icone} ${c.nome}</h3><p class="rules">${c.numeros} números • 1 a ${c.maxNumero}${c.temMes ? ' + Mês' : ''}${c.temTime ? ' + Time' : ''}${c.temTrevos ? ' + Trevos' : ''}</p></div>`).join('');
         }
         
-        // Expor funções globalmente
+        // ============================================
+        // EXPORTAÇÃO EXPLÍCITA PARA O WINDOW
+        // ============================================
         window.atualizarQuantidadePorRange = atualizarQuantidadePorRange;
         window.atualizarQuantidadePorInput = atualizarQuantidadePorInput;
         window.exportarResultadosPDF = exportarResultadosPDF;
@@ -1949,6 +1994,7 @@
         window.executarBacktesting = executarBacktesting;
         window.mostrarRelatorioPadroes = mostrarRelatorioPadroes;
         window.iniciarPagamentoPix = iniciarPagamentoPix;
+        window.importarArquivo = importarArquivo;
         
         document.addEventListener('DOMContentLoaded', () => {
             checkMaintenance();
