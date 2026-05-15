@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Loterias IA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+        window.supabaseClient = createClient(
+            'https://fuiaikymhsjdgdhojjhq.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aWFpa3ltaHNqZGdkaG9qamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwODI1NTEsImV4cCI6MjA5MzY1ODU1MX0.X9Qa1eJ6ut-QdKEZdjX2Ttm2STgJqOkEdNyohDpH3bk'
+        );
+        window.supabaseReady = true;
+        console.log('✅ Supabase perfil conectado');
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-logo"><img src="img/BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
+            <div class="header-text">
+                <h1>🧠 Loterias V.6.1 <span class="version-badge">MEU PERFIL</span></h1>
+                <p class="header-subtitle">10 loterias • IA que Aprende Padrões • Login Social • Sistema de Créditos • PIX</p>
+            </div>
+            <div class="header-logo"><img src="img/BrasãoRoa Imagem.png" onerror="this.style.display='none'" alt="Logo"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <button class="btn-voltar" onclick="window.location.href='index.html'">← Voltar ao Sistema</button>
+        <div id="perfilContent"><div class="loading">🔍 Carregando seus dados...</div></div>
+    </div>
+
+    <style>
+        /* Estilos específicos do perfil */
+        .btn-voltar { 
+            background: #64748b; 
+            color: white; 
+            border: none; 
+            padding: 8px 20px; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px;
+            margin-bottom: 15px; 
+        }
+        .btn-voltar:hover { transform: scale(1.02); background: #475569; }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-full { grid-column: span 2; }
+
+        .perfil-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .avatar { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 28px; 
+            overflow: hidden; 
+        }
+        .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .info h2 { font-size: 18px; margin-bottom: 3px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+        .info p { font-size: 11px; color: var(--text-secondary); word-break: break-all; }
+        
+        .saldo-card { 
+            background: linear-gradient(135deg, #f59e0b, #eab308); 
+            border-radius: 12px; 
+            padding: 15px; 
+            text-align: center; 
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .saldo-card strong { font-size: 28px; display: block; color: #1e293b; }
+        
+        .stats-container { 
+            text-align: center; 
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stats-number { font-size: 28px; color: #38bdf8; font-weight: 700; }
+        .stats-label { font-size: 11px; color: var(--text-secondary); }
+        .stats-divider { margin: 10px 0; border-color: var(--border); }
+        
+        .scroll-area { 
+            max-height: 350px; 
+            overflow-y: auto; 
+            padding-right: 5px;
+        }
+        .historico-item { 
+            background: var(--bg-primary); 
+            border-radius: 8px; 
+            padding: 10px; 
+            margin-bottom: 8px; 
+            border-left: 3px solid #38bdf8;
+            transition: all 0.2s;
+        }
+        .historico-item:hover { transform: translateX(3px); }
+        .historico-header { display: flex; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; }
+        .historico-loteria { font-size: 12px; font-weight: 600; color: #38bdf8; }
+        .historico-data { font-size: 10px; color: var(--text-secondary); }
+        .historico-jogos { font-size: 12px; color: #cbd5e1; word-break: break-all; margin-top: 6px; line-height: 1.5; }
+        .config-texto { font-size: 9px; color: #666; margin-top: 6px; padding-top: 4px; border-top: 1px solid #334155; }
+        
+        .transacoes-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .transacoes-table th, .transacoes-table td { padding: 8px 4px; text-align: left; border-bottom: 1px solid var(--border); }
+        .transacoes-table th { color: var(--text-secondary); font-weight: 500; }
+        .credito { color: #22c55e; font-weight: 600; }
+        .debito { color: #ef4444; font-weight: 600; }
+        
+        .empty-message { text-align: center; padding: 30px; color: var(--text-secondary); font-size: 12px; }
+        .loading { text-align: center; padding: 20px; color: #f59e0b; font-size: 14px; }
+        
+        .btn-selecionar-todos, .btn-exportar-pdf {
+            transition: all 0.2s;
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-selecionar-todos { background: #38bdf8; color: white; }
+        .btn-exportar-pdf { background: #22c55e; color: white; }
+        .btn-exportar-pdf-bloqueado { background: #64748b; color: white; cursor: not-allowed; opacity: 0.6; }
+        .btn-selecionar-todos:hover, .btn-exportar-pdf:hover { transform: scale(1.02); opacity: 0.9; }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .card-full { grid-column: span 1; }
+            .perfil-header { flex-direction: column; text-align: center; }
+            .info h2 { justify-content: center; }
+            .header-logo img { width: 80px; }
+            .header h1 { font-size: 16px; }
+        }
+    </style>
+
+    <script>
+        let usuario = null;
+        let creditos = 0;
+        let isUserPro = false;
+        let proExpiresAt = null;
+        let jogosSelecionados = new Set();
+        let exportandoPDF = false;
+        
+        function formatarNumeroZero(numero) {
+            return numero.toString().padStart(2, '0');
+        }
+        
+        function getNomeMes(numero) {
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                           'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            return meses[numero - 1] || 'Desconhecido';
+        }
+        
+        function mascararConfiguracoes(texto) {
+            if (!texto) return '••••••';
+            return '•'.repeat(Math.min(texto.length, 40));
+        }
+        
+        function toggleSelecao(itemIdx, jogoIdx) {
+            const id = `${itemIdx}_${jogoIdx}`;
+            if (jogosSelecionados.has(id)) {
+                jogosSelecionados.delete(id);
+            } else {
+                jogosSelecionados.add(id);
+            }
+            atualizarContadorSelecionados();
+        }
+        
+        function selecionarTodos() {
+            const checkboxes = document.querySelectorAll('.selecionar-jogo');
+            checkboxes.forEach(cb => {
+                cb.checked = true;
+                const id = `${cb.dataset.idx}_${cb.dataset.jogo}`;
+                jogosSelecionados.add(id);
+            });
+            atualizarContadorSelecionados();
+            mostrarToast(`${checkboxes.length} palpites selecionados!`, 'success');
+        }
+        
+        function atualizarContadorSelecionados() {
+            const contador = document.getElementById('contadorSelecionados');
+            if (contador) {
+                contador.textContent = `${jogosSelecionados.size} selecionado(s)`;
+            }
+        }
+        
+        function mostrarToast(mensagem, tipo = 'success') {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.background = tipo === 'success' ? '#22c55e' : tipo === 'warning' ? '#f59e0b' : '#ef4444';
+            toast.style.color = 'white';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.zIndex = '9999';
+            toast.style.fontSize = '13px';
+            toast.innerHTML = mensagem;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+        
+        async function exportarSelecionadosPDF() {
+            if (!isUserPro) {
+                mostrarToast('⭐ Esta funcionalidade é exclusiva para usuários PRO! Ative o plano PRO para exportar PDF.', 'warning');
+                return;
+            }
+            
+            if (exportandoPDF) return;
+            exportandoPDF = true;
+            
+            try {
+                const checkboxes = document.querySelectorAll('.selecionar-jogo:checked');
+                if (checkboxes.length === 0) {
+                    alert('Nenhum palpite selecionado!');
+                    exportandoPDF = false;
+                    return;
+                }
+                
+                const palpites = [];
+                checkboxes.forEach((checkbox) => {
+                    const item = checkbox.closest('.historico-item');
+                    if (item) {
+                        const loteriaElem = item.querySelector('.historico-loteria');
+                        const numerosElem = item.querySelector('.historico-jogos');
+                        const dataElem = item.querySelector('.historico-data');
+                        const configElem = item.querySelector('.config-texto');
+                        
+                        let numerosTexto = numerosElem ? numerosElem.innerText : '';
+                        numerosTexto = numerosTexto.replace(/[📊🎲💰📜✨📅]/g, '').replace('Números:', '').replace('Numeros:', '').trim();
+                        let loteriaTexto = loteriaElem ? loteriaElem.innerText.replace(/[🎲]/g, '').trim() : 'Loteria';
+                        let dataTexto = dataElem ? dataElem.innerText.replace(/[📅]/g, '').trim() : '';
+                        let configTexto = configElem ? configElem.innerText : '';
+                        
+                        palpites.push({ loteria: loteriaTexto, numeros: numerosTexto, data: dataTexto, config: configTexto });
+                    }
+                });
+                
+                const divPDF = document.createElement('div');
+                divPDF.style.width = '800px';
+                divPDF.style.padding = '30px';
+                divPDF.style.backgroundColor = 'white';
+                divPDF.style.fontFamily = 'Arial, sans-serif';
+                divPDF.style.position = 'absolute';
+                divPDF.style.left = '-9999px';
+                divPDF.style.top = '-9999px';
+                
+                const dataAtual = new Date();
+                const dataFormatada = dataAtual.toLocaleDateString('pt-BR') + ' às ' + dataAtual.toLocaleTimeString('pt-BR');
+                const logoUrl = 'img/BrasãoRoa Imagem.png';
+                
+                let logoHtml = `<img src="${logoUrl}" style="width: 80px; height: 80px; object-fit: contain;" onerror="this.style.display='none'">`;
+                
+                let palpitesHTML = '';
+                palpites.forEach((p, idx) => {
+                    const numerosArray = p.numeros.split(',').map(n => n.trim());
+                    palpitesHTML += `
+                        <div style="margin-bottom: 20px; padding: 12px; border-left: 4px solid #8b5cf6; background: #f8fafc; border-radius: 8px; page-break-inside: avoid;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span style="font-weight: bold; font-size: 13px;">${idx+1}. ${p.loteria}</span>
+                                <span style="font-size: 9px; color: #666;">${p.data || 'Data não informada'}</span>
+                            </div>
+                            <div style="font-family: Arial; font-size: 12px; color: #3b82f6; margin-top: 5px;">
+                                Números: ${numerosArray.map(n => `<strong>${n}</strong>`).join(' • ')}
+                            </div>
+                            ${p.config ? `<div style="font-size: 9px; color: #888; margin-top: 8px; border-top: 1px solid #eee; padding-top: 5px;">⚙️ ${p.config}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                divPDF.innerHTML = `
+                    <div>
+                        <div style="text-align: center; border-bottom: 3px solid #8b5cf6; padding-bottom: 20px; margin-bottom: 25px;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 10px;">
+                                ${logoHtml}
+                                <h1 style="font-size: 28px; color: #8b5cf6; margin: 0;">LOTERIAS IA</h1>
+                                ${logoHtml}
+                            </div>
+                            <p style="font-size: 11px; color: #666;">Sistema Profissional de Loterias com IA Real</p>
+                            <p style="font-size: 10px; color: #999;">Versão 6.1 PRO</p>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, #f8fafc, #e2e8f0); border: 2px solid #8b5cf6; padding: 18px; border-radius: 14px; margin-bottom: 25px;">
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8b5cf6, #06b6d4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; overflow: hidden;">
+                                    ${usuario.foto ? `<img src="${usuario.foto}" style="width:100%; height:100%; object-fit:cover;">` : '👤'}
+                                </div>
+                                <div>
+                                    <div style="font-size: 20px; font-weight: bold; color: #111827;">${usuario.nome || 'Usuário'}</div>
+                                    <div style="font-size: 12px; color: #374151;">${usuario.email || 'Email não informado'}</div>
+                                </div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11px; color: #334155;">
+                                <div><strong>Data da Exportação:</strong><br>${dataFormatada}</div>
+                                <div><strong>Total de Palpites:</strong><br>${palpites.length}</div>
+                                <div><strong>Sistema:</strong><br>Loterias IA V6.1 PRO</div>
+                                <div><strong>Status:</strong><br>⭐ Plano PRO</div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="color: #8b5cf6; font-size: 16px; margin-bottom: 15px;">📜 PALPITES SELECIONADOS</h3>
+                        ${palpitesHTML}
+                        
+                        <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc; font-size: 8px; color: #999;">
+                            Documento gerado por Loterias IA - ${dataFormatada}
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(divPDF);
+                await new Promise(r => setTimeout(r, 100));
+                
+                if (typeof html2canvas === 'undefined') {
+                    throw new Error('Biblioteca html2canvas não carregada');
+                }
+                
+                const canvas = await html2canvas(divPDF, {
+                    scale: 2.5,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: false
+                });
+                
+                document.body.removeChild(divPDF);
+                
+                const { jsPDF } = window.jspdf;
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                let heightLeft = imgHeight;
+                let position = 0;
+                while (heightLeft > pageHeight) {
+                    position = heightLeft - pageHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                doc.save(`palpites_loterias_ia_${Date.now()}.pdf`);
+                mostrarToast(`${palpites.length} palpites exportados com sucesso!`, 'success');
+                
+            } catch (error) {
+                console.error('Erro detalhado:', error);
+                alert('Erro ao gerar PDF: ' + error.message);
+            } finally {
+                exportandoPDF = false;
+            }
+        }
+        
+        function aguardarSupabase() {
+            return new Promise((resolve) => {
+                if (window.supabaseClient) { resolve(); return; }
+                const checkInterval = setInterval(() => {
+                    if (window.supabaseClient) { clearInterval(checkInterval); resolve(); }
+                }, 100);
+                setTimeout(() => { clearInterval(checkInterval); resolve(); }, 5000);
+            });
+        }
+        
+        async function carregarPerfil() {
+            await aguardarSupabase();
+            
+            const storedUser = sessionStorage.getItem('perfil_usuario');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    usuario = userData;
+                    creditos = userData.creditos || 0;
+                    isUserPro = userData.isPro || false;
+                    proExpiresAt = userData.proExpiresAt || null;
+                    console.log('✅ Dados carregados do sessionStorage:', usuario.email, 'PRO:', isUserPro);
+                    sessionStorage.removeItem('perfil_usuario');
+                    await carregarDadosCompletos();
+                    return;
+                } catch(e) { console.error('Erro:', e); }
+            }
+            
+            const auth = firebase.auth();
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    console.log('✅ Usuário autenticado:', user.email);
+                    usuario = { uid: user.uid, nome: user.displayName || user.email?.split('@')[0] || 'Usuário', email: user.email, foto: user.photoURL };
+                    
+                    try {
+                        const { data, error } = await window.supabaseClient.rpc('get_pro_status', { user_uid: usuario.uid });
+                        if (!error && data && data.length > 0) {
+                            isUserPro = data[0].is_pro || false;
+                            proExpiresAt = data[0].expira_em;
+                        }
+                    } catch(e) { console.error('Erro status PRO:', e); }
+                    
+                    await carregarCreditosDoBanco();
+                    await carregarDadosCompletos();
+                } else {
+                    document.getElementById('perfilContent').innerHTML = `
+                        <div class="empty-message">
+                            <h3>🔐 Você não está logado!</h3>
+                            <p>Faça login no sistema para acessar seu perfil.</p>
+                            <button class="btn-voltar" style="margin-top:15px;" onclick="window.location.href='index.html'">Ir para o sistema</button>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        async function carregarCreditosDoBanco() {
+            if (!window.supabaseClient || !usuario) return;
+            try {
+                const { data, error } = await window.supabaseClient.from('usuarios').select('creditos').eq('uid', usuario.uid).maybeSingle();
+                if (error) throw error;
+                if (data) creditos = data.creditos;
+            } catch(e) { console.error('Erro créditos:', e); }
+        }
+        
+        async function carregarDadosCompletos() {
+            if (!window.supabaseClient || !usuario) {
+                document.getElementById('perfilContent').innerHTML = `<div class="empty-message"><h3>⚠️ Erro de conexão</h3><button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button></div>`;
+                return;
+            }
+            
+            console.log('📡 Buscando dados para:', usuario.uid);
+            
+            const { data: historico, error: histError } = await window.supabaseClient
+                .from('historico_palpites')
+                .select('*')
+                .eq('usuario_uid', usuario.uid)
+                .order('data', { ascending: false })
+                .limit(50);
+            
+            if (histError) console.error('Erro histórico:', histError);
+            console.log(`📜 Histórico: ${historico?.length || 0} registros`);
+            
+            const { data: transacoes, error: transError } = await window.supabaseClient
+                .from('transacoes')
+                .select('*')
+                .eq('usuario_uid', usuario.uid)
+                .order('data', { ascending: false })
+                .limit(30);
+            
+            if (transError) console.error('Erro transações:', transError);
+            console.log(`💰 Transações: ${transacoes?.length || 0} registros`);
+            
+            renderizarPerfil(historico || [], transacoes || []);
+        }
+        
+        function renderizarPerfil(historico, transacoes) {
+            const avatarHtml = usuario.foto 
+                ? `<img src="${usuario.foto}" alt="Avatar" onerror="this.parentElement.innerHTML='👤'">`
+                : '👤';
+            
+            let historicoHtml = '';
+            let totalJogosIndividuais = 0;
+            
+            if (historico.length === 0) {
+                historicoHtml = '<div class="empty-message">Nenhum palpite gerado ainda. Gere alguns no sistema!</div>';
+            } else {
+                historicoHtml = `<div class="scroll-area">`;
+                historico.forEach((item, itemIdx) => {
+                    const ehDiaDaSorte = item.loteria === 'Dia de Sorte' || item.loteria === 'diadesorte';
+                    const temMeses = item.meses && Array.isArray(item.meses) && item.meses.length > 0;
+                    const jogosArray = item.jogos || [];
+                    const dataJogo = item.data ? new Date(item.data).toLocaleString() : 'Data desconhecida';
+                    
+                    jogosArray.forEach((jogo, jogoIdx) => {
+                        totalJogosIndividuais++;
+                        const mesNumero = temMeses ? item.meses[jogoIdx] : null;
+                        const mesNome = mesNumero ? getNomeMes(mesNumero) : null;
+                        const numerosDisplay = Array.isArray(jogo) ? jogo.join(', ') : jogo;
+                        
+                        let configDisplay = '';
+                        const filtrosTexto = item.filtros || '';
+                        if (filtrosTexto) {
+                            if (isUserPro) {
+                                configDisplay = `<div class="config-texto">⚙️ Configurações: ${filtrosTexto}</div>`;
+                            } else {
+                                configDisplay = `<div class="config-texto">⚙️ Configurações: ${mascararConfiguracoes(filtrosTexto)}</div>`;
+                            }
+                        }
+                        
+                        historicoHtml += `
+                            <div class="historico-item">
+                                <div class="historico-header">
+                                    <span class="historico-loteria">${item.loteria || 'Loteria'} - Jogo ${jogoIdx + 1}</span>
+                                    <span class="historico-data">${dataJogo}</span>
+                                </div>
+                                <div class="historico-jogos">
+                                    Números: ${numerosDisplay}
+                                    ${ehDiaDaSorte && mesNome ? `<br>📅 Mês da Sorte: ${mesNome} (${formatarNumeroZero(mesNumero)})` : ''}
+                                    ${item.extras && !temMeses && !ehDiaDaSorte ? `<br>${item.extras}` : ''}
+                                </div>
+                                ${configDisplay}
+                                <div style="margin-top: 8px;">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" class="selecionar-jogo" data-idx="${itemIdx}" data-jogo="${jogoIdx}" onchange="toggleSelecao(${itemIdx}, ${jogoIdx})">
+                                        Selecionar para PDF
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+                historicoHtml += `</div>`;
+            }
+            
+            let transacoesHtml = '';
+            if (transacoes.length === 0) {
+                transacoesHtml = '<div class="empty-message">Nenhuma transação registrada</div>';
+            } else {
+                transacoesHtml = `
+                    <div class="scroll-area">
+                        <table class="transacoes-table">
+                            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Saldo</th></tr></thead>
+                            <tbody>
+                                ${transacoes.map(t => `
+                                    <tr>
+                                        <td>${t.data ? new Date(t.data).toLocaleDateString() : '-'}</td>
+                                        <td>${t.tipo === 'compra' ? 'Compra' : t.tipo === 'uso' ? 'Jogos' : t.tipo === 'pix_simulado' ? 'Teste' : t.tipo === 'pro_ativacao' ? '⭐ PRO' : t.tipo || '-'}</td>
+                                        <td class="${t.tipo === 'uso' ? 'debito' : 'credito'}">${t.tipo === 'uso' ? `- R$ ${t.quantidade || 0}` : `+ R$ ${t.quantidade || 0}`}</td>
+                                        <td>R$ ${t.saldo_apos || 0}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            const totalCompras = transacoes.filter(t => t.tipo === 'compra' || t.tipo === 'pix_simulado' || t.tipo === 'pro_ativacao').length;
+            
+            const proBadgeHtml = isUserPro ? '<span class="pro-badge">⭐ PRO</span>' : '<span class="pro-badge" style="background: #64748b;">🔓 Grátis</span>';
+            const proExpiresHtml = isUserPro && proExpiresAt ? `<div class="pro-expires">✨ Válido até ${new Date(proExpiresAt).toLocaleDateString()}</div>` : '';
+            
+            const btnPdfHtml = isUserPro 
+                ? '<button class="btn-exportar-pdf" onclick="exportarSelecionadosPDF()">📄 Exportar PDF</button>'
+                : '<button class="btn-exportar-pdf btn-exportar-pdf-bloqueado" onclick="mostrarToast(\'⭐ Esta funcionalidade é exclusiva para usuários PRO! Ative o plano PRO para exportar PDF.\', \'warning\')">🔒 Exportar PDF (PRO)</button>';
+            
+            const html = `
+                <div class="profile-grid">
+                    <div class="card card-full">
+                        <div class="perfil-header">
+                            <div class="avatar">${avatarHtml}</div>
+                            <div class="info">
+                                <h2>${usuario.nome || 'Usuário'} ${proBadgeHtml}</h2>
+                                ${proExpiresHtml}
+                                <p>${usuario.email || 'Email não disponível'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">SALDO</div>
+                        <div class="saldo-card"><strong>R$ ${creditos}</strong></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">ESTATÍSTICAS</div>
+                        <div class="stats-container">
+                            <div class="stats-number">${totalJogosIndividuais}</div>
+                            <div class="stats-label">Palpites gerados</div>
+                            <hr class="stats-divider">
+                            <div class="stats-number" style="color: #f59e0b;">${totalCompras}</div>
+                            <div class="stats-label">Compras realizadas</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <span>PALPITES</span>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span id="contadorSelecionados" style="font-size: 10px; color: var(--text-secondary);">0 selecionado(s)</span>
+                                <button class="btn-selecionar-todos" onclick="selecionarTodos()">Selecionar Todos</button>
+                                ${btnPdfHtml}
+                            </div>
+                        </div>
+                        ${historicoHtml}
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">TRANSAÇÕES</div>
+                        ${transacoesHtml}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('perfilContent').innerHTML = html;
+            jogosSelecionados.clear();
+            atualizarContadorSelecionados();
+        }
+        
+        window.toggleSelecao = toggleSelecao;
+        window.selecionarTodos = selecionarTodos;
+        window.exportarSelecionadosPDF = exportarSelecionadosPDF;
+        window.mostrarToast = mostrarToast;
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCA_FoID7Ch8LkcwK5TbQSK23lU7BxQMuE",
+            authDomain: "loteriasia.firebaseapp.com",
+            projectId: "loteriasia",
+            storageBucket: "loteriasia.firebasestorage.app",
+            messagingSenderId: "124650527048",
+            appId: "1:124650527048:web:bc335922cb9e1586c3fb7d"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        carregarPerfil();
+    </script>
+</body>
+</html>
